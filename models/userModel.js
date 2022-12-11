@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema(
   {
     googleId: {
       type: String,
-      required: true,
     },
     displayName: {
       type: String,
@@ -20,9 +19,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+      unique: true,
+      validate: [validator.isEmail, 'Please provide a valid email address'],
+      lowercase: true,
+      trim: true,
+    },
     image: {
       type: String,
     },
+
     password: {
       type: String,
       minLength: 8,

@@ -5,28 +5,35 @@ const AppError = require('../utils/appError');
 const bcrypt = require('bcryptjs');
 const catchAsync = require('../utils/catchAsync');
 
-exports.logOut = catchAsync(async (req, res, next) => {
-  req.logout();
-  req.session.destroy((error) => {
+exports.logOut = (req, res, next) => {
+  req.logout((error) => {
     if (error) {
-      return next(new AppError('Something Went Wrong', 500));
+      return next(error);
     }
-    res.redirect('/');
+    res.redirect('/users/login');
   });
-});
+};
 
 exports.createUser = (req, res, next) => {
   // get all the values
-  const { email, fullname, password, passwordConfirm } = req.body;
+  const { email, displayName, firstName, lastName, password, passwordConfirm } =
+    req.body;
   // check if the are empty
-  if (!email || !fullname || !password || !passwordConfirm) {
+  if (
+    !email ||
+    !displayName ||
+    !firstName ||
+    !lastName ||
+    !password ||
+    !passwordConfirm
+  ) {
     return next(new AppError('All fields are required', 400));
   } else {
     // validate email and username and password
     // skipping validation
     // check if a user exists
     User.findOne(
-      { $or: [{ email: email }, { fullname: fullname }] },
+      { $or: [{ email: email }, { displayName: displayName }] },
       function (err, data) {
         if (err) throw err;
         if (data) {
@@ -40,7 +47,9 @@ exports.createUser = (req, res, next) => {
               if (err) throw err;
               // save user in db
               User({
-                fullname: fullname,
+                displayName: displayName,
+                firstName: firstName,
+                lastName: lastName,
                 email: email,
                 password: hash,
                 passwordConfirm: hash,

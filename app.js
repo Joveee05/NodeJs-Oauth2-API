@@ -8,11 +8,46 @@ const passport = require('passport');
 const AppError = require('./utils/appError');
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
+const swaggerUI = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
 
 require('./utils/passport')(passport);
 
 const app = express();
 app.use(cors());
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Pisqre API',
+      version: '1.0.0',
+      description: 'A simple Express Library API',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/',
+      },
+    ],
+    // components: {
+    //   securitySchemes: {
+    //     bearerAuth: {
+    //       type: 'http',
+    //       scheme: 'bearer',
+    //       bearerFormat: 'OAuth',
+    //     },
+    //   },
+    // },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+};
+
+const specs = swaggerJsDoc(options);
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -46,5 +81,6 @@ app.get('/welcome', (req, res) => {
 
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 module.exports = app;
