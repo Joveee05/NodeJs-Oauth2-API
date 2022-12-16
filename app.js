@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const session = require('express-session');
 const passport = require('passport');
 const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
@@ -62,16 +63,8 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(
-  session({
-    secret: 'XYzABBBCdee1234',
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 app.get('/welcome', (req, res) => {
   res.json({
@@ -83,5 +76,11 @@ app.get('/welcome', (req, res) => {
 app.use('/api/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+app.use(globalErrorHandler);
 
 module.exports = app;

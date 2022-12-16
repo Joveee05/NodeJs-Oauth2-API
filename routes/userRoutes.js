@@ -4,11 +4,15 @@ const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 const router = express.Router();
 
-router.post('/signup', authController.createUser);
+router.post('/signup', authController.signup);
 
-router.post('/login', authController.logIn);
+router.post('/login', authController.login);
 
 router.get('/logout', authController.logOut);
+
+router.use(authController.protect);
+
+router.patch('/updateMyPassword', authController.updatePassword);
 
 router
   .route('/:id')
@@ -16,7 +20,7 @@ router
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
 
-router.get('/', authController.protect, userController.getAllUsers);
+router.get('/', userController.getAllUsers);
 
 /**
  * @swagger

@@ -31,7 +31,7 @@ const sendAccessToken = (user, statusCode, res) => {
   });
 };
 
-exports.logIn = catchAsync(async (req, res, next) => {
+exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -43,6 +43,8 @@ exports.logIn = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
   sendAccessToken(user, 200, res);
 });
 
@@ -57,43 +59,22 @@ exports.logOut = (req, res) => {
   });
 };
 
-exports.createUser = (req, res, next) => {
+exports.signup = catchAsync(async (req, res, next) => {
   const { email, fullName, firstName, lastName, password, passwordConfirm } =
     req.body;
-  if (
-    !email ||
-    !fullName ||
-    !firstName ||
-    !lastName ||
-    !password ||
-    !passwordConfirm
-  ) {
-    return next(new AppError('All fields are required', 400));
-  } else {
-    User.findOne(
-      { $or: [{ email: email }, { fullName: fullName }] },
-      async function (err, data) {
-        if (err) throw err;
-        if (data) {
-          return next(new AppError('User Exists, Try Logging In!', 403));
-        } else {
-          const user = new User({
-            googleId: null,
-            email,
-            fullName,
-            firstName,
-            lastName,
-            password,
-            passwordConfirm,
-            emailToken: crypto.randomBytes(64).toString('hex'),
-          });
-          const newUser = await user.save({ validateBeforeSave: false });
-          sendAccessToken(newUser, 201, res);
-        }
-      }
-    );
-  }
-};
+  const user = new User({
+    googleId: null,
+    email,
+    fullName,
+    firstName,
+    lastName,
+    password,
+    passwordConfirm,
+    emailToken: crypto.randomBytes(64).toString('hex'),
+  });
+  const newUser = await user.save({ validateBeforeSave: false });
+  sendAccessToken(newUser, 201, res);
+});
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -139,3 +120,15 @@ exports.restrictTo =
     }
     next();
   };
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+  if (!(await user.correctPassword(req.body.currentPassword, user.password))) {
+    return next(new AppError('Wrong Password. Try again', 401));
+  }
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  sendAccessToken(user, 200, res);
+});
