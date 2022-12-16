@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/signup', authController.createUser);
 
-router.get('/login', userController.logIn);
+router.post('/login', authController.logIn);
 
 router.get('/logout', authController.logOut);
 
@@ -16,7 +16,7 @@ router
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
 
-router.get('/', userController.getAllUsers);
+router.get('/', authController.protect, userController.getAllUsers);
 
 /**
  * @swagger

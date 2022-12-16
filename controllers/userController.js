@@ -3,12 +3,6 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-exports.logIn = (req, res) => {
-  res.render('login', {
-    layout: 'login',
-  });
-};
-
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const allUsers = await User.find();
   res.status(200).json({
@@ -48,6 +42,9 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 });
 
 exports.updateUser = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(new AppError('This route is not for password updates.', 400));
+  }
   const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,

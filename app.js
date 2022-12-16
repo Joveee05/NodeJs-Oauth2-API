@@ -2,12 +2,12 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const morgan = require('morgan');
-const exphbs = require('express-handlebars');
 const session = require('express-session');
 const passport = require('passport');
 const AppError = require('./utils/appError');
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
+const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
@@ -34,7 +34,7 @@ const options = {
     //     bearerAuth: {
     //       type: 'http',
     //       scheme: 'bearer',
-    //       bearerFormat: 'OAuth',
+    //       bearerFormat: 'JWT',
     //     },
     //   },
     // },
@@ -79,7 +79,7 @@ app.get('/welcome', (req, res) => {
   });
 });
 
-app.use('/users', userRouter);
+app.use('/api/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
