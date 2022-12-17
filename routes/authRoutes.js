@@ -15,4 +15,10 @@ router.get(
   }
 );
 
+router.get('/', (req, res) => {
+  res.render('login', {
+    layout: 'login',
+  });
+});
+
 module.exports = router;

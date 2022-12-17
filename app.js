@@ -63,8 +63,16 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(
+  session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.session());
 
 app.get('/welcome', (req, res) => {
   res.json({
