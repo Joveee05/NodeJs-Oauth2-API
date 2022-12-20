@@ -2,8 +2,15 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+const compression = require('compression');
 const session = require('express-session');
 const passport = require('passport');
+
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
@@ -16,6 +23,8 @@ require('./utils/passport')(passport);
 
 const app = express();
 app.use(cors());
+
+app.use(helmet());
 
 const options = {
   definition: {
@@ -30,15 +39,15 @@ const options = {
         url: 'http://localhost:3000/',
       },
     ],
-    // components: {
-    //   securitySchemes: {
-    //     bearerAuth: {
-    //       type: 'http',
-    //       scheme: 'bearer',
-    //       bearerFormat: 'JWT',
-    //     },
-    //   },
-    // },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
     security: [
       {
         bearerAuth: [],
@@ -63,6 +72,14 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests. Try again in an hour',
+});
+
+app.use('/api', limiter);
+
 app.use(
   session({
     secret: 'keyboard cat',
@@ -71,8 +88,12 @@ app.use(
   })
 );
 
+app.use(xss());
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(mongoSanitize());
 
 app.get('/welcome', (req, res) => {
   res.json({
@@ -80,6 +101,8 @@ app.get('/welcome', (req, res) => {
     Author: 'Brian Etaghene',
   });
 });
+
+app.use(compression());
 
 app.use('/api/users', userRouter);
 app.use('/auth', authRouter);
