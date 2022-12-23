@@ -180,7 +180,7 @@ router.get('/', userController.getAllUsers);
  *              schema:
  *                 $ref: '#/components/schemas/User'
  *              example:
- *                  displayName: Monica Jules
+ *                  fullName: Monica Jules
  *                  firstName: Monica
  *                  lastName: Jules
  *                  email: monica@example.com
