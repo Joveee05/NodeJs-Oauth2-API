@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const { nocache, generateAccessToken } = require('../controllers/agora');
 const authController = require('../controllers/authController');
 const router = express.Router();
 
@@ -20,5 +21,7 @@ router.get('/', (req, res) => {
     layout: 'login',
   });
 });
+
+router.get('/access_token', nocache, generateAccessToken);
 
 module.exports = router;
