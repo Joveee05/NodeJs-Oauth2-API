@@ -1,6 +1,7 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
 const User = require('../models/userModel');
+const crypto = require('crypto');
 
 module.exports = function (passport) {
   passport.use(
@@ -17,6 +18,7 @@ module.exports = function (passport) {
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
           image: profile.photos[0].value,
+          emailToken: crypto.randomBytes(64).toString('hex'),
         };
 
         try {
@@ -31,6 +33,7 @@ module.exports = function (passport) {
         } catch (err) {
           console.error(err);
         }
+        console.log(profile);
       }
     )
   );

@@ -82,7 +82,7 @@ app.use('/api', limiter);
 
 app.use(
   session({
-    secret: 'keyboard cat',
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
   })

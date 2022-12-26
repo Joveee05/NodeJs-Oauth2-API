@@ -18,6 +18,8 @@ router.use(authController.protect);
 
 router.get('/verify-email', authController.verifyEmail);
 
+router.patch('/updateMe', userController.updateMe);
+
 router.patch('/updateMyPassword', authController.updatePassword);
 
 router
