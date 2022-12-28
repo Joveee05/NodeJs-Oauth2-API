@@ -30,11 +30,14 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Pisqre API',
+      title: 'Pisqre Community API',
       version: '1.0.0',
-      description: 'A simple Express Library API',
+      description: 'The Pisqre API',
     },
     servers: [
+      {
+        url: 'http://localhost:3000/api',
+      },
       {
         url: 'http://localhost:3000/',
       },

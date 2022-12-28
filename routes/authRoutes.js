@@ -16,7 +16,13 @@ router.get(
   }
 );
 
-router.get('/', (req, res) => {
+router.get('/login', (req, res) => {
+  res.render('login', {
+    layout: 'login',
+  });
+});
+
+router.get('/signup', (req, res) => {
   res.render('login', {
     layout: 'login',
   });
