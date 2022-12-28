@@ -4,7 +4,10 @@ const { nocache, generateAccessToken } = require('../controllers/agora');
 const authController = require('../controllers/authController');
 const router = express.Router();
 
-router.get('/google', passport.authenticate('google', { scope: ['profile'] }));
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
 // @desc    Google auth callback
 // @route   GET /auth/google/callback

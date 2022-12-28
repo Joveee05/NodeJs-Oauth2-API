@@ -17,6 +17,7 @@ module.exports = function (passport) {
           fullName: profile.displayName,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
+          email: profile.emails[0].value,
           image: profile.photos[0].value,
           emailToken: crypto.randomBytes(64).toString('hex'),
         };
@@ -33,7 +34,6 @@ module.exports = function (passport) {
         } catch (err) {
           console.error(err);
         }
-        console.log(profile);
       }
     )
   );
