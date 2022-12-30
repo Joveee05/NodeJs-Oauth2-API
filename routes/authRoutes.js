@@ -9,8 +9,6 @@ router.get(
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-// @desc    Google auth callback
-// @route   GET /auth/google/callback
 router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
@@ -20,15 +18,11 @@ router.get(
 );
 
 router.get('/login', (req, res) => {
-  res.render('login', {
-    layout: 'login',
-  });
+  res.render('login');
 });
 
 router.get('/signup', (req, res) => {
-  res.render('login', {
-    layout: 'login',
-  });
+  res.render('login');
 });
 
 router.get('/access_token', nocache, generateAccessToken);
