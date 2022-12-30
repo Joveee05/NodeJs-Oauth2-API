@@ -98,13 +98,6 @@ app.use(passport.session());
 
 app.use(mongoSanitize());
 
-app.get('/welcome', (req, res) => {
-  res.json({
-    message: 'Hello, this is the Pisqre API',
-    Author: 'Brian Etaghene',
-  });
-});
-
 app.use(compression());
 
 app.use('/api/users', userRouter);

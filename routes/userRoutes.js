@@ -18,7 +18,12 @@ router.get('/verify-email', authController.verifyEmail);
 
 router.use(authController.protect);
 
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe
+);
 
 router.get('/me', userController.getMe, userController.getUser);
 
