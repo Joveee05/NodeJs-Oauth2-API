@@ -20,8 +20,8 @@ const getAccessToken = (user, res) => {
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
   res.cookie('jwt', token, cookieOptions);
-  return token
-}
+  return token;
+};
 
 router.get(
   '/google',
@@ -32,12 +32,12 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    const token = getAccessToken(req.user._id, res)
+    const token = getAccessToken(req.user._id, res);
     res.writeHead(302, {
-      'Location': 'http://localhost:4200/auth/google/'+token
+      Location: 'http://localhost:4200/auth/google/' + token,
     });
     res.end();
-   /*  res.status(200).json({
+    /*  res.status(200).json({
       status: 'success',
       data: req.user,
     }); */
