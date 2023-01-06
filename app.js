@@ -18,6 +18,7 @@ const authRouter = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const { questions, fileUpload, vote, answer } = require("./routes/index");
 
 require('./utils/passport')(passport);
 
@@ -100,6 +101,10 @@ app.use(mongoSanitize());
 
 app.use(compression());
 
+app.use('/api/questions', questions)
+app.use('/api/file', fileUpload)
+app.use('/api/vote', vote)
+app.use('/api/answers', answer)
 app.use('/api/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
