@@ -123,5 +123,5 @@ tutorSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-const User = mongoose.model('User', tutorSchema);
-module.exports = User;
+const Tutor = mongoose.model('Tutor', tutorSchema);
+module.exports = Tutor;

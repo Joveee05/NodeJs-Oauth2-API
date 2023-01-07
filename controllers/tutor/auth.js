@@ -27,7 +27,7 @@ const sendAccessToken = (user, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      tutor,
+      user,
     },
   });
 };
@@ -73,7 +73,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const tutorCheck = await Tutor.findOne({ email: req.body.email });
   if (tutorCheck) {
-    return next(new AppError('Tutor already exists', 403));
+    return next(new AppError('User already exists', 403));
   }
   const tutor = new Tutor({
     googleId: null,

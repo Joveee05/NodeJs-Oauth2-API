@@ -14,6 +14,7 @@ const passport = require('passport');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
+const tutorRouter = require('./routes/tutorRoutes');
 const authRouter = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
@@ -101,6 +102,7 @@ app.use(mongoSanitize());
 app.use(compression());
 
 app.use('/api/users', userRouter);
+app.use('/api/tutors', tutorRouter);
 app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
