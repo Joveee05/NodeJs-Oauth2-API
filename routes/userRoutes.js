@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.post('/signup', authController.signup);
 

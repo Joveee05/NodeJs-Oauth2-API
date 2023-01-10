@@ -1,6 +1,16 @@
 const express = require('express');
 const router = express.Router();
-let { findVote, addVote, removeVote, getVotesForUser, getVotesForObject, removeVotesForQuestion } = require('../controllers/voteController')
+const authController = require('../controllers/authController');
+let {
+  findVote,
+  addVote,
+  removeVote,
+  getVotesForUser,
+  getVotesForObject,
+  removeVotesForQuestion,
+} = require('../controllers/voteController');
+
+router.use(authController.protect);
 
 /**
  * @swagger
@@ -25,18 +35,18 @@ let { findVote, addVote, removeVote, getVotesForUser, getVotesForObject, removeV
  *       200:
  *         description: Successfully Voted
  */
-router.post ('/add', async (req, res) => {
-	const objectId = req.body.objectId;
-	const userId = req.body.userId;
-	const voteType = req.body.voteType;
-	const objectType = req.body.objectType;
+router.post('/add', async (req, res) => {
+  const objectId = req.body.objectId;
+  const userId = req.body.userId;
+  const voteType = req.body.voteType;
+  const objectType = req.body.objectType;
 
-	const response = await addVote(objectId, userId, voteType, objectType);
-	if (response.success == true) {
-        res.status(200).json(response);
-    } else {
-        res.status(404).json(response);
-    }
+  const response = await addVote(objectId, userId, voteType, objectType);
+  if (response.success == true) {
+    res.status(200).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 /**
@@ -58,16 +68,16 @@ router.post ('/add', async (req, res) => {
  *       200:
  *         description: Successfully deleted vote
  */
-router.delete ('/delete', async (req, res) => {
-	const objectId = req.body.objectId;
-	const userId = req.body.userId;
+router.delete('/delete', async (req, res) => {
+  const objectId = req.body.objectId;
+  const userId = req.body.userId;
 
-	const response = await removeVote(objectId, userId);
-	if (response.success == true) {
-        res.status(200).json(response);
-    } else {
-        res.status(404).json(response);
-    }
+  const response = await removeVote(objectId, userId);
+  if (response.success == true) {
+    res.status(200).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 /**
@@ -85,16 +95,16 @@ router.delete ('/delete', async (req, res) => {
  *       200:
  *         description: Successfully found Vote Information
  */
-router.get ('/user/:id', async (req, res) => {
-	const userId = req.params.id;
-	console.log (userId);
-	const response = await getVotesForUser(userId);
+router.get('/user/:id', async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId);
+  const response = await getVotesForUser(userId);
 
-	if (response.success == true) {
-		res.status(200).json(response);
-	} else {
-		res.status(404).json(response);
-	}
+  if (response.success == true) {
+    res.status(200).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 /**
@@ -112,17 +122,17 @@ router.get ('/user/:id', async (req, res) => {
  *       200:
  *         description: Successfully found Vote Information
  */
-router.get ('/object/:id', async (req, res) => {
-	console.log (req);
-	const objectId = req.params.id;
-	console.log (objectId);
-	const response = await getVotesForObject(objectId);
+router.get('/object/:id', async (req, res) => {
+  console.log(req);
+  const objectId = req.params.id;
+  console.log(objectId);
+  const response = await getVotesForObject(objectId);
 
-	if (response.success == true) {
-		res.status(200).json(response);
-	} else {
-		res.status(404).json(response);
-	}
+  if (response.success == true) {
+    res.status(200).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 module.exports = router;

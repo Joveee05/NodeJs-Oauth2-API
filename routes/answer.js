@@ -1,6 +1,16 @@
 const express = require('express');
+const authController = require('../controllers/authController');
 const router = express.Router();
-let {getAllAnswers, getAnswerById, addAnswer, removeAnswer, updateAnswer, getAnswerByOptions} = require('../controllers/answerController')
+let {
+  getAllAnswers,
+  getAnswerById,
+  addAnswer,
+  removeAnswer,
+  updateAnswer,
+  getAnswerByOptions,
+} = require('../controllers/answerController');
+
+router.use(authController.protect);
 
 //Add an answer
 /**
@@ -24,22 +34,22 @@ let {getAllAnswers, getAnswerById, addAnswer, removeAnswer, updateAnswer, getAns
  *       201:
  *         description: Created Answer
  */
-router.post ('/', async(req, res) => {
-    let body = {
-        userId: req.body.userId,
-        questionId: req.body.questionId,
-        answer: req.body.answer,
-        answerTimeStamp: new Date(),
-        answerModifiedTimeStamp: new Date(),
-    };
+router.post('/', async (req, res) => {
+  let body = {
+    userId: req.body.userId,
+    questionId: req.body.questionId,
+    answer: req.body.answer,
+    answerTimeStamp: new Date(),
+    answerModifiedTimeStamp: new Date(),
+  };
 
-    let response = await addAnswer(body);
+  let response = await addAnswer(body);
 
-    if (response.success == true) {
-        res.status(201).json(response);
-    } else {
-        res.status(404).json(response);
-    }
+  if (response.success == true) {
+    res.status(201).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 //update answer
@@ -65,14 +75,14 @@ router.post ('/', async(req, res) => {
  *       201:
  *         description: Updated Answer
  */
-router.patch ('/:id', async(req, res) => {
-	let response = await updateAnswer(req.params.id, req.body);
+router.patch('/:id', async (req, res) => {
+  let response = await updateAnswer(req.params.id, req.body);
 
-	if (response.success == true) {
-        res.status(201).json(response);
-    } else {
-        res.status(404).json(response);
-    }
+  if (response.success == true) {
+    res.status(201).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 //delete answer
@@ -91,14 +101,14 @@ router.patch ('/:id', async(req, res) => {
  *       200:
  *         description: Returns the requested answer
  */
-router.delete ('/:id', async(req, res) => {
-	let response = await removeAnswer(req.params.id)
-    try {
-        res.status(200).json(response);
-    } catch (err) {
-        res.status(500).json(response);
-    }
-})
+router.delete('/:id', async (req, res) => {
+  let response = await removeAnswer(req.params.id);
+  try {
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json(response);
+  }
+});
 
 //Return all answers
 /**
@@ -110,13 +120,17 @@ router.delete ('/:id', async(req, res) => {
  *       200:
  *         description: Returns all the answers
  */
-router.get ('/', async(req, res) => {
-	let response = await getAllAnswers(req.query.s, req.query.page, req.query.limit);
-    if (response.success == true) {
-        res.status(200).json(response);
-    } else {
-        res.status(404).json(response);
-    }
+router.get('/', async (req, res) => {
+  let response = await getAllAnswers(
+    req.query.s,
+    req.query.page,
+    req.query.limit
+  );
+  if (response.success == true) {
+    res.status(200).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 //Return ans by id
@@ -135,9 +149,9 @@ router.get ('/', async(req, res) => {
  *       200:
  *         description: Returns the requested answer
  */
-router.get ('/:id', async(req, res) => {
-	let response = await getAnswerById(req.params.id);
-    res.json(response);
+router.get('/:id', async (req, res) => {
+  let response = await getAnswerById(req.params.id);
+  res.json(response);
 });
 
 /**
@@ -155,10 +169,10 @@ router.get ('/:id', async(req, res) => {
  *       200:
  *         description: Returns the requested answers
  */
-router.get ('/user/:id', async(req, res) => {
-	let response = await getAnswerByOptions({userId: req.params.id});
-	res.json (response);
-})
+router.get('/user/:id', async (req, res) => {
+  let response = await getAnswerByOptions({ userId: req.params.id });
+  res.json(response);
+});
 
 /**
  * @swagger
@@ -175,9 +189,9 @@ router.get ('/user/:id', async(req, res) => {
  *       200:
  *         description: Returns the requested answers
  */
-router.get ('/question/:id', async(req, res) => {
-	let response = await getAnswerByOptions({questionId: req.params.id});
-	res.json (response);
-})
+router.get('/question/:id', async (req, res) => {
+  let response = await getAnswerByOptions({ questionId: req.params.id });
+  res.json(response);
+});
 
 module.exports = router;

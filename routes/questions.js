@@ -1,6 +1,7 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const mongoose = require('mongoose');
+const authController = require('../controllers/authController');
 const Question = require('../models/questions');
 let {
   getAllQuestions,
@@ -9,6 +10,26 @@ let {
   updateQuestion,
   removeQuestion,
 } = require('../controllers/questionController');
+const AppError = require('../utils/appError');
+
+router.use(authController.protect);
+
+router.get('/myQuestions', async (req, res, next) => {
+  const getMyQuestions = await Question.find({ user: req.user.id }).populate(
+    'user'
+  );
+
+  if (getMyQuestions.length < 1) {
+    return next(new AppError('Oops... No questions found!!', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    result: getMyQuestions.length,
+    data: {
+      getMyQuestions,
+    },
+  });
+});
 
 /**
  * @swagger
@@ -114,13 +135,12 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   let keywords = [];
   if (req.body.keywords) keywords = req.body.keywords;
+
   let body = {
-    userId: req.body.userId,
     questionBody: req.body.questionBody,
     title: req.body.title,
+    user: req.user.id,
     keywords: keywords,
-    askedTimeStamp: new Date(),
-    modifiedTimeStamp: new Date(),
   };
 
   let response = await addQuestion(body);

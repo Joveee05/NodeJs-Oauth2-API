@@ -1,4 +1,5 @@
 const Question = require('../models/questions');
+const User = require('../models/userModel');
 const help = require('./utility.js');
 
 async function getAllQuestions(search) {
@@ -14,7 +15,7 @@ async function getAllQuestions(search) {
     };
   }
   try {
-    const question = await Question.find(options);
+    const question = await Question.find(options).sort('-createdAt');
     return {
       success: true,
       data: question,
