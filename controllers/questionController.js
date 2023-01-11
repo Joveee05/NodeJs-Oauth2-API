@@ -15,7 +15,10 @@ async function getAllQuestions(search) {
     };
   }
   try {
-    const question = await Question.find(options).sort('-createdAt');
+    const question = await Question.find(options)
+      .populate('answeredBy')
+      .sort('-createdAt');
+
     return {
       success: true,
       data: question,
@@ -28,7 +31,7 @@ async function getAllQuestions(search) {
 async function getQuestionById(id) {
   let question;
   try {
-    question = await Question.findById(id);
+    question = await Question.findById(id).populate('answeredBy');
     if (question == null) {
       return { success: false, message: 'Cannot find question' };
     }

@@ -19,6 +19,11 @@ const questionPageSchema = new Schema(
       type: Number,
       default: 0,
     },
+    answeredBy: [
+      {
+        type: mongoose.Schema.Types.Mixed,
+      },
+    ],
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
@@ -38,8 +43,8 @@ const questionPageSchema = new Schema(
 
 questionPageSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'user',
-    select: 'firstName image',
+    path: 'user answeredBy',
+    select: 'firstName fullName image',
   });
   next();
 });

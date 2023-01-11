@@ -1,6 +1,8 @@
 const express = require('express');
 const authController = require('../controllers/authController');
+const Answer = require('../models/answer');
 const router = express.Router();
+const AppError = require('../utils/appError');
 let {
   getAllAnswers,
   getAnswerById,
@@ -9,8 +11,27 @@ let {
   updateAnswer,
   getAnswerByOptions,
 } = require('../controllers/answerController');
+const AnswerSchema = require('../models/answer');
+const QuestionPageSchema = require('../models/questions');
 
 router.use(authController.protect);
+
+router.get('/myAnswers', async (req, res, next) => {
+  const getMyAnswers = await Answer.find({ answeredBy: req.user.id })
+    .populate('answeredBy')
+    .sort('-answerTimeStamp');
+
+  if (getMyAnswers.length < 1) {
+    return next(new AppError('Oops... No answers found!!', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    result: getMyAnswers.length,
+    data: {
+      getMyAnswers,
+    },
+  });
+});
 
 //Add an answer
 /**
@@ -34,16 +55,26 @@ router.use(authController.protect);
  *       201:
  *         description: Created Answer
  */
-router.post('/', async (req, res) => {
+router.post('/:questionId', async (req, res) => {
+  const questionId = req.params.questionId;
   let body = {
-    userId: req.body.userId,
-    questionId: req.body.questionId,
+    answeredBy: req.user.id,
     answer: req.body.answer,
     answerTimeStamp: new Date(),
     answerModifiedTimeStamp: new Date(),
   };
 
-  let response = await addAnswer(body);
+  const response = await addAnswer(body).then(
+    await QuestionPageSchema.findByIdAndUpdate(questionId, {
+      $push: {
+        answeredBy: {
+          user: req.user.fullName,
+          image: req.user.image,
+          answer: req.body.answer,
+        },
+      },
+    })
+  );
 
   if (response.success == true) {
     res.status(201).json(response);
