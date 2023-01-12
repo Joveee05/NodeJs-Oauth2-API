@@ -25,9 +25,7 @@ router.get('/myQuestions', async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     result: getMyQuestions.length,
-    data: {
-      getMyQuestions,
-    },
+    data: getMyQuestions,
   });
 });
 
@@ -56,10 +54,9 @@ router.get('/search', async (req, res, next) => {
   });
 
   if (data.length < 1) {
-    res.status(404).json({
-      status: 'failed',
-      message: 'Oops... No question found. Try searching again.',
-    });
+    return next(
+      new AppError('Oops... No question found. Try searching again.', 404)
+    );
   } else {
     res.status(200).json({
       status: 'success',
@@ -182,7 +179,7 @@ router.post('/', async (req, res) => {
  *         description: Created
  */
 router.patch('/:id', async (req, res) => {
-  let response = await updateQuestion(req.params.id, req.body);
+  let response = await updateQuestion(req.params.id, req.body, { new: true });
 
   if (response.success == true) {
     res.status(201).json(response);

@@ -7,6 +7,11 @@ const questionPageSchema = new Schema(
       type: Number,
       default: 0,
     },
+
+    answers: {
+      type: Number,
+      default: 0,
+    },
     title: {
       type: String,
       required: true,

@@ -10,6 +10,10 @@ const answerSchema = new Schema({
     type: String,
     required: true,
   },
+  question: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'QuestionPageSchema',
+  },
   answerTimeStamp: {
     type: Date,
     required: true,
@@ -30,8 +34,8 @@ const answerSchema = new Schema({
 
 answerSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'answeredBy',
-    select: 'firstName fullName image',
+    path: 'answeredBy question',
+    select: 'firstName fullName image title',
   });
   next();
 });

@@ -19,6 +19,7 @@ router.use(authController.protect);
 router.get('/myAnswers', async (req, res, next) => {
   const getMyAnswers = await Answer.find({ answeredBy: req.user.id })
     .populate('answeredBy')
+    .populate('question')
     .sort('-answerTimeStamp');
 
   if (getMyAnswers.length < 1) {
@@ -27,9 +28,7 @@ router.get('/myAnswers', async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     result: getMyAnswers.length,
-    data: {
-      getMyAnswers,
-    },
+    data: getMyAnswers,
   });
 });
 
@@ -59,6 +58,7 @@ router.post('/:questionId', async (req, res) => {
   const questionId = req.params.questionId;
   let body = {
     answeredBy: req.user.id,
+    question: questionId,
     answer: req.body.answer,
     answerTimeStamp: new Date(),
     answerModifiedTimeStamp: new Date(),
@@ -77,6 +77,9 @@ router.post('/:questionId', async (req, res) => {
   );
 
   if (response.success == true) {
+    await QuestionPageSchema.findByIdAndUpdate(questionId, {
+      $inc: { answers: 1 },
+    });
     res.status(201).json(response);
   } else {
     res.status(404).json(response);
