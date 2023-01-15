@@ -14,6 +14,26 @@ let {
 const AnswerSchema = require('../models/answer');
 const QuestionPageSchema = require('../models/questions');
 
+/**
+ * @swagger
+ * /answers/question/{id}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The question ID.
+ *     description: Get all answers for particular question
+ *     responses:
+ *       200:
+ *         description: Returns the requested answers
+ */
+router.get('/question/:id', async (req, res, next) => {
+  let response = await getAnswerByOptions({ question: req.params.id });
+  res.json(response);
+});
+
 router.use(authController.protect);
 
 router.get('/myAnswers', async (req, res, next) => {
@@ -207,29 +227,5 @@ router.get('/user/:id', async (req, res) => {
   let response = await getAnswerByOptions({ userId: req.params.id });
   res.json(response);
 });
-
-/**
- * @swagger
- * /answers/question/{id}:
- *   get:
- *     parameters:
- *      - in: path
- *        name: id
- *        required: true
- *        type: string
- *        description: The question ID.
- *     description: Get all answers for particular question
- *     responses:
- *       200:
- *         description: Returns the requested answers
- */
-router.get(
-  '/question/:id',
-  authController.isLoggedIn,
-  async (req, res, next) => {
-    let response = await getAnswerByOptions({ question: req.params.id });
-    res.json(response);
-  }
-);
 
 module.exports = router;
