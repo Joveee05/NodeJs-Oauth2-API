@@ -78,7 +78,6 @@ async function updateQuesVote(question) {
 
 async function addQuestion(body) {
   const question = new Question(body);
-  console.log(question);
 
   try {
     const newQuestion = await question.save();
@@ -93,31 +92,27 @@ async function addQuestion(body) {
 }
 
 async function updateQuestion(id, ques) {
-  console.log('Entered');
   let question;
   try {
-    question = await Question.findById(id);
+    question = await Question.findByIdAndUpdate(id, { new: true });
     if (question == null) {
       return { success: false, message: 'Cannot find question' };
     }
-    console.log(question);
+
     if (ques.title) {
-      console.log(ques.title);
       question.title = ques.title;
     }
     if (ques.questionBody) {
-      console.log(ques.questionBody);
       question.questionBody = ques.questionBody;
     }
     if (ques.keywords) {
-      console.log(ques.keywords);
-      question.keywords = question.keywords.concat(ques.keywords);
+      question.keywords = ques.keywords;
     }
     question.modifiedTimeStamp = new Date();
-    console.log(question);
+
     try {
       const updatedQuestion = await question.save();
-      console.log(updatedQuestion);
+
       return {
         success: true,
         data: updatedQuestion,

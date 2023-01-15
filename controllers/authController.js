@@ -124,16 +124,41 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.restrictTo =
-  (...roles) =>
-  (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return next(
-        new AppError('You do not have permission to perform this action.', 403)
+// exports.restrictTo =
+//   (...roles) =>
+//   (req, res, next) => {
+//     if (!roles.includes(req.user.role)) {
+//       return next(
+//         new AppError('You do not have permission to perform this action.', 403)
+//       );
+//     }
+//     next();
+//   };
+
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
       );
+
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
     }
-    next();
-  };
+  }
+  next();
+};
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');

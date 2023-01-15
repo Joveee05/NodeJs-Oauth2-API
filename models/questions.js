@@ -35,10 +35,11 @@ const questionPageSchema = new Schema(
       required: [true, 'A question must belong to a user.'],
     },
 
-    keywords: {
-      type: [String],
-      defaut: [],
-    },
+    keywords: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     versionKey: false,

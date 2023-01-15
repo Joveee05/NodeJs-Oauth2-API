@@ -223,9 +223,13 @@ router.get('/user/:id', async (req, res) => {
  *       200:
  *         description: Returns the requested answers
  */
-router.get('/question/:id', async (req, res) => {
-  let response = await getAnswerByOptions({ questionId: req.params.id });
-  res.json(response);
-});
+router.get(
+  '/question/:id',
+  authController.isLoggedIn,
+  async (req, res, next) => {
+    let response = await getAnswerByOptions({ question: req.params.id });
+    res.json(response);
+  }
+);
 
 module.exports = router;

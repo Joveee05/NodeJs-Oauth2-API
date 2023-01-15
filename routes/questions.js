@@ -12,23 +12,6 @@ let {
 } = require('../controllers/questionController');
 const AppError = require('../utils/appError');
 
-router.use(authController.protect);
-
-router.get('/myQuestions', async (req, res, next) => {
-  const getMyQuestions = await Question.find({ user: req.user.id }).populate(
-    'user'
-  );
-
-  if (getMyQuestions.length < 1) {
-    return next(new AppError('Oops... No questions found!!', 404));
-  }
-  res.status(200).json({
-    status: 'success',
-    result: getMyQuestions.length,
-    data: getMyQuestions,
-  });
-});
-
 /**
  * @swagger
  * /questions/search:
@@ -84,6 +67,23 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.use(authController.protect);
+
+router.get('/myQuestions', async (req, res, next) => {
+  const getMyQuestions = await Question.find({ user: req.user.id }).populate(
+    'user'
+  );
+
+  if (getMyQuestions.length < 1) {
+    return next(new AppError('Oops... No questions found!!', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    result: getMyQuestions.length,
+    data: getMyQuestions,
+  });
+});
+
 /**
  * @swagger
  * /questions/{id}:
@@ -99,7 +99,7 @@ router.get('/', async (req, res) => {
  *       200:
  *         description: Returns the requested questions
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', authController.isLoggedIn, async (req, res) => {
   let response = await getQuestionById(req.params.id);
   res.json(response);
 });
@@ -137,7 +137,7 @@ router.post('/', async (req, res) => {
     questionBody: req.body.questionBody,
     title: req.body.title,
     user: req.user.id,
-    keywords: keywords,
+    keywords: { id: keywords },
   };
 
   let response = await addQuestion(body);
@@ -179,7 +179,7 @@ router.post('/', async (req, res) => {
  *         description: Created
  */
 router.patch('/:id', async (req, res) => {
-  let response = await updateQuestion(req.params.id, req.body, { new: true });
+  let response = await updateQuestion(req.params.id, req.body);
 
   if (response.success == true) {
     res.status(201).json(response);

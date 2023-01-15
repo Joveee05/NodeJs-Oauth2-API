@@ -117,11 +117,17 @@ async function removeAnswer(id) {
 
 async function getAnswerByOptions(option) {
   try {
-    answer = await Answer.find(option).populate('answeredBy');
-    return {
-      success: true,
-      message: answer,
-    };
+    answer = await Answer.find(option);
+    if (answer.length < 1) {
+      return {
+        message: 'No answers found',
+      };
+    } else {
+      return {
+        success: true,
+        message: answer,
+      };
+    }
   } catch (err) {
     return {
       success: false,
