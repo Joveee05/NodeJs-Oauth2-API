@@ -40,6 +40,10 @@ const tutorSchema = new mongoose.Schema(
       type: String,
       default: 'tutor',
     },
+    topics: {
+      type: String,
+      required: [true, 'A tutor must have topics'],
+    },
     password: {
       type: String,
       minLength: 8,

@@ -54,6 +54,23 @@ exports.getAllTutors = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.findTutor = catchAsync(async (req, res, next) => {
+  const tutor = await Tutor.find({
+    $or: [{ topics: { $regex: req.body.topics } }],
+  });
+  if (tutor.length < 1) {
+    return next(
+      new AppError('Oops... No tutor found. Try searching again.', 404)
+    );
+  } else {
+    res.status(200).json({
+      status: 'success',
+      result: tutor.length,
+      tutor,
+    });
+  }
+});
+
 exports.getTutor = catchAsync(async (req, res, next) => {
   const tutor = await Tutor.findById(req.params.id);
   if (!tutor) {

@@ -13,6 +13,10 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       enum: ['30minutes', '1hour'],
     },
+    tutor: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Tutor',
+    },
     time: {
       type: String,
       enum: [''],
@@ -34,7 +38,7 @@ const bookingSchema = new mongoose.Schema(
 
 bookingSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'bookedBy',
+    path: 'bookedBy tutor',
     select: 'fullName image',
   });
   next();
