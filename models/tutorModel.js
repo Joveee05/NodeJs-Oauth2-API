@@ -40,7 +40,7 @@ const tutorSchema = new mongoose.Schema(
       type: String,
       default: 'tutor',
     },
-    topics: {
+    topic: {
       type: String,
       required: [true, 'A tutor must have topics'],
     },

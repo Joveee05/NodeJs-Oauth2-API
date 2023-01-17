@@ -8,7 +8,7 @@ exports.bookSession = catchAsync(async (req, res, next) => {
     courseName: req.body.courseName,
     topic: req.body.topic,
     duration: req.body.duration,
-    tutor: req.body.tutorId,
+    tutor: req.params.tutorId,
     user: req.user.id,
     time: req.body.time,
     day: req.body.day,
