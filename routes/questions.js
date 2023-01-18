@@ -137,7 +137,7 @@ router.post('/', async (req, res) => {
     questionBody: req.body.questionBody,
     title: req.body.title,
     user: req.user.id,
-    keywords: { id: keywords },
+    keywords: keywords,
   };
 
   let response = await addQuestion(body);

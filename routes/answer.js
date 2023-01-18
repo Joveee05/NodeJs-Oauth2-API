@@ -156,8 +156,14 @@ router.patch('/:id', async (req, res) => {
  *         description: Returns the requested answer
  */
 router.delete('/:id', async (req, res) => {
-  let response = await removeAnswer(req.params.id);
   try {
+    const questionId = req.body.questionId;
+    let response = await removeAnswer(req.params.id);
+    if (response.success == true) {
+      await QuestionPageSchema.findByIdAndUpdate(questionId, {
+        $inc: { answers: -1 },
+      });
+    }
     res.status(200).json(response);
   } catch (err) {
     res.status(500).json(response);
