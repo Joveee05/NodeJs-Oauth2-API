@@ -11,7 +11,7 @@ const bookingSchema = new mongoose.Schema(
     },
     duration: {
       type: String,
-      enum: ['30minutes', '1hour'],
+      enum: ['1hour', '2hours'],
     },
     tutor: {
       type: mongoose.Schema.ObjectId,
@@ -19,7 +19,6 @@ const bookingSchema = new mongoose.Schema(
     },
     time: {
       type: String,
-      enum: [''],
     },
     bookedBy: {
       type: mongoose.Schema.ObjectId,
