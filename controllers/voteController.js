@@ -79,14 +79,14 @@ async function updateAnswerVote(objectId, value) {
 
 async function addVote(objectId, userId, voteType, objectType) {
 	const ans = await findVote(objectId, userId);
-	console.log (ans)
 	if (ans.success == true) {
 		if (ans.data.voteType == voteType) {
-			console.log ("VoteTypeSame")
-			return {
+			/* return {
 				success: false,
 				message: "Already Voted",
-			};
+			}; */
+			let result = removeVote(objectId,userId)
+			return result;
 		} else {
 			ans.data.voteType = voteType;
 			msg = await updateVote(ans.data);
