@@ -7,7 +7,6 @@ let {
   removeVote,
   getVotesForUser,
   getVotesForObject,
-  removeVotesForQuestion,
 } = require('../controllers/voteController');
 
 router.use(authController.protect);

@@ -89,7 +89,7 @@ router.get('/:id', async (req, res) => {
 
 router.use(authController.protect);
 
-router.get('/myQuestions', async (req, res, next) => {
+router.get('/me/myQuestions', async (req, res, next) => {
   const getMyQuestions = await Question.find({ user: req.user.id }).populate(
     'user'
   );
