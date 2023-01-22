@@ -1,15 +1,12 @@
 const express = require('express');
-const router = express.Router();
 const mongoose = require('mongoose');
-require('dotenv').config();
 const multer = require('multer');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const fs = require('fs');
-
+const router = express.Router();
+require('dotenv').config();
 //creating bucket
 let bucket;
-
-const multerStorage = multer.memoryStorage();
 
 mongoose.connection.on('connected', () => {
   var client = mongoose.connections[0].client;
@@ -17,11 +14,11 @@ mongoose.connection.on('connected', () => {
   bucket = new mongoose.mongo.GridFSBucket(db, {
     bucketName: 'questionFiles',
   });
-  //  console.log(bucket);
+  // console.log(bucket);
 });
 
 const storage = new GridFsStorage({
-  url: process.env.DATABASE,
+  url: process.env.MONGO_URI,
   file: (req, file) => {
     console.log(req.params.id);
     return new Promise((resolve, reject) => {
@@ -38,7 +35,7 @@ const storage = new GridFsStorage({
   },
 });
 
-const upload = multer(storage).single('uploadFile1');
+const upload = multer({ storage }).single('uploadFile1');
 
 /**
  * @swagger
@@ -69,7 +66,6 @@ router.post('/upload/:id', async (req, res) => {
     return res.status(200).send('File uploaded successfully');
   });
 });
-
 /**
  * @swagger
  * /file/info/{id}:
