@@ -61,29 +61,26 @@ exports.logOut = (req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const {
+  const body = {
     email,
     fullName,
     firstName,
     lastName,
     role,
+    university,
+    degree,
+    CV,
+    course,
     password,
     passwordConfirm,
-  } = req.body;
+  };
 
   const tutorCheck = await Tutor.findOne({ email: req.body.email });
   if (tutorCheck) {
     return next(new AppError('User already exists', 403));
   }
   const tutor = new Tutor({
-    googleId: null,
-    email,
-    fullName,
-    firstName,
-    lastName,
-    role,
-    password,
-    passwordConfirm,
+    body,
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
   const newTutor = await tutor.save({ validateBeforeSave: false });
