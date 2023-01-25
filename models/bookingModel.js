@@ -5,13 +5,19 @@ const bookingSchema = new mongoose.Schema(
   {
     courseName: {
       type: String,
+      required: [true, 'A user must provide a course'],
     },
     topic: {
       type: String,
+      required: [true, 'A user must provide a topic'],
     },
     duration: {
       type: String,
       enum: ['1hour', '2hours'],
+    },
+    sessionType: {
+      type: String,
+      enum: ['Live Session', 'Demo'],
     },
     tutor: {
       type: mongoose.Schema.ObjectId,
