@@ -9,7 +9,8 @@ exports.bookSession = catchAsync(async (req, res, next) => {
     topic: req.body.topic,
     duration: req.body.duration,
     tutor: req.params.tutorId,
-    user: req.user.id,
+    sessionType: req.body.sessionType,
+    bookedBy: req.user.id,
     time: req.body.time,
     day: req.body.day,
   };
