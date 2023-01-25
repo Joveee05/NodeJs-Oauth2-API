@@ -10,7 +10,7 @@ const tutorSchema = new mongoose.Schema(
     },
     fullName: {
       type: String,
-      required: true,
+      required: [true, 'A user must have a fullname'],
     },
     firstName: {
       type: String,
@@ -40,7 +40,19 @@ const tutorSchema = new mongoose.Schema(
       type: String,
       default: 'tutor',
     },
-    topic: {
+    CV: {
+      type: String,
+      required: [true, 'Please upload your CV'],
+    },
+    degree: {
+      type: String,
+      required: [true, 'A tutor must have a degree'],
+    },
+    university: {
+      type: String,
+      required: [true, 'A tutor must have attended a university'],
+    },
+    course: {
       type: String,
       required: [true, 'A tutor must have topics'],
     },
