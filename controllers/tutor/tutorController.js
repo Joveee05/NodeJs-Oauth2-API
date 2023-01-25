@@ -56,7 +56,7 @@ exports.getAllTutors = catchAsync(async (req, res, next) => {
 
 exports.findTutor = catchAsync(async (req, res, next) => {
   const tutor = await Tutor.find({
-    $or: [{ topics: { $regex: req.body.topics } }],
+    $or: [{ course: { $regex: req.body.course } }],
   });
   if (tutor.length < 1) {
     return next(
