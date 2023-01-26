@@ -16,6 +16,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const tutorRouter = require('./routes/tutorRoutes');
 const authRouter = require('./routes/authRoutes');
+const cvRouter = require('./routes/cvUpload');
 const bookingRouter = require('./routes/bookingRoutes');
 const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
@@ -103,6 +104,7 @@ app.use(mongoSanitize());
 app.use(compression());
 
 app.use('/api/users', userRouter);
+app.use('/api/cvs', cvRouter);
 app.use('/api/tutors', tutorRouter);
 app.use('/api/live_session', bookingRouter);
 app.use('/auth', authRouter);
