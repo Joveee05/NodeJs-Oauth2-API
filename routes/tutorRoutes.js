@@ -16,6 +16,8 @@ router.patch('/resetPassword/:token', auth.resetPassword);
 
 router.get('/verify-email', auth.verifyEmail);
 
+router.get('/verify-tutor/:id', tutorController.verifyTutor);
+
 router.use(auth.protect);
 
 router.patch(
