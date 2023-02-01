@@ -22,6 +22,11 @@ const tutorSchema = new mongoose.Schema(
     emailToken: {
       type: String,
     },
+    description: {
+      type: String,
+      required: true,
+      maxLength: 300,
+    },
     isVerified: {
       type: Boolean,
       default: false,
