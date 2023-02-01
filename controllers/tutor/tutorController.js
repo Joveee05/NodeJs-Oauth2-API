@@ -143,3 +143,18 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.verifyTutor = catchAsync(async (req, res, next) => {
+  const tutorId = req.params.id;
+  const tutor = await Tutor.findOne({ _id: tutorId });
+  if (tutor) {
+    tutor.adminVerified = true;
+    await tutor.save({ validateBeforeSave: false });
+    res.status(200).json({
+      status: 'success',
+      message: 'Tutor verification successful',
+    });
+  } else {
+    return next(new AppError('Tutor verification failed'));
+  }
+});
