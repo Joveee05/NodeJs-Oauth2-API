@@ -12,12 +12,6 @@ const tutorSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A user must have a fullname'],
     },
-    firstName: {
-      type: String,
-    },
-    lastName: {
-      type: String,
-    },
     email: {
       type: String,
       unique: true,
@@ -39,6 +33,10 @@ const tutorSchema = new mongoose.Schema(
     role: {
       type: String,
       default: 'tutor',
+    },
+    adminVerified: {
+      type: Boolean,
+      default: false,
     },
     CV: {
       type: String,
