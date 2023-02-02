@@ -1,5 +1,6 @@
 const Question = require('../models/questions');
 const User = require('../models/userModel');
+
 const help = require('./utility.js');
 
 async function getAllQuestions(search) {
@@ -58,7 +59,7 @@ async function updateView(question) {
     };
   } catch (err) {
     console.log(err);
-    return { sucess: false, message: 'Failed to update views' };
+    return { success: false, message: 'Failed to update views' };
   }
 }
 
