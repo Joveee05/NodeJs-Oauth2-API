@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const mongoose = require('mongoose');
 const authController = require('../controllers/authController');
+const APIFeatures = require('../utils/apiFeatures');
 const Question = require('../models/questions');
 let {
   getAllQuestions,
@@ -11,6 +12,27 @@ let {
   removeQuestion,
 } = require('../controllers/questionController');
 const AppError = require('../utils/appError');
+
+/**
+ * @swagger
+ * /questions/top_questions:
+ *   get:
+ *     description: All top questions with most answers
+ *     responses:
+ *       200:
+ *         description: Returns all the top questions
+ */
+
+router.get('/top_questions', async (req, res, next) => {
+  const topQuestion = await Question.find().sort('-answers');
+  res.status(200).json({
+    status: 'success',
+    results: topQuestion.length,
+    data: {
+      topQuestion,
+    },
+  });
+});
 
 /**
  * @swagger
@@ -59,12 +81,16 @@ router.get('/search', async (req, res, next) => {
  *         description: Returns all the questions
  */
 router.get('/', async (req, res) => {
-  let response = await getAllQuestions(req.query.page, req.query.limit);
-  if (response.success == true) {
-    res.status(200).json(response);
-  } else {
-    res.status(404).json(response);
-  }
+  const features = new APIFeatures(Question.find(), req.query).paginate();
+  const questions = await features.query;
+  // let response = await getAllQuestions(req.query.page, req.query.limit);
+  res.status(200).json({
+    status: 'success',
+    results: questions.length,
+    data: {
+      questions,
+    },
+  });
 });
 
 /**
@@ -90,16 +116,18 @@ router.get('/:id', async (req, res) => {
 router.use(authController.protect);
 
 router.get('/me/myQuestions', async (req, res, next) => {
-  const getMyQuestions = await Question.find({ user: req.user.id }).populate(
-    'user'
-  );
+  const features = new APIFeatures(
+    Question.find({ user: req.user.id }),
+    req.query
+  ).paginate();
+  const getMyQuestions = await features.query;
 
   if (getMyQuestions.length < 1) {
     return next(new AppError('Oops... No questions found!!', 404));
   }
   res.status(200).json({
     status: 'success',
-    result: getMyQuestions.length,
+    results: getMyQuestions.length,
     data: getMyQuestions,
   });
 });
