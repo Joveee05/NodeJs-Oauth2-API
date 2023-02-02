@@ -1,6 +1,7 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const Answer = require('../models/answer');
+const APIFeatures = require('../utils/apiFeatures');
 const router = express.Router();
 const AppError = require('../utils/appError');
 let {
@@ -37,10 +38,12 @@ router.get('/question/:id', async (req, res, next) => {
 router.use(authController.protect);
 
 router.get('/myAnswers', async (req, res, next) => {
-  const getMyAnswers = await Answer.find({ answeredBy: req.user.id })
-    .populate('answeredBy')
-    .populate('question')
-    .sort('-answerTimeStamp');
+  const features = new APIFeatures(
+    Answer.find({ answeredBy: req.user.id }),
+    req.query
+  ).paginate();
+  const getMyAnswers = await features.query;
+  // const getMyAnswers = await Answer.find({ answeredBy: req.user.id })
 
   if (getMyAnswers.length < 1) {
     return next(new AppError('Oops... No answers found!!', 404));
@@ -181,16 +184,15 @@ router.delete('/:id', async (req, res) => {
  *         description: Returns all the answers
  */
 router.get('/', async (req, res) => {
-  let response = await getAllAnswers(
-    req.query.s,
-    req.query.page,
-    req.query.limit
-  );
-  if (response.success == true) {
-    res.status(200).json(response);
-  } else {
-    res.status(404).json(response);
-  }
+  const features = new APIFeatures(Answer.find(), req.query).paginate();
+  const answers = await features.query;
+  res.status(200).json({
+    status: 'success',
+    results: answers.length,
+    data: {
+      answers,
+    },
+  });
 });
 
 //Return ans by id
