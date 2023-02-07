@@ -9,6 +9,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const compression = require('compression');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 
 const AppError = require('./utils/appError');
@@ -19,7 +20,9 @@ const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const { questions, fileUpload, vote, answer } = require('./routes/index');
+const dotenv = require('dotenv');
 
+dotenv.config({ path: './config.env' });
 require('./utils/passport')(passport);
 
 const app = express();
@@ -94,6 +97,7 @@ app.use('/api', limiter);
 app.use(
   session({
     secret: process.env.SECRET,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     resave: false,
     saveUninitialized: false,
   })
