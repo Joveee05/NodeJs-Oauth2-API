@@ -22,6 +22,18 @@ const tutorSchema = new mongoose.Schema(
     emailToken: {
       type: String,
     },
+    languageSpoken: {
+      type: String,
+    },
+    level: {
+      type: String,
+    },
+    countryOfOrigin: {
+      type: String,
+    },
+    phoneNumber: {
+      type: Number,
+    },
     description: {
       type: String,
       required: true,
