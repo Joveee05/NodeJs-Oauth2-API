@@ -3,20 +3,14 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const crypto = require('crypto');
 
-const userSchema = new mongoose.Schema(
+const tutorSchema = new mongoose.Schema(
   {
     googleId: {
       type: String,
     },
     fullName: {
       type: String,
-      required: true,
-    },
-    firstName: {
-      type: String,
-    },
-    lastName: {
-      type: String,
+      required: [true, 'A user must have a fullname'],
     },
     email: {
       type: String,
@@ -28,6 +22,11 @@ const userSchema = new mongoose.Schema(
     emailToken: {
       type: String,
     },
+    description: {
+      type: String,
+      required: true,
+      maxLength: 300,
+    },
     isVerified: {
       type: Boolean,
       default: false,
@@ -38,7 +37,27 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: 'student',
+      default: 'tutor',
+    },
+    adminVerified: {
+      type: Boolean,
+      default: false,
+    },
+    CV: {
+      type: String,
+      required: [true, 'Please upload your CV'],
+    },
+    degree: {
+      type: String,
+      required: [true, 'A tutor must have a degree'],
+    },
+    university: {
+      type: String,
+      required: [true, 'A tutor must have attended a university'],
+    },
+    course: {
+      type: String,
+      required: [true, 'A tutor must have topics'],
     },
     password: {
       type: String,
@@ -73,14 +92,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre('save', async function (next) {
+tutorSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
   next();
 });
 
-userSchema.pre('save', function (next) {
+tutorSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000;
@@ -88,16 +107,16 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-// userSchema.pre(/^find/, function (next) {
-//   this.find({ active: { $ne: false } });
-//   next();
-// });
+tutorSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
 
-userSchema.methods.correctPassword = async function (password) {
+tutorSchema.methods.correctPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+tutorSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
@@ -110,7 +129,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
-userSchema.methods.createPasswordResetToken = function () {
+tutorSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
 
   this.passwordResetToken = crypto
@@ -123,5 +142,5 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+const Tutor = mongoose.model('Tutor', tutorSchema);
+module.exports = Tutor;

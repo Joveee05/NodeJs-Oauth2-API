@@ -1,11 +1,11 @@
 const express = require('express');
-const User = require('../models/userModel');
+const Tutor = require('../../models/tutorModel');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const Email = require('../utils/email');
-const AppError = require('../utils/appError');
+const sendEmail = require('../../utils/email');
+const AppError = require('../../utils/appError');
 const crypto = require('crypto');
-const catchAsync = require('../utils/catchAsync');
+const catchAsync = require('../../utils/catchAsync');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -39,14 +39,14 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please enter email and password', 400));
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const tutor = await Tutor.findOne({ email }).select('+password');
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  if (!user || !(await tutor.correctPassword(password, tutor.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  sendAccessToken(user, 200, res);
+  tutor.passwordResetToken = undefined;
+  tutor.passwordResetExpires = undefined;
+  sendAccessToken(tutor, 200, res);
 });
 
 exports.logOut = (req, res) => {
@@ -61,37 +61,24 @@ exports.logOut = (req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const {
-    email,
-    fullName,
-    firstName,
-    lastName,
-    role,
-    password,
-    passwordConfirm,
-  } = req.body;
-
-  const userCheck = await User.findOne({ email: req.body.email });
-  if (userCheck) {
-    return next(new AppError('User already exists', 403));
+  const tutorCheck = await Tutor.findOne({ email: req.body.email });
+  if (tutorCheck) {
+    return next(new AppError('Tutor already exists', 403));
   }
-  const user = new User({
+  const tutor = new Tutor({
     googleId: null,
-    email,
-    fullName,
-    firstName,
-    lastName,
-    role,
-    password,
-    passwordConfirm,
+    email: req.body.email,
+    fullName: req.body.fullName,
+    university: req.body.university,
+    degree: req.body.degree,
+    CV: req.body.cv,
+    course: req.body.course,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
-  const newUser = await user.save({ validateBeforeSave: false });
-  const url = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/verify-email?token=${user.emailToken}`;
-  await new Email(newUser, url).sendWelcome();
-  sendAccessToken(newUser, 201, res);
+  const newTutor = await tutor.save({ validateBeforeSave: false });
+  sendAccessToken(newTutor, 201, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -111,47 +98,22 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  const currentUser = await User.findById(decoded.id);
-  if (!currentUser) {
-    return next(new AppError('This user no longer exists.', 401));
+  const currentTutor = await Tutor.findById(decoded.id);
+  if (!currentTutor) {
+    return next(new AppError('This tutor no longer exists.', 401));
   }
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
+  if (currentTutor.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError(
-        'This user recently changed password. Please log in with new password.',
+        'This tutor recently changed password. Please log in with new password.',
         401
       )
     );
   }
-  req.user = currentUser;
-  res.locals.user = currentUser;
+  req.user = currentTutor;
+  res.locals.user = currentTutor;
   next();
 });
-
-exports.restrictTo =
-  (...roles) =>
-  (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return next(
-        new AppError('You do not have permission to perform this action.', 403)
-      );
-
-      const currentUser = await User.findById(decoded.id);
-      if (!currentUser) {
-        return next();
-      }
-
-      if (currentUser.changedPasswordAfter(decoded.iat)) {
-        return next();
-      }
-      res.locals.user = currentUser;
-      return next();
-    } catch (err) {
-      return next();
-    }
-  }
-  next();
-};
 
 // exports.restrictTo =
 //   (...roles) =>
@@ -165,23 +127,25 @@ exports.restrictTo =
 //   };
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id).select('+password');
-  if (!(await user.correctPassword(req.body.currentPassword, user.password))) {
+  const tutor = await Tutor.findById(req.user.id).select('+password');
+  if (
+    !(await tutor.correctPassword(req.body.currentPassword, tutor.password))
+  ) {
     return next(new AppError('Wrong Password. Try again', 401));
   }
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  await user.save();
+  tutor.password = req.body.password;
+  tutor.passwordConfirm = req.body.passwordConfirm;
+  await tutor.save();
 
-  sendAccessToken(user, 200, res);
+  sendAccessToken(tutor, 200, res);
 });
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const token = req.query.token;
-  const user = await User.findOne({ emailToken: token });
-  if (user) {
-    (user.emailToken = undefined), (user.isVerified = true);
-    await user.save({ validateBeforeSave: false });
+  const tutor = await Tutor.findOne({ emailToken: token });
+  if (tutor) {
+    (tutor.emailToken = undefined), (tutor.isVerified = true);
+    await tutor.save({ validateBeforeSave: false });
     res.status(200).json({
       status: 'success',
       message: 'Email verification successful',
@@ -192,13 +156,13 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) {
-    return next(new AppError('No user found with that email address', 404));
+  const tutor = await Tutor.findOne({ email: req.body.email });
+  if (!tutor) {
+    return next(new AppError('No tutor found with that email address', 404));
   }
 
-  const resetToken = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false });
+  const resetToken = tutor.createPasswordResetToken();
+  await tutor.save({ validateBeforeSave: false });
 
   const resetURL = `${req.protocol}://${req.get(
     'host'
@@ -206,15 +170,19 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   const message = `Forgot your password? Copy and paste this URL on your browser: ${resetURL}. \nIf you didn't forget your password, ignore this email`;
   try {
-    await new Email(user, resetURL).sendresetPassword();
+    await sendEmail({
+      email: tutor.email,
+      subject: 'Your password reset token',
+      message,
+    });
     res.status(200).json({
       status: 'success',
       message: 'Password reset token sent to your email',
     });
   } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save({ validateBeforeSave: false });
+    tutor.passwordResetToken = undefined;
+    tutor.passwordResetExpires = undefined;
+    await tutor.save({ validateBeforeSave: false });
     return next(new AppError('Error sending email. Try again later', 500));
   }
 });
@@ -225,19 +193,19 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .update(req.params.token)
     .digest('hex');
 
-  const user = await User.findOne({
+  const tutor = await Tutor.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
 
-  if (!user) {
+  if (!tutor) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
+  tutor.password = req.body.password;
+  tutor.passwordConfirm = req.body.passwordConfirm;
+  tutor.passwordResetToken = undefined;
+  tutor.passwordResetExpires = undefined;
+  await tutor.save();
 
-  sendAccessToken(user, 200, res);
+  sendAccessToken(tutor, 200, res);
 });
