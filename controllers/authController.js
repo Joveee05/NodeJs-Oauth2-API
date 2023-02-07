@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/userModel');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 const AppError = require('../utils/appError');
 const crypto = require('crypto');
 const catchAsync = require('../utils/catchAsync');
@@ -87,6 +87,10 @@ exports.signup = catchAsync(async (req, res, next) => {
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
   const newUser = await user.save({ validateBeforeSave: false });
+  const url = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/verify-email?token=${user.emailToken}`;
+  await new Email(newUser, url).sendWelcome();
   sendAccessToken(newUser, 201, res);
 });
 
@@ -202,11 +206,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   const message = `Forgot your password? Copy and paste this URL on your browser: ${resetURL}. \nIf you didn't forget your password, ignore this email`;
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token',
-      message,
-    });
+    await new Email(user, resetURL).sendresetPassword();
     res.status(200).json({
       status: 'success',
       message: 'Password reset token sent to your email',
