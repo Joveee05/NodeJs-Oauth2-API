@@ -90,7 +90,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get(
     'host'
   )}/api/users/verify-email?token=${user.emailToken}`;
-  await new Email(newUser, url).sendWelcome();
+  await new Email(newUser, url, user.emailToken).sendWelcome();
   sendAccessToken(newUser, 201, res);
 });
 
