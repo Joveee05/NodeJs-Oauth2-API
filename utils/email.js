@@ -33,10 +33,10 @@ module.exports = class Email {
   }
 
   async send(template, subject) {
-    const url = `http://localhost:4200/auth/validation/${this.token}`
+    //const url = `http://localhost:4200/auth/validation/${this.token}`
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       fullName: this.fullName,
-      url: url,
+      url: this.url,
       subject,
     });
 

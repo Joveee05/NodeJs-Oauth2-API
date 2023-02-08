@@ -87,10 +87,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
   const newUser = await user.save({ validateBeforeSave: false });
-  const url = `${req.protocol}://${req.get(
-    'host'
-  )}/api/users/verify-email?token=${user.emailToken}`;
-  await new Email(newUser, url, user.emailToken).sendWelcome();
+  const url = `${req.protocol}://localhost:4200/auth/validation/${user.emailToken}`;
+  await new Email(newUser, url).sendWelcome();
   sendAccessToken(newUser, 201, res);
 });
 
@@ -200,9 +198,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get(
+  const resetURL = `${req.protocol}://localhost:4200/auth/reset-password/${resetToken}`;
+  /* const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api/users/resetpassword/${resetToken}`;
+  )}/auth/reset-password/${resetToken}`; */
 
   // const message = `Forgot your password? Copy and paste this URL on your browser: ${resetURL}. \nIf you didn't forget your password, ignore this email`;
   try {
