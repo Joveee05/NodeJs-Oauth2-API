@@ -3,9 +3,8 @@ const htmlToText = require('html-to-text');
 const pug = require('pug');
 
 module.exports = class Email {
-  constructor(user, url, token) {
+  constructor(user, url) {
     this.to = user.email;
-    this.token = token
     this.fullName = user.fullName;
     this.url = url;
     this.from = `Pisqre <${process.env.EMAIL_FROM}>`;
@@ -33,7 +32,6 @@ module.exports = class Email {
   }
 
   async send(template, subject) {
-    const url = `http://localhost:4200/auth/validation/${this.token}`
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       fullName: this.fullName,
       url: url,
@@ -45,7 +43,6 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      // text: htmlToText.fromString(html),
     };
 
     await this.newTransport().sendMail(mailOptions);
