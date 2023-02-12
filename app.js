@@ -115,6 +115,10 @@ app.use(mongoSanitize());
 
 app.use(compression());
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Pisqre Community API By Brian Etaghene');
+});
+
 app.use('/api/questions', questions);
 app.use('/api/file', fileUpload);
 app.use('/api/vote', vote);

@@ -21,6 +21,10 @@ const server = app.listen(port, () => {
   );
 });
 
+mongoose
+  .connect(DB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Database connected successfully!'));
+
 process.on('unhandledRejection', (err) => {
   console.log(err.name, err.message);
   console.log('App Shutting Down...');
