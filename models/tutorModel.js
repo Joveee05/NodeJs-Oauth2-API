@@ -5,12 +5,13 @@ const crypto = require('crypto');
 
 const tutorSchema = new mongoose.Schema(
   {
-    googleId: {
+    firstName: {
       type: String,
+      required: [true, 'A user must have a firstname'],
     },
-    fullName: {
+    lastName: {
       type: String,
-      required: [true, 'A user must have a fullname'],
+      required: [true, 'A user must have a lastname'],
     },
     email: {
       type: String,
@@ -25,10 +26,26 @@ const tutorSchema = new mongoose.Schema(
     languageSpoken: {
       type: String,
     },
-    level: {
+    languageLevel: {
       type: String,
     },
+    gender: {
+      type: String,
+      enum: ['Male', 'Female'],
+    },
     countryOfOrigin: {
+      type: String,
+    },
+    certificate: {
+      type: String,
+    },
+    startDate: {
+      type: String,
+    },
+    issuedBy: {
+      type: String,
+    },
+    endDate: {
       type: String,
     },
     phoneNumber: {
@@ -62,6 +79,9 @@ const tutorSchema = new mongoose.Schema(
     degree: {
       type: String,
       required: [true, 'A tutor must have a degree'],
+    },
+    degreeType: {
+      type: String,
     },
     university: {
       type: String,
@@ -119,10 +139,10 @@ tutorSchema.pre('save', function (next) {
   next();
 });
 
-tutorSchema.pre(/^find/, function (next) {
-  this.find({ active: { $ne: false } });
-  next();
-});
+// tutorSchema.pre(/^find/, function (next) {
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
 
 tutorSchema.methods.correctPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
