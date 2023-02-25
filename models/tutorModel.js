@@ -5,13 +5,9 @@ const crypto = require('crypto');
 
 const tutorSchema = new mongoose.Schema(
   {
-    firstName: {
+    fullName: {
       type: String,
       required: [true, 'A user must have a firstname'],
-    },
-    lastName: {
-      type: String,
-      required: [true, 'A user must have a lastname'],
     },
     email: {
       type: String,
