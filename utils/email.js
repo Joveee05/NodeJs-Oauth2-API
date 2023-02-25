@@ -34,7 +34,7 @@ module.exports = class Email {
   async send(template, subject) {
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       fullName: this.fullName,
-      url: url,
+      url: this.url,
       subject,
     });
 
@@ -50,6 +50,10 @@ module.exports = class Email {
 
   async sendWelcome() {
     await this.send('welcome', 'Welcome to the Pisqre Community!');
+  }
+
+  async contactUs() {
+    await this.send('contactUs', 'Thank You for Contacting Us!');
   }
 
   async sendPasswordReset() {
