@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const Email = require('../utils/email');
 const AppError = require('../utils/appError');
 const crypto = require('crypto');
+const Contact = require('../models/contactUs');
 const catchAsync = require('../utils/catchAsync');
 
 const signToken = (id) =>
@@ -92,6 +93,19 @@ exports.signup = catchAsync(async (req, res, next) => {
   )}/api/users/verify-email?token=${user.emailToken}`;
   await new Email(newUser, url).sendWelcome();
   sendAccessToken(newUser, 201, res);
+});
+
+exports.contactUs = catchAsync(async (req, res, next) => {
+  const { fullName, email, message } = req.body;
+  if (!fullName || !email || !message) {
+    return next(new AppError('Please input all fields'));
+  }
+  const user = await Contact.create(req.body);
+  await new Email(user).contactUs();
+  res.status(201).json({
+    status: 'success',
+    message: 'Email sent successfully',
+  });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
