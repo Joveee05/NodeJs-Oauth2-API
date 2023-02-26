@@ -43,7 +43,7 @@ router.get('/', tutorController.getAllTutors);
  * @swagger
  * components:
  *    schemas:
- *      User:
+ *      Tutor:
  *        type: object
  *        required:
  *          -googleId
@@ -80,10 +80,21 @@ router.get('/', tutorController.getAllTutors);
  *              description: User profile photo
  *        example:
  *          id: 65648ffa94874749b5
- *          googleId: 1426wgy3767727662
  *          name: Max Lawrence
- *          firstName: Max
- *          lastName: Max Lawrence
+ *          fullName: Max John
+ *          CV: cv.pdf
+ *          degree: Bachelor of Science
+ *          degreeType: Bachelors
+ *          certificate: certificate.pdf
+ *          languageSpoken: English
+ *          languageLevel: A1
+ *          course: Mathematics
+ *          startDate: Date
+ *          endDate: Date
+ *          description: I have been a tutor for 10 years
+ *          issuedBy: Society of Engineers
+ *          phoneNumber: 8747949484
+ *          university: University of India
  *          email: max@example.com
  *          password: test1234
  *          passwordConfirm: test1234
@@ -94,65 +105,65 @@ router.get('/', tutorController.getAllTutors);
 /**
  * @swagger
  * tags:
- *    name: Users
- *    description: The Pisqre Users Managing API
+ *    name: Tutors
+ *    description: The Pisqre Tutors Managing API
  */
 
 /**
  * @swagger
- * /users/{id}:
+ * /tutors/{id}:
  *    patch:
- *      summary: Edit or update user
- *      tags: [Users]
+ *      summary: Edit or update tutor
+ *      tags: [Tutors]
  *      parameters:
  *      - in: path
- *        name: The user id
+ *        name: The tutor id
  *        schema:
  *        type: string
  *        required: true
- *        description: The user id
+ *        description: The tutor id
  *      requestBody:
  *        required: true
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/Tutor'
  *            example:
- *               fullName:
- *               email:
+ *               fullName: John Davies
+ *               email: john@example.com
  *      responses:
  *        200:
- *          description: User updated
+ *          description: Tutor updated
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Tutor'
  *        404:
- *          description: The user was not found
+ *          description: The tutor was not found
  *        500:
  *          description: Server error
  */
 
 /**
  * @swagger
- * /users/{id}:
+ * /tutors/{id}:
  *      get:
- *        summary: Get user by id
- *        tags: [Users]
+ *        summary: Get tutor by id
+ *        tags: [Tutors]
  *        parameters:
  *          - in: path
  *            name: id
  *            schema:
  *              type: string
  *            required: true
- *            description: The user id
+ *            description: The tutor id
  *        responses:
  *          200:
- *            description: User found
+ *            description: Tutor found
  *            content:
  *                application/json:
  *                  schema:
- *                      $ref: '#/components/schemas/User'
+ *                      $ref: '#/components/schemas/Tutor'
  *          404:
  *            description: Not found
  *
@@ -160,17 +171,17 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/{id}:
+ * /tutors/{id}:
  *    delete:
- *      summary: Delete User
- *      tags: [Users]
+ *      summary: Delete Tutor
+ *      tags: [Tutors]
  *      parameters:
  *        - in: path
  *          name: id
  *          schema:
  *             type: string
  *          required: true
- *          description: The user id
+ *          description: The tutor id
  *      responses:
  *          204:
  *            description: No content
@@ -180,41 +191,25 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/signup:
+ * /tutors/signup:
  *    post:
- *      summary: Manual User SignUp without Google OAuth
- *      tags: [Users]
+ *      summary: Tutor SignUp
+ *      tags: [Tutors]
  *      requestBody:
  *        required: true
  *        content:
  *          application/json:
  *              schema:
- *                 $ref: '#/components/schemas/User'
- *              example:
- *                  fullName: Monica Jules
- *                  firstName: Monica
- *                  lastName: Jules
- *                  email: monica@example.com
- *                  password: test1234
- *                  passwordConfirm: test1234
+ *                 $ref: '#/components/schemas/Tutor'
  *      responses:
  *          201:
- *            description: Hello, this is the Pisqre API
+ *            description: Success
  *            content:
  *                application/json:
  *                    schema:
- *                       $ref: '#/components/schemas/User'
- *                    example:
- *                        id: 65648ffa94874749b5
- *                        displayName: Monica Jules
- *                        firstName: Monica
- *                        lastName: Jules
- *                        email: monica@example.com
- *                        password: test1234
- *                        passwordConfirm: test1234
- *                        photo: default.jpg
+ *                       $ref: '#/components/schemas/Tutor'
  *          403:
- *            description: User already exits
+ *            description: Tutor already exits
  *
  *          500:
  *            description: Internal server error. Try again
@@ -222,16 +217,16 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/login:
+ * /tutors/login:
  *     post:
- *       summary: Login without Google OAuth
- *       tags: [Users]
+ *       summary: Login for Tutors
+ *       tags: [Tutors]
  *       requestBody:
  *          required: true
  *          content:
  *            application/json:
  *                  schema:
- *                    $ref: '#/components/schemas/User'
+ *                    $ref: '#/components/schemas/Tutor'
  *                  example:
  *                    email: max@example.com
  *                    password: test1234
@@ -242,14 +237,7 @@ router.get('/', tutorController.getAllTutors);
  *            content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/User'
- *                      example:
- *                          token: ucbkejnchcuedhcjecnljcuhejio8392
- *                          id: 65648ffa94874749b5
- *                          fullName: Max Lawrence
- *                          role: student
- *                          email: max@example.com
- *                          photo: default.jpg
+ *                          $ref: '#/components/schemas/Tutor'
  *            400:
  *              description: Bad request
  *            500:
@@ -258,10 +246,10 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/logout:
+ * /tutors/logout:
  *     get:
  *        summary: Log Out
- *        tags: [Users]
+ *        tags: [Tutors]
  *        responses:
  *          200:
  *            description: Logged Out
@@ -271,16 +259,16 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/updateMyPassword:
+ * /tutors/updateMyPassword:
  *       patch:
  *          summary: Change password
- *          tags: [Users]
+ *          tags: [Tutors]
  *          requestBody:
  *              required: true
  *              content:
  *                   application/json:
  *                       schema:
- *                           $ref: '#/components/schemas/User'
+ *                           $ref: '#/components/schemas/Tutor'
  *                       example:
  *                          currentPassword: test1234
  *                          password: pass1234
@@ -291,14 +279,7 @@ router.get('/', tutorController.getAllTutors);
  *                content:
  *                  application/json:
  *                      schema:
- *                        $ref: '#/components/schemas/User'
- *                      example:
- *                        token: sdjindcnhbcyyerofhuh1823
- *                        id: 65648ffa94874749b5
- *                        name: Max Lawrence
- *                        email: max@example.com
- *                        role: student
- *                        photo: default.jpg
+ *                        $ref: '#/components/schemas/Tutor'
  *             400:
  *                description: Bad request
  *
@@ -306,66 +287,66 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/updateMe:
+ * /tutors/updateMe:
  *    patch:
- *      summary: Edit or update currently logged in user details except password
- *      tags: [Users]
+ *      summary: Edit or update currently logged in tutor details EXCEPT password
+ *      tags: [Tutors]
  *      parameters:
  *      - in: path
  *        name: id
  *        schema:
  *        type: string
  *        required: true
- *        description: The user id
+ *        description: The tutor id
  *      requestBody:
  *        required: true
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/Tutor'
  *            example:
- *               fullName:
- *               email:
+ *               fullName: Johnson Dakota
+ *               email: johnson@example.com
  *      responses:
  *        200:
- *          description: User updated
+ *          description: Tutor updated
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Tutor'
  *        404:
- *          description: The user was not found
+ *          description: The tutor was not found
  *        500:
  *          description: Server error
  */
 
 /**
  * @swagger
- * /users/me:
+ * /tutors/me:
  *   get:
- *     summary: Returns currently logged in user
- *     tags: [Users]
+ *     summary: Returns currently logged in tutor
+ *     tags: [Tutors]
  *     responses:
  *        200:
- *          description: The details of logged in user
+ *          description: The details of logged in tutor
  *          content:
  *              applicaton/json:
  *                  schema:
- *                      $ref: '#/components/schemas/User'
+ *                      $ref: '#/components/schemas/Tutor'
  */
 
 /**
  * @swagger
- * /users/forgotPassword:
+ * /tutors/forgotPassword:
  *       post:
  *          summary: Forgot password
- *          tags: [Users]
+ *          tags: [Tutors]
  *          requestBody:
  *              required: true
  *              content:
  *                   application/json:
  *                       schema:
- *                           $ref: '#/components/schemas/User'
+ *                           $ref: '#/components/schemas/Tutor'
  *                       example:
  *                          email: max@example.com
  *          responses:
@@ -378,23 +359,23 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /users/resetPassword/{token}:
+ * /tutors/resetPassword/{token}:
  *    patch:
  *      summary: Reset user password via token
- *      tags: [Users]
+ *      tags: [Tutors]
  *      parameters:
  *      - in: path
  *        name: Reset token
  *        schema:
  *        type: string
  *        required: true
- *        description: The user reset token sent to user via email
+ *        description: The tutor reset token sent to tutor via email
  *      requestBody:
  *        required: true
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/Tutor'
  *            example:
  *               password: newpass1234
  *               passwordConfirm: newpass1234
@@ -405,88 +386,27 @@ router.get('/', tutorController.getAllTutors);
  *            application/json:
  *              schema:
  *                $ref: '#/components/schemas/User'
- *              example:
- *                        token: sdjindcnhbcyyerofhuh1823
- *                        id: 65648ffa94874749b5
- *                        name: Max Lawrence
- *                        email: max@example.com
- *                        role: student
- *                        photo: default.jpg
  *        500:
  *          description: Internal Server error
  */
 /**
  * @swagger
- * /users/verify-email:
+ * /tutors/verify-email:
  *    get:
  *      summary: Verify account/email via emailToken
- *      tags: [Users]
+ *      tags: [Tutors]
  *      parameters:
  *      - in: query
  *        name: emailToken
  *        schema:
  *        type: string
  *        required: true
- *        description: The user verification token sent to user via email
+ *        description: The tutor verification token sent to tutor via email
  *      responses:
  *        200:
- *          description: User verified successfully
+ *          description: Tutor verified successfully
  *        500:
  *          description: Internal Server error
- */
-
-/**
- * @swagger
- * /auth/login:
- *     post:
- *       summary: Login with Google OAuth2.0
- *       tags: [Users]
- *       responses:
- *          200:
- *            description: Logged in successfully
- *            content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/User'
- *                      example:
- *                          token: ucbkejnchcuedhcjecnljcuhejio8392
- *                          googleId: 123398944672
- *                          id: 65648ffa94874749b5
- *                          fullName: Max Lawrence
- *                          role: student
- *                          email: max@example.com
- *                          photo: https://lh3.googleusercontent.com/a/AEdFTp5CVt6Cdg9DblLo3xTrbBiKjmtTwIrN5dAu5KAm=s96-c
- *            400:
- *              description: Bad request
- *            500:
- *              description: Internal server error
- */
-
-/**
- * @swagger
- * /auth/signup:
- *     post:
- *       summary: SignUp with Google OAuth2.0
- *       tags: [Users]
- *       responses:
- *          200:
- *            description: Success
- *            content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/User'
- *                      example:
- *                          token: ucbkejnchcuedhcjecnljcuhejio8392
- *                          googleId: 123398944672
- *                          id: 65648ffa94874749b5
- *                          fullName: Max Lawrence
- *                          role: student
- *                          email: max@example.com
- *                          photo: https://lh3.googleusercontent.com/a/AEdFTp5CVt6Cdg9DblLo3xTrbBiKjmtTwIrN5dAu5KAm=s96-c
- *            400:
- *              description: Bad request
- *            500:
- *              description: Internal server error
  */
 
 module.exports = router;
