@@ -378,6 +378,30 @@ router.get('/', userController.getAllUsers);
 
 /**
  * @swagger
+ * /users/contactUs:
+ *       post:
+ *          summary: Contact Us
+ *          tags: [Users]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                   application/json:
+ *                       schema:
+ *                           $ref: '#/components/schemas/User'
+ *                       example:
+ *                          fullName: John Smith
+ *                          email: max@example.com
+ *                          message: I need help contacting a tutor.
+ *          responses:
+ *             200:
+ *                description: Email sent successfully
+ *             500:
+ *                description: Something went wrong
+ *
+ */
+
+/**
+ * @swagger
  * /users/resetPassword/{token}:
  *    patch:
  *      summary: Reset user password via token
