@@ -56,6 +56,10 @@ module.exports = class Email {
     await this.send('contactUs', 'Thank You for Contacting Us!');
   }
 
+  async tutorWelcome() {
+    await this.send('tutorWelcome', 'Become a Mentor');
+  }
+
   async sendPasswordReset() {
     await this.send(
       'resetPassword',
