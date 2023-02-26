@@ -91,7 +91,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get(
     'host'
   )}/api/tutors/verify-email?token=${tutor.emailToken}`;
-  await new Email(newTutor, url).sendWelcome();
+  await new Email(newTutor, url).tutorWelcome();
   sendAccessToken(newTutor, 201, res);
 });
 
