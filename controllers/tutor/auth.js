@@ -12,8 +12,8 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const sendAccessToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
+const sendAccessToken = (tutor, statusCode, res) => {
+  const token = signToken(tutor._id);
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -27,7 +27,7 @@ const sendAccessToken = (user, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      user,
+      tutor,
     },
   });
 };
@@ -41,7 +41,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   const tutor = await Tutor.findOne({ email }).select('+password');
 
-  if (!user || !(await tutor.correctPassword(password, tutor.password))) {
+  if (!tutor || !(await tutor.correctPassword(password, tutor.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
   tutor.passwordResetToken = undefined;
