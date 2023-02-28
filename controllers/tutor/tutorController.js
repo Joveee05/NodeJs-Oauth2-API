@@ -113,12 +113,12 @@ exports.updateTutor = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
   if (!tutor) {
-    return next(new AppError('No user found with this ID', 404));
+    return next(new AppError('No tutor found with this ID', 404));
   }
 
   res.status(200).json({
     status: 'success',
-    message: 'user modification successful',
+    message: 'Tutor modification successful',
     data: tutor,
   });
 });
