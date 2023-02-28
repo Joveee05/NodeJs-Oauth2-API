@@ -18,6 +18,12 @@ router.get('/verify-email', auth.verifyEmail);
 
 router.get('/verify-tutor/:id', tutorController.verifyTutor);
 
+router
+  .route('/:id')
+  .get(tutorController.getTutor)
+  .patch(tutorController.updateTutor)
+  .delete(tutorController.deleteTutor);
+
 router.use(auth.protect);
 
 router.patch(
@@ -30,12 +36,6 @@ router.patch(
 router.get('/me', tutorController.getMe, tutorController.getTutor);
 
 router.patch('/updateMyPassword', auth.updatePassword);
-
-router
-  .route('/:id')
-  .get(tutorController.getTutor)
-  .patch(tutorController.updateTutor)
-  .delete(tutorController.deleteTutor);
 
 router.get('/', tutorController.getAllTutors);
 
