@@ -27,7 +27,7 @@ router
 router.use(auth.protect);
 
 router.patch(
-  '/updateMe',
+  '/me/updateMe',
   tutorController.uploadUserPhoto,
   tutorController.resizeUserPhoto,
   tutorController.updateMe
@@ -35,7 +35,7 @@ router.patch(
 
 router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
 
-router.patch('/updateMyPassword', auth.updatePassword);
+router.patch('/me/updateMyPassword', auth.updatePassword);
 
 router.get('/', tutorController.getAllTutors);
 
@@ -259,7 +259,7 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /tutors/updateMyPassword:
+ * /tutors/me/updateMyPassword:
  *       patch:
  *          summary: Change password
  *          tags: [Tutors]
@@ -287,7 +287,7 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /tutors/updateMe:
+ * /tutors/me/updateMe:
  *    patch:
  *      summary: Edit or update currently logged in tutor details EXCEPT password
  *      tags: [Tutors]

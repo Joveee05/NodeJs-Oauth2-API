@@ -149,7 +149,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   }
   tutor.password = req.body.password;
   tutor.passwordConfirm = req.body.passwordConfirm;
-  await tutor.save();
+  await tutor.save({ validateBeforeSave: false });
 
   sendAccessToken(tutor, 200, res);
 });
@@ -215,7 +215,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   tutor.passwordConfirm = req.body.passwordConfirm;
   tutor.passwordResetToken = undefined;
   tutor.passwordResetExpires = undefined;
-  await tutor.save();
+  await tutor.save({ validateBeforeSave: false });
 
   sendAccessToken(tutor, 200, res);
 });
