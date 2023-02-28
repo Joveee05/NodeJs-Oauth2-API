@@ -78,7 +78,7 @@ exports.getTutor = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: 'success',
-    message: 'user found',
+    message: 'tutor found',
     data: {
       tutor,
     },
