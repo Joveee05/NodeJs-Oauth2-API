@@ -33,7 +33,7 @@ router.patch(
   tutorController.updateMe
 );
 
-router.get('/me', tutorController.getMe, tutorController.getTutor);
+router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
 
 router.patch('/updateMyPassword', auth.updatePassword);
 
@@ -322,7 +322,7 @@ router.get('/', tutorController.getAllTutors);
 
 /**
  * @swagger
- * /tutors/me:
+ * /tutors/me/myAccount:
  *   get:
  *     summary: Returns currently logged in tutor
  *     tags: [Tutors]
