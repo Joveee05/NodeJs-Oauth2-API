@@ -7,7 +7,7 @@ const tutorSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: [true, 'A user must have a firstname'],
+      required: [true, 'A user must have a fullname'],
     },
     email: {
       type: String,
@@ -35,6 +35,12 @@ const tutorSchema = new mongoose.Schema(
     certificate: {
       type: String,
     },
+    onlineExperience: {
+      type: String,
+    },
+    offlineExperience: {
+      type: String,
+    },
     startDate: {
       type: String,
     },
@@ -50,7 +56,7 @@ const tutorSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
-      maxLength: 300,
+      maxLength: 350,
     },
     isVerified: {
       type: Boolean,
