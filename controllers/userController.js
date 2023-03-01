@@ -45,8 +45,13 @@ const filterObj = (obj, ...allowedFields) => {
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const allUsers = await User.find().sort('-createdAt');
+
+  if (allUsers.length < 1) {
+    return next(new AppError('No users found in the database.', 404));
+  }
   res.status(200).json({
     status: 'success',
+    message: 'Users found',
     results: allUsers.length,
     data: {
       allUsers,
