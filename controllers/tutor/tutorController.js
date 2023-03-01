@@ -45,8 +45,12 @@ const filterObj = (obj, ...allowedFields) => {
 
 exports.getAllTutors = catchAsync(async (req, res, next) => {
   const tutors = await Tutor.find().sort('-createdAt');
+  if (tutors.length < 1) {
+    return next(new AppError('No tutors found in the database.', 404));
+  }
   res.status(200).json({
     status: 'success',
+    message: 'Tutors found',
     results: tutors.length,
     data: {
       tutors,
