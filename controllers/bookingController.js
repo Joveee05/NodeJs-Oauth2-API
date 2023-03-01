@@ -1,6 +1,7 @@
 const express = require('express');
 const Booking = require('../models/bookingModel');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 
 exports.bookSession = catchAsync(async (req, res, next) => {
@@ -31,6 +32,7 @@ exports.getAllBookings = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: 'success',
+    message: 'Bookings found',
     results: booking.length,
     data: booking,
   });
@@ -51,6 +53,23 @@ exports.getBooking = catchAsync(async (req, res, next) => {
       data: booking,
     });
   }
+});
+
+exports.getMyBookings = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    Booking.find({ tutor: req.params.id }),
+    req.query
+  ).paginate();
+  const myBookings = await features.query;
+  if (myBookings.length < 1) {
+    return next(new AppError('Oops... No bookings found!!', 404));
+  }
+  res.status.json({
+    status: 'success',
+    message: 'Bookings found',
+    results: myBookings.length,
+    data: myBookings,
+  });
 });
 
 exports.updateBooking = catchAsync(async (req, res, next) => {
