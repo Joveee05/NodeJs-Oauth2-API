@@ -24,6 +24,8 @@ router
   .patch(tutorController.updateTutor)
   .delete(tutorController.deleteTutor);
 
+router.get('/', tutorController.getAllTutors);
+
 router.use(auth.protect);
 
 router.patch(
@@ -37,8 +39,6 @@ router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
 
 router.patch('/me/updateMyPassword', auth.updatePassword);
 
-router.get('/', tutorController.getAllTutors);
-
 /**
  * @swagger
  * components:
@@ -46,42 +46,72 @@ router.get('/', tutorController.getAllTutors);
  *      Tutor:
  *        type: object
  *        required:
- *          -googleId
- *          -displayName
- *          -firstName
- *          -lastName
+ *          -fullName
+ *          -degree
  *          -email
+ *          -CV
+ *          -university
+ *          -course
  *          -password
  *          -passwordConfirm
  *        properties:
  *           id:
  *              type: String
- *              description: The auto-generated id of the user
- *           firstName:
+ *              description: The auto-generated id of the tutor
+ *           fullName:
  *              type: String
- *              description: The user first name
- *           lastName:
+ *              description: The tutor's fullname
+ *           degree:
  *              type: String
- *              description: The user first name
- *           googleId:
+ *              description: The tutor's university degree
+ *           course:
  *              type: String
- *              description: The auto-generated googleId of the user
+ *              description: The course the tutor teaches
+ *           certificate:
+ *              type: String
+ *              description: The tuto's certificate
+ *           degreeType:
+ *              type: String
+ *              description: The type of tutor degree
+ *           description:
+ *              type: String
+ *              description: Brief summary of everything about tutor
+ *           university:
+ *              type: String
+ *              description: The university attended by tutor
+ *           startDate:
+ *              type: String
+ *              description: The start date of tutor's university degree e.g 2015
+ *           endDate:
+ *              type: String
+ *              description: The end date of tutor's university degree e.g 2020
+ *           onlineExperience:
+ *              type: String
+ *              description: The tutor's online teaching exprience e.g 2years
+ *           offlineExperience:
+ *              type: String
+ *              description: The tutor's offline teaching exprience e.g 5years
+ *           CV:
+ *              type: String
+ *              description: The tutor CV in document format
+ *           languageSpoken:
+ *              type: String
+ *              description: The language spoken by the tutor
  *           email:
  *              type: String
- *              description: The user email
+ *              description: The tutor email
  *           password:
  *              type: String
- *              description: The user password
+ *              description: The tutor password
  *           passwordConfirm:
  *              type: String
- *              description: Confirm user password
- *           photo:
+ *              description: Confirm tutor password
+ *           image:
  *              type: String
- *              description: User profile photo
+ *              description: Tutor profile photo
  *        example:
  *          id: 65648ffa94874749b5
- *          name: Max Lawrence
- *          fullName: Max John
+ *          fullName: Max Lawrence
  *          CV: cv.pdf
  *          degree: Bachelor of Science
  *          degreeType: Bachelors
@@ -89,6 +119,8 @@ router.get('/', tutorController.getAllTutors);
  *          languageSpoken: English
  *          languageLevel: A1
  *          course: Mathematics
+ *          onlineExperience: 2years
+ *          offlineExperience: 5years
  *          startDate: Date
  *          endDate: Date
  *          description: I have been a tutor for 10 years
@@ -333,6 +365,24 @@ router.get('/', tutorController.getAllTutors);
  *              applicaton/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Tutor'
+ */
+
+/**
+ * @swagger
+ * /tutors:
+ *      get:
+ *        summary: Get all tutors
+ *        tags: [Tutors]
+ *        responses:
+ *          200:
+ *            description: Tutors found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Tutor'
+ *          404:
+ *            description: No tutors found in the database
+ *
  */
 
 /**
