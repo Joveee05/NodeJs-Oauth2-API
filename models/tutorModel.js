@@ -7,11 +7,12 @@ const tutorSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: [true, 'A user must have a fullname'],
+      required: [true, 'A tutor must have a fullname'],
     },
     email: {
       type: String,
       unique: true,
+      required: [true, 'A tutor must have an email'],
       validate: [validator.isEmail, 'Please provide a valid email address'],
       lowercase: true,
       trim: true,
