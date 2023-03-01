@@ -18,6 +18,8 @@ router.patch('/resetPassword/:token', authController.resetPassword);
 
 router.get('/verify-email', authController.verifyEmail);
 
+router.get('/', userController.getAllUsers);
+
 router.use(authController.protect);
 
 router.patch(
@@ -36,8 +38,6 @@ router
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
-
-router.get('/', userController.getAllUsers);
 
 /**
  * @swagger
@@ -75,7 +75,7 @@ router.get('/', userController.getAllUsers);
  *           passwordConfirm:
  *              type: String
  *              description: Confirm user password
- *           photo:
+ *           image:
  *              type: String
  *              description: User profile photo
  *        example:
@@ -511,6 +511,24 @@ router.get('/', userController.getAllUsers);
  *              description: Bad request
  *            500:
  *              description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /users:
+ *      get:
+ *        summary: Get all users
+ *        tags: [Users]
+ *        responses:
+ *          200:
+ *            description: Users found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/User'
+ *          404:
+ *            description: No users found in the database
+ *
  */
 
 module.exports = router;
