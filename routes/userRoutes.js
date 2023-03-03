@@ -439,6 +439,7 @@ router
  *        500:
  *          description: Internal Server error
  */
+
 /**
  * @swagger
  * /users/verify-email:
@@ -461,40 +462,13 @@ router
 
 /**
  * @swagger
- * /auth/login:
+ * /auth/google:
  *     post:
- *       summary: Login with Google OAuth2.0
+ *       summary: Sign Up and Login with Google OAuth2.0
  *       tags: [Users]
  *       responses:
  *          200:
  *            description: Logged in successfully
- *            content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/User'
- *                      example:
- *                          token: ucbkejnchcuedhcjecnljcuhejio8392
- *                          googleId: 123398944672
- *                          id: 65648ffa94874749b5
- *                          fullName: Max Lawrence
- *                          role: student
- *                          email: max@example.com
- *                          photo: https://lh3.googleusercontent.com/a/AEdFTp5CVt6Cdg9DblLo3xTrbBiKjmtTwIrN5dAu5KAm=s96-c
- *            400:
- *              description: Bad request
- *            500:
- *              description: Internal server error
- */
-
-/**
- * @swagger
- * /auth/signup:
- *     post:
- *       summary: SignUp with Google OAuth2.0
- *       tags: [Users]
- *       responses:
- *          200:
- *            description: Success
  *            content:
  *                  application/json:
  *                      schema:
