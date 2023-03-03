@@ -17,7 +17,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const tutorRouter = require('./routes/tutorRoutes');
 const authRouter = require('./routes/authRoutes');
-const cvRouter = require('./routes/cvUpload');
+const documentRouter = require('./routes/documentRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const cookieParser = require('cookie-parser');
 const swaggerUI = require('swagger-ui-express');
@@ -46,7 +46,7 @@ const options = {
         url: 'https://pisqre-app-kyruo.ondigitalocean.app/api',
       },
       {
-        url: 'https://pisqre-app-kyruo.ondigitalocean.app/',
+        url: 'https://pisqre-app-kyruo.ondigitalocean.app',
       },
     ],
     components: {
@@ -116,7 +116,10 @@ app.use(mongoSanitize());
 app.use(compression());
 
 app.get('/', (req, res) => {
-  res.send('Welcome to the Pisqre Community API By Brian Etaghene');
+  res.json({
+    message: 'Welcome to the Pisqre Community API',
+    Author: 'Brian Etaghene',
+  });
 });
 
 app.use('/api/questions', questions);
@@ -124,14 +127,16 @@ app.use('/api/file', fileUpload);
 app.use('/api/vote', vote);
 app.use('/api/answers', answer);
 app.use('/api/users', userRouter);
-app.use('/api/cvs', cvRouter);
+app.use('/api/documents', documentRouter);
 app.use('/api/tutors', tutorRouter);
 app.use('/api/live_session', bookingRouter);
 app.use('/auth', authRouter);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  res.status(500).json({
+    message: `Can't find ${req.originalUrl} on this server!`,
+  });
 });
 
 app.use(globalErrorHandler);
