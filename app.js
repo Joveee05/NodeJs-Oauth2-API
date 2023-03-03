@@ -43,10 +43,10 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000/api',
+        url: 'https://pisqre-app-kyruo.ondigitalocean.app/api',
       },
       {
-        url: 'http://localhost:3000/',
+        url: 'https://pisqre-app-kyruo.ondigitalocean.app/',
       },
     ],
     components: {
