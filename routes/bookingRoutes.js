@@ -171,6 +171,12 @@ router
  *    post:
  *      summary: Book Live Session
  *      tags: [Bookings]
+ *      parameters:
+ *          - in: path
+ *            name: tutor Id
+ *            type: string
+ *            description: The ID of the Tutor
+ *            required: true
  *      requestBody:
  *        required: true
  *        content:
