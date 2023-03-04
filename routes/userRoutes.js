@@ -463,7 +463,7 @@ router
 /**
  * @swagger
  * /auth/google:
- *     post:
+ *     get:
  *       summary: Sign Up and Login with Google OAuth2.0
  *       tags: [Users]
  *       responses:
