@@ -25,7 +25,6 @@ async function updateView(question) {
   question.views = question.views + 1;
   try {
     const updatedQuestion = await question.save();
-    console.log(updatedQuestion);
     return {
       success: true,
       message: 'question views updated successfully',
@@ -39,7 +38,6 @@ async function updateView(question) {
 async function updateQuesVote(question) {
   try {
     const updatedQuestion = await question.save();
-    console.log(updatedQuestion);
     return {
       success: true,
       message: 'question votes updated successfully',

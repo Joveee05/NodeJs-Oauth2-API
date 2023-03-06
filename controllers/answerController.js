@@ -29,7 +29,6 @@ async function getAllAnswers(search) {
 async function updateAnsVote(answer) {
   try {
     const updatedAnswer = await answer.save();
-    console.log(updatedAnswer);
     return {
       success: true,
       message: 'answer votes updated successfully',
@@ -66,7 +65,6 @@ async function updateView(answer) {
   answer.views = answer.views + 1;
   try {
     const updatedAnswer = await answer.save();
-    console.log(updatedAnswer);
     return {
       success: true,
       message: 'answer views updated successfully',
@@ -140,7 +138,6 @@ async function updateAnswer(id, ans) {
   let answer;
   try {
     res = await Answer.findById(id);
-    console.log(res);
     if (res == null) {
       return {
         success: false,
@@ -151,9 +148,7 @@ async function updateAnswer(id, ans) {
       res.answer = ans.answer;
     }
     res.answerModifiedTimeStamp = new Date();
-    console.log('Updated Ans:', res);
     const updatedAnswer = await res.save();
-    console.log(updatedAnswer);
     return {
       success: true,
       data: updatedAnswer,

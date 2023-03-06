@@ -8,7 +8,6 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
 
-//creating bucket
 let bucket;
 
 mongoose.connection.on('connected', () => {
@@ -17,7 +16,6 @@ mongoose.connection.on('connected', () => {
   bucket = new mongoose.mongo.GridFSBucket(db, {
     bucketName: 'Documents',
   });
-  // console.log(bucket);
 });
 
 const storage = new GridFsStorage({

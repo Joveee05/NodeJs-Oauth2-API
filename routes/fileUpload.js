@@ -5,7 +5,7 @@ const { GridFsStorage } = require('multer-gridfs-storage');
 const fs = require('fs');
 const router = express.Router();
 require('dotenv').config();
-//creating bucket
+
 let bucket;
 
 mongoose.connection.on('connected', () => {
@@ -14,13 +14,11 @@ mongoose.connection.on('connected', () => {
   bucket = new mongoose.mongo.GridFSBucket(db, {
     bucketName: 'questionFiles',
   });
-  // console.log(bucket);
 });
 
 const storage = new GridFsStorage({
   url: process.env.MONGO_URI,
   file: (req, file) => {
-    console.log(req.params.id);
     return new Promise((resolve, reject) => {
       const filename = file.originalname;
       const fileInfo = {

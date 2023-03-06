@@ -96,7 +96,6 @@ router.delete('/delete', async (req, res) => {
  */
 router.get('/user/:id', async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
   const response = await getVotesForUser(userId);
 
   if (response.success == true) {
@@ -122,9 +121,7 @@ router.get('/user/:id', async (req, res) => {
  *         description: Successfully found Vote Information
  */
 router.get('/object/:id', async (req, res) => {
-  console.log(req);
   const objectId = req.params.id;
-  console.log(objectId);
   const response = await getVotesForObject(objectId);
 
   if (response.success == true) {
