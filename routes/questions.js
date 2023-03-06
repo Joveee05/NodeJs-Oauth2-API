@@ -1,11 +1,11 @@
 const express = require('express');
-const router = express.Router({ mergeParams: true });
 const mongoose = require('mongoose');
 const authController = require('../controllers/authController');
+const questionController = require('../controllers/questionController');
 const APIFeatures = require('../utils/apiFeatures');
 const Question = require('../models/questions');
+const router = express.Router({ mergeParams: true });
 let {
-  getAllQuestions,
   getQuestionById,
   addQuestion,
   updateQuestion,
@@ -24,7 +24,7 @@ const AppError = require('../utils/appError');
  */
 
 router.get('/top_questions', async (req, res, next) => {
-  const topQuestion = await Question.find().sort('-answers');
+  const topQuestion = await Question.find().sort('-answers -createdAt');
   res.status(200).json({
     status: 'success',
     results: topQuestion.length,
@@ -52,20 +52,20 @@ router.get('/top_questions', async (req, res, next) => {
 
 router.get('/search', async (req, res, next) => {
   const data = await Question.find({
-    $or: [
-      { questionBody: { $regex: req.query.question } },
-      { title: { $regex: req.query.question } },
-    ],
+    $text: { $search: req.query.question, $caseSensitive: false },
   });
 
   if (data.length < 1) {
     return next(
-      new AppError('Oops... No question found. Try searching again.', 404)
+      new AppError(
+        'Oops... No question found. This may be due to a spelling error. Try searching again.',
+        404
+      )
     );
   } else {
     res.status(200).json({
       status: 'success',
-      result: data.length,
+      results: data.length,
       data,
     });
   }
@@ -81,7 +81,9 @@ router.get('/search', async (req, res, next) => {
  *         description: Returns all the questions
  */
 router.get('/', async (req, res) => {
-  const features = new APIFeatures(Question.find(), req.query).paginate();
+  const features = new APIFeatures(Question.find(), req.query)
+    .sort()
+    .paginate();
   const questions = await features.query;
   // let response = await getAllQuestions(req.query.page, req.query.limit);
   res.status(200).json({
