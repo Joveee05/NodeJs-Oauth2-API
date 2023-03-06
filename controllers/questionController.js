@@ -1,33 +1,6 @@
 const Question = require('../models/questions');
 const User = require('../models/userModel');
-
 const help = require('./utility.js');
-
-async function getAllQuestions(search) {
-  let options = {};
-
-  if (search) {
-    options = {
-      ...options,
-      $or: [
-        { question: new RegExp(search.toString(), 'i') },
-        { subject: new RegExp(search.toString(), 'i') },
-      ],
-    };
-  }
-  try {
-    const question = await Question.find(options)
-      .populate('answeredBy')
-      .sort('-createdAt');
-
-    return {
-      success: true,
-      data: question,
-    };
-  } catch (err) {
-    return { success: false, message: 'Questions not found' };
-  }
-}
 
 async function getQuestionById(id) {
   let question;
@@ -154,7 +127,6 @@ async function removeQuestion(id) {
 }
 
 module.exports = {
-  getAllQuestions,
   getQuestionById,
   addQuestion,
   updateQuestion,
