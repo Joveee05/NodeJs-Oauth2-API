@@ -1,6 +1,6 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
-
+const Email = require('../utils/email');
 const User = require('../models/userModel');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
@@ -33,6 +33,8 @@ module.exports = function (passport) {
             done(null, user);
           } else {
             user = await User.create(newUser);
+            const url = process.env.WELCOME_URL + `${user.emailToken}`;
+            await new Email(newUser, url).sendWelcome();
             done(null, user);
           }
         } catch (err) {
