@@ -88,9 +88,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
   const newUser = await user.save({ validateBeforeSave: false });
-  const url = `${req.protocol}://${req.get(
-    'host'
-  )}/api/users/verify-email?token=${user.emailToken}`;
+  const url = process.env.WELCOME_URL + `${user.emailToken}`;
   await new Email(newUser, url).sendWelcome();
   sendAccessToken(newUser, 201, res);
 });
@@ -214,11 +212,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/users/resetPassword/${resetToken}`;
-
-  // const message = `Forgot your password? Copy and paste this URL on your browser: ${resetURL}. \nIf you didn't forget your password, ignore this email`;
+  const resetURL = process.env.RESET_URL + `${resetToken}`;
   try {
     await new Email(user, resetURL).sendPasswordReset();
     res.status(200).json({
