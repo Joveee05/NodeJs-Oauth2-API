@@ -117,7 +117,7 @@ router.get('/:id', async (req, res, next) => {
   );
   if (question) {
     const userIp = req.ip;
-    if (question.iP != userIp) {
+    if (!question.iP.includes(userIp)) {
       const updateIp = await Question.findByIdAndUpdate(
         req.params.id,
         {
@@ -125,12 +125,12 @@ router.get('/:id', async (req, res, next) => {
         },
         { new: true }
       ).then(await updateView(question));
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
-        data: question,
+        data: updateIp,
       });
     } else {
-      res.status(200).json({
+      return res.status(200).json({
         status: 'success',
         data: question,
       });
