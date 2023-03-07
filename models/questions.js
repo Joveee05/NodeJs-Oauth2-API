@@ -40,6 +40,11 @@ const questionPageSchema = new Schema(
         type: String,
       },
     ],
+    iP: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     versionKey: false,
