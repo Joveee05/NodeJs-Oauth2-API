@@ -8,6 +8,7 @@ const router = express.Router({ mergeParams: true });
 let {
   getQuestionById,
   addQuestion,
+  updateView,
   updateQuestion,
   removeQuestion,
 } = require('../controllers/questionController');
@@ -110,9 +111,34 @@ router.get('/', async (req, res) => {
  *       200:
  *         description: Returns the requested questions
  */
-router.get('/:id', async (req, res) => {
-  let response = await getQuestionById(req.params.id);
-  res.json(response);
+
+router.get('/:id', async (req, res, next) => {
+  const question = await Question.findById(req.params.id).populate(
+    'answeredBy'
+  );
+  if (question) {
+    const userIp = req.ip;
+    if (question.iP != userIp) {
+      const updateIp = await Question.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: { iP: req.ip },
+        },
+        { new: true }
+      ).then(await updateView(question));
+      res.status(200).json({
+        status: 'success',
+        data: question,
+      });
+    } else {
+      res.status(200).json({
+        status: 'success',
+        data: question,
+      });
+    }
+  } else {
+    return next(new AppError('Oops!! No question found...', 404));
+  }
 });
 
 router.use(authController.protect);
@@ -166,6 +192,7 @@ router.post('/', async (req, res) => {
   let body = {
     questionBody: req.body.questionBody,
     title: req.body.title,
+    iP: req.ip,
     user: req.user.id,
     keywords: keywords,
   };
