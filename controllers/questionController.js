@@ -3,6 +3,26 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const help = require('./utility.js');
 
+async function getQuestionById(id) {
+  let question;
+  try {
+    question = await Question.findById(id).populate('answeredBy');
+    if (question == null) {
+      return { status: false, message: 'Cannot find question' };
+    }
+    const res = await updateView(question);
+
+    if (res.status == false) return res;
+  } catch (err) {
+    return { status: false, message: err.message };
+  }
+
+  return {
+    success: true,
+    data: question,
+  };
+}
+
 async function updateView(question) {
   question.views = question.views + 1;
   try {
