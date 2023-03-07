@@ -6,7 +6,6 @@ const APIFeatures = require('../utils/apiFeatures');
 const Question = require('../models/questions');
 const router = express.Router({ mergeParams: true });
 let {
-  getQuestionById,
   addQuestion,
   updateView,
   updateQuestion,
