@@ -3,6 +3,7 @@ const Tutor = require('../../models/tutorModel');
 const multer = require('multer');
 const sharp = require('sharp');
 const AppError = require('../../utils/appError');
+const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 
 const multerStorage = multer.memoryStorage();
@@ -109,8 +110,18 @@ exports.deleteTutor = catchAsync(async (req, res, next) => {
 });
 
 exports.updateTutor = catchAsync(async (req, res, next) => {
-  if (req.body.password || req.body.passwordConfirm) {
-    return next(new AppError('This route is not for password updates.', 400));
+  if (
+    req.body.password ||
+    req.body.passwordConfirm ||
+    req.body.email ||
+    req.body.fullName
+  ) {
+    return next(
+      new AppError(
+        'This route is not for password, name or email updates.',
+        400
+      )
+    );
   }
   const tutor = await Tutor.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -119,7 +130,14 @@ exports.updateTutor = catchAsync(async (req, res, next) => {
   if (!tutor) {
     return next(new AppError('No tutor found with this ID', 404));
   }
-
+  // else {
+  //   await new Email(tutor).tutorVerify();
+  //   res.status(200).json({
+  //     status: 'success',
+  //     message: 'Tutor modification successful',
+  //     data: tutor,
+  //   });
+  // }
   res.status(200).json({
     status: 'success',
     message: 'Tutor modification successful',
