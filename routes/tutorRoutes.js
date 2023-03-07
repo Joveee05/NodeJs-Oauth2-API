@@ -161,8 +161,10 @@ router.patch('/me/updateMyPassword', auth.updatePassword);
  *            schema:
  *              $ref: '#/components/schemas/Tutor'
  *            example:
- *               fullName: John Davies
- *               email: john@example.com
+ *               university: University of India
+ *               degree: Bachelor of Engineering
+ *               course: Mathematics
+ *               languageSpoken: English
  *      responses:
  *        200:
  *          description: Tutor updated
