@@ -24,7 +24,10 @@ const AppError = require('../utils/appError');
  */
 
 router.get('/top_questions', async (req, res, next) => {
-  const topQuestion = await Question.find().sort('-answers -createdAt');
+  const features = new APIFeatures(Question.find(), req.query)
+    .sort('-answers -createdAt')
+    .paginate();
+  const topQuestion = await features.query;
   res.status(200).json({
     status: 'success',
     results: topQuestion.length,
@@ -85,7 +88,6 @@ router.get('/', async (req, res) => {
     .sort()
     .paginate();
   const questions = await features.query;
-  // let response = await getAllQuestions(req.query.page, req.query.limit);
   res.status(200).json({
     status: 'success',
     results: questions.length,
