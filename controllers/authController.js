@@ -74,7 +74,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const userCheck = await User.findOne({ email: req.body.email });
   if (userCheck) {
-    return next(new AppError('User already exists', 403));
+    return next(new AppError('User already exists.. Please LogIn', 403));
   }
   const user = new User({
     googleId: null,
