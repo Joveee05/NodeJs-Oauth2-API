@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Email = require('../utils/email');
 const User = require('../models/userModel');
 const crypto = require('crypto');
+const AppError = require('./appError');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: '../config.env' });
@@ -32,6 +33,12 @@ module.exports = function (passport) {
           if (user) {
             done(null, user);
           } else {
+            const userCheck = await User.findOne({
+              email: profile.emails[0].value,
+            });
+            if (userCheck) {
+              return new AppError('User already exists.. Please LogIn', 403);
+            }
             user = await User.create(newUser);
             const url = process.env.WELCOME_URL + `${user.emailToken}`;
             await new Email(newUser, url).sendWelcome();
