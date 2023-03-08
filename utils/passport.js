@@ -33,12 +33,6 @@ module.exports = function (passport) {
           if (user) {
             done(null, user);
           } else {
-            const userCheck = await User.findOne({
-              email: profile.emails[0].value,
-            });
-            if (userCheck) {
-              return new AppError('User already exists.. Please LogIn', 403);
-            }
             user = await User.create(newUser);
             const url = process.env.WELCOME_URL + `${user.emailToken}`;
             await new Email(newUser, url).sendWelcome();
