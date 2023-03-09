@@ -62,27 +62,15 @@ exports.logOut = (req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const {
-    email,
-    fullName,
-    firstName,
-    lastName,
-    role,
-    password,
-    passwordConfirm,
-  } = req.body;
+  const { email, fullName, firstName, lastName, password, passwordConfirm } =
+    req.body;
 
-  const userCheck = await User.findOne({ email: req.body.email });
-  if (userCheck) {
-    return next(new AppError('User already exists.. Please LogIn', 403));
-  }
   const user = new User({
     googleId: null,
     email,
     fullName,
     firstName,
     lastName,
-    role,
     password,
     passwordConfirm,
     emailToken: crypto.randomBytes(64).toString('hex'),
