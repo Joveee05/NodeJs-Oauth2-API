@@ -33,10 +33,17 @@ module.exports = function (passport) {
           if (user) {
             done(null, user);
           } else {
-            user = await User.create(newUser);
-            const url = process.env.WELCOME_URL + `${user.emailToken}`;
-            await new Email(newUser, url).sendWelcome();
-            done(null, user);
+            const userCheck = await User.findOne({
+              email: profile.emails[0].value,
+            });
+            if (userCheck) {
+              return new AppError('User already exist', 403);
+            } else {
+              user = await User.create(newUser);
+              const url = process.env.WELCOME_URL + `${user.emailToken}`;
+              await new Email(newUser, url).sendWelcome();
+              done(null, user);
+            }
           }
         } catch (err) {
           console.error(err);
