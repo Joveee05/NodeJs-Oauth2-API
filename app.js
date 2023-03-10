@@ -89,14 +89,6 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: 'Too many requests. Try again in an hour',
-});
-
-app.use('/api', limiter);
-
 app.use(
   session({
     secret: process.env.SECRET,
