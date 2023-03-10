@@ -54,9 +54,11 @@ const tutorSchema = new mongoose.Schema(
     phoneNumber: {
       type: Number,
     },
+    timeAvailable: {
+      type: Date,
+    },
     description: {
       type: String,
-      required: true,
       maxLength: 350,
     },
     isVerified: {
