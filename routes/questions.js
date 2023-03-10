@@ -84,12 +84,14 @@ router.get('/search', async (req, res, next) => {
  *         description: Returns all the questions
  */
 router.get('/', async (req, res) => {
+  const allQuestions = await Question.find().sort('-createdAt');
   const features = new APIFeatures(Question.find(), req.query)
     .sort()
     .paginate();
   const questions = await features.query;
   res.status(200).json({
     status: 'success',
+    allQuestions: allQuestions.length,
     results: questions.length,
     data: {
       questions,
