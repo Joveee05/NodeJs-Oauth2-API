@@ -24,12 +24,14 @@ const AppError = require('../utils/appError');
  */
 
 router.get('/top_questions', async (req, res, next) => {
+  const allQuestions = await Question.find();
   const features = new APIFeatures(Question.find(), req.query)
-    .sort('-answers -createdAt')
+    .sortByAnswers()
     .paginate();
   const topQuestion = await features.query;
   res.status(200).json({
     status: 'success',
+    allQuestions: allQuestions.length,
     results: topQuestion.length,
     data: {
       topQuestion,
@@ -84,7 +86,7 @@ router.get('/search', async (req, res, next) => {
  *         description: Returns all the questions
  */
 router.get('/', async (req, res) => {
-  const allQuestions = await Question.find().sort('-createdAt');
+  const allQuestions = await Question.find();
   const features = new APIFeatures(Question.find(), req.query)
     .sort()
     .paginate();
@@ -131,7 +133,7 @@ router.get('/:id', async (req, res, next) => {
       ).then(await updateView(question));
       return res.status(200).json({
         status: 'success',
-        data: updateIp,
+        data: question,
       });
     } else {
       return res.status(200).json({
