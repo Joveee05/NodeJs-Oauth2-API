@@ -149,10 +149,13 @@ router.get('/:id', async (req, res, next) => {
 router.use(authController.protect);
 
 router.get('/me/myQuestions', async (req, res, next) => {
+  const allMyQuestions = await Question.find({ user: req.user.id });
   const features = new APIFeatures(
     Question.find({ user: req.user.id }),
     req.query
-  ).paginate();
+  )
+    .sort()
+    .paginate();
   const getMyQuestions = await features.query;
 
   if (getMyQuestions.length < 1) {
@@ -160,6 +163,7 @@ router.get('/me/myQuestions', async (req, res, next) => {
   }
   res.status(200).json({
     status: 'success',
+    allMyQuestions: allMyQuestions.length,
     results: getMyQuestions.length,
     data: getMyQuestions,
   });
