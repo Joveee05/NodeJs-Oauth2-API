@@ -38,19 +38,22 @@ router.get('/question/:id', async (req, res, next) => {
 router.use(authController.protect);
 
 router.get('/myAnswers', async (req, res, next) => {
+  const allMyAnswers = await Answer.find({ answeredBy: req.user.id });
   const features = new APIFeatures(
     Answer.find({ answeredBy: req.user.id }),
     req.query
-  ).paginate();
+  )
+    .sortByTimeStamp()
+    .paginate();
   const getMyAnswers = await features.query;
-  // const getMyAnswers = await Answer.find({ answeredBy: req.user.id })
 
   if (getMyAnswers.length < 1) {
     return next(new AppError('Oops... No answers found!!', 404));
   }
   res.status(200).json({
     status: 'success',
-    result: getMyAnswers.length,
+    allMyAnswers: allMyAnswers.length,
+    results: getMyAnswers.length,
     data: getMyAnswers,
   });
 });
@@ -184,10 +187,12 @@ router.delete('/:id', async (req, res) => {
  *         description: Returns all the answers
  */
 router.get('/', async (req, res) => {
-  const features = new APIFeatures(Answer.find(), req.query).paginate();
+  const allAnswers = await Answer.find();
+  const features = new APIFeatures(Answer.find(), req.query).sort().paginate();
   const answers = await features.query;
   res.status(200).json({
     status: 'success',
+    allAnswers: allAnswers.length,
     results: answers.length,
     data: {
       answers,
