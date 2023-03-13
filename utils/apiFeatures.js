@@ -25,6 +25,17 @@ class APIFeatures {
     return this;
   }
 
+  sortByTimeStamp() {
+    if (this.queryString.sort) {
+      const sortBy = this.queryString.sort.split(',').join(' ');
+      this.query = this.query.sort(sortBy);
+    } else {
+      this.query = this.query.sort('-answerTimeStamp');
+    }
+
+    return this;
+  }
+
   sortByAnswers() {
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(',').join(' ');
