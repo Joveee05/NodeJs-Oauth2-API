@@ -156,10 +156,20 @@ router.patch('/:id', async (req, res) => {
  *        required: true
  *        type: string
  *        description: The answer ID.
- *     description: Delete a answer by id
+ *      - in: body
+ *        name: Question Id
+ *        required: true
+ *        description: The question Id where you want to delete an answer
+ *        schema:
+ *          type: object
+ *          properties:
+ *              questionId:
+ *                  type: string
+ *     description: Delete an answer by id
+ *
  *     responses:
  *       200:
- *         description: Returns the requested answer
+ *         description: Deleted answer
  */
 router.delete('/:id', async (req, res) => {
   try {
