@@ -14,7 +14,7 @@ mongoose.connection.on('connected', () => {
   var client = mongoose.connections[0].client;
   var db = mongoose.connections[0].db;
   bucket = new mongoose.mongo.GridFSBucket(db, {
-    bucketName: 'Documents',
+    bucketName: 'documents',
   });
 });
 
@@ -25,7 +25,7 @@ const storage = new GridFsStorage({
       const filename = file.originalname;
       const fileInfo = {
         filename: filename,
-        bucketName: 'Documents',
+        bucketName: 'documents',
         metadata: {
           tutorID: new mongoose.Types.ObjectId(req.params.id),
         },
