@@ -148,7 +148,7 @@ router.patch('/:id', async (req, res) => {
 //delete answer
 /**
  * @swagger
- * /answers/{id}:
+ * /answers/{id}/question/{questionId}:
  *   delete:
  *     parameters:
  *      - in: path
@@ -156,24 +156,20 @@ router.patch('/:id', async (req, res) => {
  *        required: true
  *        type: string
  *        description: The answer ID.
- *      - in: body
+ *      - in: path
  *        name: Question Id
  *        required: true
+ *        type: string
  *        description: The question Id where you want to delete an answer
- *        schema:
- *          type: object
- *          properties:
- *              questionId:
- *                  type: string
  *     description: Delete an answer by id
  *
  *     responses:
  *       200:
  *         description: Deleted answer
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id/question/:questionId', async (req, res) => {
   try {
-    const questionId = req.body.questionId;
+    const questionId = req.params.questionId;
     let response = await removeAnswer(req.params.id);
     if (response.success == true) {
       await QuestionPageSchema.findByIdAndUpdate(questionId, {
