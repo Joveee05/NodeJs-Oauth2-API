@@ -57,7 +57,7 @@ exports.getBooking = catchAsync(async (req, res, next) => {
 
 exports.getMyBookings = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(
-    Booking.find({ tutor: req.params.id }),
+    Booking.find({ tutor: req.user.id }),
     req.query
   ).paginate();
   const myBookings = await features.query;
