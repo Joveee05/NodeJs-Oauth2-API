@@ -70,12 +70,13 @@ router.post('/upload/:id', async (req, res) => {
   upload(req, res, (err) => {
     if (err) {
       return res.status(400).send({ error: err });
-      return;
+    } else {
+      return res.status(200).json({
+        status: 'success',
+        message: 'Document uploaded successfully',
+        data: req.file,
+      });
     }
-    res.status(200).json({
-      status: 'success',
-      message: 'Document uploaded successfully',
-    });
   });
 });
 
