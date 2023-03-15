@@ -75,7 +75,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm,
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
-  const newUser = await user.save({ validateBeforeSave: false });
+  const newUser = await user.save({ validateBeforeSave: true });
   const url = process.env.WELCOME_URL + `${user.emailToken}`;
   await new Email(newUser, url).sendWelcome();
   sendAccessToken(newUser, 201, res);
