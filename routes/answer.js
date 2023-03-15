@@ -194,7 +194,9 @@ router.delete('/:id/question/:questionId', async (req, res) => {
  */
 router.get('/', async (req, res) => {
   const allAnswers = await Answer.find();
-  const features = new APIFeatures(Answer.find(), req.query).sort().paginate();
+  const features = new APIFeatures(Answer.find(), req.query)
+    .sortByTimeStamp()
+    .paginate();
   const answers = await features.query;
   res.status(200).json({
     status: 'success',
