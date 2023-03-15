@@ -310,13 +310,6 @@ router
  *    patch:
  *      summary: Edit or update currently logged in user details except password
  *      tags: [Users]
- *      parameters:
- *      - in: path
- *        name: id
- *        schema:
- *        type: string
- *        required: true
- *        description: The user id
  *      requestBody:
  *        required: true
  *        content:
