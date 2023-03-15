@@ -1,19 +1,26 @@
 const express = require('express');
 const bookingController = require('../controllers/bookingController');
-
+const auth = require('../controllers/tutor/auth');
+const authController = require('../controllers/authController');
 const router = express.Router();
 
-router.get('/', bookingController.getAllBookings);
-
-router.post('/book_session', bookingController.bookSession);
-
-router.get('/myBookings/:tutorId', bookingController.getMyBookings);
+router.post(
+  '/book_session',
+  authController.protect,
+  bookingController.bookSession
+);
 
 router
   .route('/bookings/:id')
   .get(bookingController.getBooking)
   .patch(bookingController.updateBooking)
   .delete(bookingController.deleteBooking);
+
+router.use(auth.protect);
+
+router.get('/', bookingController.getAllBookings);
+
+router.get('/myBookings', bookingController.getMyBookings);
 
 /**
  * @swagger
