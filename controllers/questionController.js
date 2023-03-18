@@ -54,7 +54,7 @@ async function addQuestion(body) {
   const question = new Question(body);
 
   try {
-    const newQuestion = await question.save();
+    const newQuestion = await question.save({ validateBeforeSave: true });
     return {
       success: true,
       data: newQuestion,
