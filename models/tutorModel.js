@@ -37,6 +37,9 @@ const tutorSchema = new mongoose.Schema(
       type: String,
     },
     certificate: {
+      type: String,
+    },
+    certificateID: {
       type: mongoose.Schema.ObjectId,
     },
     onlineExperience: {
@@ -89,12 +92,18 @@ const tutorSchema = new mongoose.Schema(
       default: false,
     },
     CV: {
+      type: String,
+    },
+    degree: {
+      type: String,
+    },
+    cvID: {
       type: mongoose.Schema.ObjectId,
       required: [true, 'Please upload your CV'],
     },
-    degree: {
+    degreeId: {
       type: mongoose.Schema.ObjectId,
-      required: [true, 'A tutor must have a degree'],
+      required: [true, 'A tutor must upload a degree'],
     },
     degreeType: {
       type: String,
