@@ -28,13 +28,16 @@ const tutorSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ['Male', 'Female'],
+      enum: {
+        values: ['Male', 'Female'],
+        message: 'Gender must either be: Male or Female',
+      },
     },
     countryOfOrigin: {
       type: String,
     },
     certificate: {
-      type: String,
+      type: mongoose.Schema.ObjectId,
     },
     onlineExperience: {
       type: String,
@@ -59,7 +62,15 @@ const tutorSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxLength: 350,
+      maxLength: [500, 'Description must not exceed 500 characters'],
+    },
+    aboutMe: {
+      type: String,
+      maxLength: [150, 'About me must not exceed 150 characters'],
+    },
+    price: {
+      type: Number,
+      required: [true, 'A tutor must have a price'],
     },
     isVerified: {
       type: Boolean,
@@ -78,11 +89,11 @@ const tutorSchema = new mongoose.Schema(
       default: false,
     },
     CV: {
-      type: String,
+      type: mongoose.Schema.ObjectId,
       required: [true, 'Please upload your CV'],
     },
     degree: {
-      type: String,
+      type: mongoose.Schema.ObjectId,
       required: [true, 'A tutor must have a degree'],
     },
     degreeType: {
@@ -92,10 +103,12 @@ const tutorSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A tutor must have attended a university'],
     },
-    course: {
-      type: String,
-      required: [true, 'A tutor must have topics'],
-    },
+    course: [
+      {
+        type: String,
+        required: [true, 'A tutor must have at least one course'],
+      },
+    ],
     password: {
       type: String,
       minLength: 8,
