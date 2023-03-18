@@ -257,7 +257,7 @@ router.get('/user/:id', async (req, res) => {
  *     description: Upload answer image
  *     parameters:
  *       - in: formData
- *         name: answer
+ *         name: file
  *         type: file
  *         description: Upload Answer Image
  *         required: true
@@ -276,6 +276,7 @@ router.get('/user/:id', async (req, res) => {
  *                  status: success
  *                  message: Upload successful
  *                  filename: answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
+ *                  imageUrl: https://abc.com/public/answer/answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
  */
 
 router.post(
