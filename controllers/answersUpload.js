@@ -2,6 +2,9 @@ const multer = require('multer');
 const sharp = require('sharp');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: './../config.env' });
 
 const multerStorage = multer.memoryStorage();
 
@@ -15,7 +18,7 @@ const multerFilter = (req, file, cb) => {
 
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
-exports.uploadAnswerFile = upload.single('answer');
+exports.uploadAnswerFile = upload.single('file');
 
 exports.saveToFolder = catchAsync(async (req, res, next) => {
   if (!req.file) {
@@ -32,6 +35,7 @@ exports.saveToFolder = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: 'Upload successful',
-    data: req.file.filename,
+    filename: req.file.filename,
+    imageUrl: process.env.IMAGE_URL + `${req.file.filename}`,
   });
 });
