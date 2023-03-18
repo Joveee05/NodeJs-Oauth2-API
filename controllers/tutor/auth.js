@@ -68,26 +68,11 @@ exports.signup = catchAsync(async (req, res, next) => {
   const tutor = new Tutor({
     email: req.body.email,
     fullName: req.body.fullName,
-    university: req.body.university,
-    degree: req.body.degree,
-    degreeType: req.body.degreeType,
-    CV: req.body.cv,
-    gender: req.body.gender,
-    countryOfOrigin: req.body.countryOfOrigin,
-    languageSpoken: req.body.languageSpoken,
-    languageLevel: req.body.languageLevel,
-    course: req.body.course,
-    certificate: req.body.certificate,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate,
-    issuedBy: req.body.issuedBy,
-    phoneNumber: req.body.phoneNumber,
-    description: req.body.description,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
-  const newTutor = await tutor.save({ validateBeforeSave: false });
+  const newTutor = await tutor.save({ validateBeforeSave: true });
   const url = `${req.protocol}://${req.get(
     'host'
   )}/api/tutors/verify-email?token=${tutor.emailToken}`;
