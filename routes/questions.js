@@ -130,7 +130,7 @@ router.get('/:id', async (req, res, next) => {
           $push: { iP: req.ip },
         },
         { new: true }
-      ).then(await updateView(updateIp));
+      ).then(await updateView(question));
       return res.status(200).json({
         status: 'success',
         data: updateIp,
