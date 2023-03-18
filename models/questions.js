@@ -18,7 +18,6 @@ const questionPageSchema = new Schema(
     },
     branch: {
       type: String,
-      required: true,
     },
     questionBody: {
       type: String,
