@@ -16,6 +16,10 @@ const questionPageSchema = new Schema(
       type: String,
       required: true,
     },
+    branch: {
+      type: String,
+      required: true,
+    },
     questionBody: {
       type: String,
       required: true,
@@ -32,7 +36,10 @@ const questionPageSchema = new Schema(
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'A question must belong to a user.'],
+    },
+    tutor: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Tutor',
     },
 
     keywords: [
