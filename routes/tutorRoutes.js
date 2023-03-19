@@ -18,6 +18,8 @@ router.get('/verify-email', auth.verifyEmail);
 
 router.get('/verify-tutor/:id', tutorController.verifyTutor);
 
+router.get('/search_tutors', tutorController.searchTutor);
+
 router
   .route('/:id')
   .get(tutorController.getTutor)
@@ -38,6 +40,14 @@ router.patch(
 router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
 
 router.patch('/me/updateMyPassword', auth.updatePassword);
+
+router.post('/ask_questions', tutorController.askQuestion);
+
+router.post('/answers/:id', tutorController.tutorAnswer);
+
+router.get('/me/my_questions', tutorController.myQuestions);
+
+router.get('/me/all_my_answers', tutorController.myAnswers);
 
 /**
  * @swagger
@@ -459,6 +469,174 @@ router.patch('/me/updateMyPassword', auth.updatePassword);
  *          description: Tutor verified successfully
  *        500:
  *          description: Internal Server error
+ */
+
+/**
+ * @swagger
+ * /tutors/ask_questions:
+ *   post:
+ *     summary: Ask question for tutors
+ *     tags: [Tutors]
+ *     parameters:
+ *      - in: body
+ *        name: Question
+ *        description: Ask questions for tutor
+ *        schema:
+ *          type: object
+ *          properties:
+ *            branch:
+ *              type: string
+ *            questionBody:
+ *              type: string
+ *            title:
+ *              type: string
+ *            keywords:
+ *              type: array
+ *              items:
+ *                type: string
+ *     responses:
+ *       201:
+ *         description: Question created successfully
+ *         content:
+ *            application/json:
+ *                    schema:
+ *                        example:
+ *                            status: success
+ *                            message: Question created successfully
+ *                            data:
+ *                              vote: 0
+ *                              answers: 0
+ *                              title: test
+ *                              branch: Chemistry
+ *                              questionBody: 123
+ *                              views: 0
+ *                              answeredBy: []
+ *                              tutor: 63b8c8814egjhd73637u
+ *                              keywords: [
+ *                                  string node
+ *                                        ]
+ *                              id: 63b8c881464647yehe93
+ */
+
+/**
+ * @swagger
+ * /tutors/answers/{id}:
+ *   post:
+ *     summary: Answer questions for tutors
+ *     tags: [Tutors]
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *        type: string
+ *        required: true
+ *        description: The id of the question to be asnwered
+ *      - in: body
+ *        name: Answer
+ *        description: New answer for tutor
+ *        schema:
+ *          type: object
+ *          properties:
+ *            answer:
+ *              type: string
+ *     responses:
+ *       201:
+ *         description: Answer created successfully
+ *         content:
+ *             application/json:
+ *                  schema:
+ *                     example:
+ *                        status: success
+ *                        message: Answer created successfully
+ *                        data:
+ *                          answeredByTutor: 65747yehd03746hh
+ *                          answer: string
+ *                          question: 65747yehd03746hh
+ *                          answerTimeStamp: 2023-03-19T12:56:27.956Z
+ *                          answerModifiedTimeStamp: 2023-03-19T12:56:27.956Z
+ *                          views: 0
+ *                          votes: 0
+ *                          id: 65408ftegh5464ydgd99
+ */
+
+/**
+ * @swagger
+ * /tutors/me/my_questions:
+ *   get:
+ *     summary: Returns all questions of currently logged in tutor
+ *     tags: [Tutors]
+ *     responses:
+ *        200:
+ *          description: success
+ *          content:
+ *            application/json:
+ *                    schema:
+ *                        example:
+ *                            status: success
+ *                            allQuestions: 12
+ *                            results: 12
+ *                            data:
+ *                              vote: 0
+ *                              answers: 0
+ *                              title: test
+ *                              branch: Chemistry
+ *                              questionBody: 123
+ *                              views: 0
+ *                              answeredBy: []
+ *                              tutor: 63b8c8814egjhd73637u
+ *                              keywords: [
+ *                                  string node
+ *                                        ]
+ *                              id: 63b8c881464647yehe93
+ *        404:
+ *          description: Oops... No questions found!!
+ */
+
+/**
+ * @swagger
+ * /tutors/me/all_my_answers:
+ *   get:
+ *     summary: Returns all answers of currently logged in tutor
+ *     tags: [Tutors]
+ *     responses:
+ *        200:
+ *          description: success
+ *          content:
+ *            application/json:
+ *                    schema:
+ *                        example:
+ *                           status: success
+ *                           allMyAnswers: 12
+ *                           results: 12
+ *                           data:
+ *                             answeredByTutor: 65747yehd03746hh
+ *                             answer: string
+ *                             question: 65747yehd03746hh
+ *                             answerTimeStamp: 2023-03-19T12:56:27.956Z
+ *                             answerModifiedTimeStamp: 2023-03-19T12:56:27.956Z
+ *                             views: 0
+ *                             votes: 0
+ *                             id: 65408ftegh5464ydgd99
+ *        404:
+ *          description: Oops... No answers found!!
+ */
+
+/**
+ * @swagger
+ * /tutors/search_tutors:
+ *   get:
+ *     summary: Get a tutor by searching for courses
+ *     tags: [Tutors]
+ *     parameters:
+ *      - in: query
+ *        name: course
+ *        required: true
+ *        type: string
+ *        description: The course to search for.
+ *     description: Get a tutor by searching for courses
+ *     responses:
+ *       200:
+ *         description: Returns the requested tutors who teach the courses searched for
  */
 
 module.exports = router;
