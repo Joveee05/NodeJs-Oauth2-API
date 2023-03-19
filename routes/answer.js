@@ -96,17 +96,16 @@ router.post('/:questionId', async (req, res) => {
       $push: {
         answeredBy: {
           user: req.user.fullName,
+          role: req.user.role,
           image: req.user.image,
           answer: req.body.answer,
         },
       },
+      $inc: { answers: 1 },
     })
   );
 
   if (response.success == true) {
-    await QuestionPageSchema.findByIdAndUpdate(questionId, {
-      $inc: { answers: 1 },
-    });
     res.status(201).json(response);
   } else {
     res.status(404).json(response);
@@ -276,7 +275,7 @@ router.get('/user/:id', async (req, res) => {
  *                  status: success
  *                  message: Upload successful
  *                  filename: answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
- *                  imageUrl: https://abc.com/public/answer/answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
+ *                  imageUrl: https://abc.com/answer/answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
  */
 
 router.post(
