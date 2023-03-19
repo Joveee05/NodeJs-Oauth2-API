@@ -65,15 +65,14 @@ const tutorSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxLength: [500, 'Description must not exceed 500 characters'],
+      maxLength: 500,
     },
     aboutMe: {
       type: String,
-      maxLength: [150, 'About me must not exceed 150 characters'],
+      maxLength: 150,
     },
     price: {
       type: Number,
-      required: [true, 'A tutor must have a price'],
     },
     isVerified: {
       type: Boolean,
@@ -99,23 +98,19 @@ const tutorSchema = new mongoose.Schema(
     },
     cvID: {
       type: mongoose.Schema.ObjectId,
-      required: [true, 'Please upload your CV'],
     },
     degreeId: {
       type: mongoose.Schema.ObjectId,
-      required: [true, 'A tutor must upload a degree'],
     },
     degreeType: {
       type: String,
     },
     university: {
       type: String,
-      required: [true, 'A tutor must have attended a university'],
     },
     course: [
       {
         type: String,
-        required: [true, 'A tutor must have at least one course'],
       },
     ],
     password: {
