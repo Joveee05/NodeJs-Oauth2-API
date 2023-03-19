@@ -7,12 +7,16 @@ const scheduleSchema = new mongoose.Schema(
       ref: 'Tutor',
       required: [true, 'Please provide a tutorId'],
     },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
-    },
+    startDate: [
+      {
+        type: Date,
+      },
+    ],
+    endDate: [
+      {
+        type: Date,
+      },
+    ],
     booked: {
       type: Boolean,
       default: false,
