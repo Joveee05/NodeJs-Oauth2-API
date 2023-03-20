@@ -637,6 +637,8 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *     responses:
  *       200:
  *         description: Returns the requested tutors who teach the courses searched for
+ *       404:
+ *         description: Oops... No tutor found. This may be due to a spelling error. Try searching again.
  */
 
 module.exports = router;
