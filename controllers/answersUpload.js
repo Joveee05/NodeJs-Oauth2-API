@@ -28,6 +28,7 @@ exports.saveToFolder = catchAsync(async (req, res, next) => {
   req.file.filename = `answer-${questionId}-${Date.now()}.jpeg`;
 
   await sharp(req.file.buffer)
+    .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 100 })
     .toFile(`public/answers/${req.file.filename}`);
