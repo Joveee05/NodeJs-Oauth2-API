@@ -1,7 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const Answer = require('../models/answer');
-const answerController = require('../controllers/answersUpload');
 const APIFeatures = require('../utils/apiFeatures');
 const router = express.Router();
 const AppError = require('../utils/appError');
@@ -248,40 +247,5 @@ router.get('/user/:id', async (req, res) => {
   let response = await getAnswerByOptions({ userId: req.params.id });
   res.json(response);
 });
-
-/**
- * @swagger
- * /answers/upload_answers/{id}:
- *   post:
- *     description: Upload answer image
- *     parameters:
- *       - in: formData
- *         name: file
- *         type: file
- *         description: Upload Answer Image
- *         required: true
- *       - in: path
- *         name: id
- *         type: string
- *         description: Question ID
- *         required: true
- *     responses:
- *       200:
- *         description: Upload successful
- *         content:
- *            application/json:
- *                schema:
- *                example:
- *                  status: success
- *                  message: Upload successful
- *                  filename: answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
- *                  imageUrl: https://abc.com/answer/answer-6414bbd8964fe7638cca00d4-1679098274743.jpeg
- */
-
-router.post(
-  '/upload_answers/:id',
-  answerController.uploadAnswerFile,
-  answerController.saveToFolder
-);
 
 module.exports = router;
