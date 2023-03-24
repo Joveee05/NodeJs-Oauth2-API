@@ -112,8 +112,8 @@ exports.getWeeklyPlan = catchAsync(async (req, res, next) => {
       $sort: { numOfSchedule: -1 },
     },
   ]);
-  if (!plan) {
-    return next(new AppError('Something went wrong', 400));
+  if (plan.length < 1) {
+    return next(new AppError('Oops.. No schedule found for this year', 404));
   } else {
     res.status(200).json({
       status: 'success',
