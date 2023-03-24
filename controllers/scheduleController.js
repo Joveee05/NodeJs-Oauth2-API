@@ -125,8 +125,8 @@ exports.getWeeklyPlan = catchAsync(async (req, res, next) => {
 exports.dateQuery = catchAsync(async (req, res, next) => {
   const schedule = await Schedule.find({
     startDate: {
-      $gt: req.query.from,
-      $lt: req.query.to,
+      $gte: req.query.from,
+      $lte: req.query.to,
     },
   });
   if (schedule.length < 1) {
@@ -136,6 +136,7 @@ exports.dateQuery = catchAsync(async (req, res, next) => {
   } else {
     res.status(200).json({
       status: 'success',
+      results: schedule.length,
       data: schedule,
     });
   }
