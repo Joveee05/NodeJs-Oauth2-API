@@ -3,6 +3,7 @@
 const express = require('express');
 const Schedule = require('../models/scheduleModel');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 
 exports.createSchedule = catchAsync(async (req, res, next) => {
@@ -20,13 +21,20 @@ exports.createSchedule = catchAsync(async (req, res, next) => {
 });
 
 exports.getSchedule = catchAsync(async (req, res, next) => {
-  const schedule = await Schedule.find({ tutorId: req.user.id }).sort(
-    '-createdAt'
-  );
+  const myschedule = await Schedule.find({ tutorId: req.user.id });
+  const features = new APIFeatures(
+    Schedule.find({ tutorId: req.user.id }),
+    req.query
+  )
+    .sort()
+    .paginate();
+  const schedule = await features.query;
   if (!schedule.length < 1) {
     return res.status(200).json({
       status: 'success',
       message: 'Schedule Found',
+      results: schedule.length,
+      myschedule: myschedule.length,
       data: schedule,
     });
   } else {
@@ -68,5 +76,67 @@ exports.deleteSchedule = catchAsync(async (req, res, next) => {
         404
       )
     );
+  }
+});
+
+exports.getWeeklyPlan = catchAsync(async (req, res, next) => {
+  const year = req.query.year * 1;
+  const plan = await Schedule.aggregate([
+    {
+      $unwind: '$startDate',
+    },
+    {
+      $match: {
+        startDate: {
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { $week: '$startDate' },
+        numOfSchedule: { $sum: 1 },
+        booked: { $push: '$booked' },
+      },
+    },
+    {
+      $addFields: { week: '$_id' },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+    {
+      $sort: { numOfSchedule: -1 },
+    },
+  ]);
+  if (!plan) {
+    return next(new AppError('Something went wrong', 400));
+  } else {
+    res.status(200).json({
+      status: 'success',
+      data: plan,
+    });
+  }
+});
+
+exports.dateQuery = catchAsync(async (req, res, next) => {
+  const schedule = await Schedule.find({
+    startDate: {
+      $gt: req.query.from,
+      $lt: req.query.to,
+    },
+  });
+  if (schedule.length < 1) {
+    return next(
+      new AppError('Oops.. No schedule found between these dates', 404)
+    );
+  } else {
+    res.status(200).json({
+      status: 'success',
+      data: schedule,
+    });
   }
 });
