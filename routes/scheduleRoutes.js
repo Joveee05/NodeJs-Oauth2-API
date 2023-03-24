@@ -9,6 +9,10 @@ router.use(auth.protect);
 
 router.post('/create_my_schedule', scheduleController.createSchedule);
 
+router.get('/get-weekly-schedule', scheduleController.getWeeklyPlan);
+
+router.get('/schedule-between-date', scheduleController.dateQuery);
+
 router.get('/mySchedule', scheduleController.getSchedule);
 
 router.patch('/change_schedule/:id', scheduleController.updateSchedule);
@@ -88,6 +92,8 @@ router.delete('/delete_schedule/:id', scheduleController.deleteSchedule);
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Schedule'
+ *          401:
+ *            description: You're not logged in. Please log in to get access
  *          404:
  *            description: No schedule found for this tutor
  *
@@ -140,6 +146,81 @@ router.delete('/delete_schedule/:id', scheduleController.deleteSchedule);
  *
  *          500:
  *            description: Internal server error.
+ */
+
+/**
+ * @swagger
+ * /schedules/get-weekly-schedule:
+ *     get:
+ *       summary: Get weekly schedule
+ *       tags: [Schedules]
+ *       parameters:
+ *          - in: query
+ *            name: year
+ *            required: true
+ *            description: Year to get weekly schedules e.g 2023
+ *       responses:
+ *          200:
+ *            description: success
+ *            content:
+ *               application/json:
+ *                      schema:
+ *                         example:
+ *                            status: success
+ *                            data: [{
+ *                               numOfSchedule: 2,
+ *                               booked: [
+ *                                   false,
+ *                                   false,
+ *                                      ],
+ *                               week: 11,
+ *                                 }]
+ *          401:
+ *            description: You're not logged in. Please log in to get access
+ *          400:
+ *            description: Something went wrong
+ *
+ */
+
+/**
+ * @swagger
+ * /schedules/schedule-between-date:
+ *     get:
+ *       summary: Get schedule between two dates
+ *       tags: [Schedules]
+ *       parameters:
+ *          - in: query
+ *            name: from
+ *            required: true
+ *            description: e.g 2023-03-01
+ *          - in: query
+ *            name: to
+ *            required: true
+ *            description: e.g 2023-03-31
+ *       responses:
+ *          200:
+ *            description: success
+ *            content:
+ *               application/json:
+ *                      schema:
+ *                         example:
+ *                            status: success
+ *                            data: [{
+ *                               _id: 641854cac888be8f1b2e42a6,
+ *                               tutorId: 64179c2dc888be8f1b2e4072,
+ *                               startDate: [
+ *                                   2023-03-20T06:00:00.000Z,
+ *                                      ],
+ *                               endDate: [
+ *                                   2023-03-21T10:00:00.000Z,
+ *                                      ],
+ *                               booked: false,
+ *                                 }]
+ *          401:
+ *            description: You're not logged in. Please log in to get access
+ *          404:
+ *            description: Oops.. No schedule found between these dates
+ *
  */
 
 module.exports = router;
