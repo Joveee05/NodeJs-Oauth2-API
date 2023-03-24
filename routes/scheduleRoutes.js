@@ -177,8 +177,8 @@ router.delete('/delete_schedule/:id', scheduleController.deleteSchedule);
  *                                 }]
  *          401:
  *            description: You're not logged in. Please log in to get access
- *          400:
- *            description: Something went wrong
+ *          404:
+ *            description: Oops.. No schedule found for this year
  *
  */
 
