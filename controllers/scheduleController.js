@@ -112,6 +112,7 @@ exports.getWeeklyPlan = catchAsync(async (req, res, next) => {
       $sort: { numOfSchedule: -1 },
     },
   ]);
+
   if (plan.length < 1) {
     return next(new AppError('Oops.. No schedule found for this year', 404));
   } else {
@@ -123,12 +124,11 @@ exports.getWeeklyPlan = catchAsync(async (req, res, next) => {
 });
 
 exports.dateQuery = catchAsync(async (req, res, next) => {
-  const schedule = await Schedule.find({
-    startDate: {
-      $gte: req.query.from,
-      $lte: req.query.to,
-    },
-  });
+  const schedule = await Schedule.find({ tutorId: req.user.id })
+    .where('startDate')
+    .gte(req.query.from)
+    .lte(req.query.to)
+    .exec();
   if (schedule.length < 1) {
     return next(
       new AppError('Oops.. No schedule found between these dates', 404)
