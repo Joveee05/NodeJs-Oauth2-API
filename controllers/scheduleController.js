@@ -20,7 +20,43 @@ exports.createSchedule = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.createMultipleSchedule = catchAsync(async (req, res, next) => {
+  let newSchedule = [];
+  const payload = {
+    tutorId: req.user.id,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+  };
+  for (let i = 0; i < req.query.numOfSchedule; i++) {
+    newSchedule.push(await Schedule.create(payload));
+  }
+  res.status(201).json({
+    status: 'success',
+    message: 'Schedule created successfully',
+    results: newSchedule.length,
+    data: newSchedule,
+  });
+});
+
 exports.getSchedule = catchAsync(async (req, res, next) => {
+  const schedule = await Schedule.findById(req.params.id);
+  if (!schedule) {
+    return next(
+      new AppError(
+        'Oops.. No schedule found. Please check that the id is correct',
+        404
+      )
+    );
+  } else {
+    res.status(200).json({
+      status: 'success',
+      message: 'Schdeule found',
+      data: schedule,
+    });
+  }
+});
+
+exports.getMySchedule = catchAsync(async (req, res, next) => {
   const myschedule = await Schedule.find({ tutorId: req.user.id });
   const features = new APIFeatures(
     Schedule.find({ tutorId: req.user.id }),
@@ -124,7 +160,7 @@ exports.getWeeklyPlan = catchAsync(async (req, res, next) => {
 });
 
 exports.dateQuery = catchAsync(async (req, res, next) => {
-  const schedule = await Schedule.find({ tutorId: req.user.id })
+  const schedule = await Schedule.find({ tutorId: req.params.tutorId })
     .where('startDate')
     .gte(req.query.from)
     .lte(req.query.to)
