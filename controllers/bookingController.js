@@ -64,7 +64,24 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
   if (myBookings.length < 1) {
     return next(new AppError('Oops... No bookings found!!', 404));
   }
-  res.status.json({
+  res.status(200).json({
+    status: 'success',
+    message: 'Bookings found',
+    results: myBookings.length,
+    data: myBookings,
+  });
+});
+
+exports.getUserBookings = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    Booking.find({ bookedBy: req.user.id }),
+    req.query
+  ).paginate();
+  const myBookings = await features.query;
+  if (myBookings.length < 1) {
+    return next(new AppError('Oops... No bookings found!!', 404));
+  }
+  res.status(200).json({
     status: 'success',
     message: 'Bookings found',
     results: myBookings.length,
@@ -104,8 +121,7 @@ exports.deleteBooking = catchAsync(async (req, res, next) => {
   } else {
     res.status(200).json({
       status: 'success',
-      message: 'Booking updated successfully',
-      data: booking,
+      message: 'Booking deleted successfully',
     });
   }
 });
