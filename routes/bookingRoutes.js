@@ -5,9 +5,15 @@ const authController = require('../controllers/authController');
 const router = express.Router();
 
 router.post(
-  '/book_session',
+  '/book_session/:tutorId',
   authController.protect,
   bookingController.bookSession
+);
+
+router.get(
+  '/my-live-sessions',
+  authController.protect,
+  bookingController.getUserBookings
 );
 
 router
@@ -16,11 +22,9 @@ router
   .patch(bookingController.updateBooking)
   .delete(bookingController.deleteBooking);
 
-router.use(auth.protect);
-
 router.get('/', bookingController.getAllBookings);
 
-router.get('/myBookings', bookingController.getMyBookings);
+router.get('/myBookings', auth.protect, bookingController.getMyBookings);
 
 /**
  * @swagger
@@ -103,6 +107,8 @@ router.get('/myBookings', bookingController.getMyBookings);
  *            application/json:
  *              schema:
  *                $ref: '#/components/schemas/Booking'
+ *        401:
+ *            description: You are not logged in. Please log in to get access
  *        404:
  *          description: The Booking was not found
  *        500:
@@ -129,6 +135,8 @@ router.get('/myBookings', bookingController.getMyBookings);
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: Not found
  *
@@ -147,6 +155,8 @@ router.get('/myBookings', bookingController.getMyBookings);
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: No Live Session Booking found in the database
  *
@@ -168,13 +178,15 @@ router.get('/myBookings', bookingController.getMyBookings);
  *      responses:
  *          204:
  *            description: No content
+ *          401:
+ *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: Not found
  */
 
 /**
  * @swagger
- * /live_session/bookings/book_session:
+ * /live_session/book_session/{id}:
  *    post:
  *      summary: Book Live Session
  *      tags: [Bookings]
@@ -197,24 +209,18 @@ router.get('/myBookings', bookingController.getMyBookings);
  *                application/json:
  *                    schema:
  *                       $ref: '#/components/schemas/Booking'
- *
+ *          401:
+ *            description: You are not logged in. Please log in to get access
  *          500:
  *            description: Internal server error. Try again
  */
 
 /**
  * @swagger
- * /live_session/myBookings/{id}:
+ * /live_session/myBookings:
  *      get:
- *        summary: Get all bookings for a particular tutor
+ *        summary: Get all bookings for a particular tutor who is logged in.
  *        tags: [Bookings]
- *        parameters:
- *          - in: path
- *            name: id
- *            schema:
- *              type: string
- *            required: true
- *            description: The tutor id
  *        responses:
  *          200:
  *            description: Bookings found
@@ -222,6 +228,28 @@ router.get('/myBookings', bookingController.getMyBookings);
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          404:
+ *            description: Oops... No bookings found!!
+ *
+ */
+
+/**
+ * @swagger
+ * /live_session/my-live-sessions:
+ *      get:
+ *        summary: Get all bookings for a particular logged in user
+ *        tags: [Bookings]
+ *        responses:
+ *          200:
+ *            description: Bookings found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Booking'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: Oops... No bookings found!!
  *
