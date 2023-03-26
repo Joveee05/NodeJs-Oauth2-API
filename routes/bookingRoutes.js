@@ -196,6 +196,11 @@ router.get('/myBookings', auth.protect, bookingController.getMyBookings);
  *            type: string
  *            description: The ID of the Tutor
  *            required: true
+ *          - in: query
+ *            name: schedule
+ *            type: string
+ *            description: The ID of the schedule
+ *            required: true
  *      requestBody:
  *        required: true
  *        content:
