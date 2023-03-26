@@ -22,6 +22,7 @@ const bookingSchema = new mongoose.Schema(
     tutor: {
       type: mongoose.Schema.ObjectId,
       ref: 'Tutor',
+      required: [true, 'Please provide a tutor Id'],
     },
     time: {
       type: String,
