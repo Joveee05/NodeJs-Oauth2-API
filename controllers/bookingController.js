@@ -1,8 +1,19 @@
 const express = require('express');
 const Booking = require('../models/bookingModel');
+const Schedule = require('../models/scheduleModel');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+
+const updateSchedule = async function (id) {
+  const result = await Schedule.findByIdAndUpdate(id, { new: true });
+  if (result) {
+    result.booked = true;
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid schedule id', 400);
+  }
+};
 
 exports.bookSession = catchAsync(async (req, res, next) => {
   const body = {
@@ -16,6 +27,7 @@ exports.bookSession = catchAsync(async (req, res, next) => {
     day: req.body.day,
   };
   const booking = await Booking.create(body);
+  updateSchedule(req.query.schedule);
   res.status(201).json({
     status: 'success',
     message: 'Live Session Booked successfully',
