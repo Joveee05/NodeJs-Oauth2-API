@@ -73,9 +73,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
   const newTutor = await tutor.save({ validateBeforeSave: true });
-  const url = `${req.protocol}://${req.get(
-    'host'
-  )}/api/tutors/verify-email?token=${tutor.emailToken}`;
+  const url = process.env.WELCOME_URL_TUTOR + `${user.emailToken}`;
   await new Email(newTutor, url).tutorWelcome();
   sendAccessToken(newTutor, 201, res);
 });
@@ -163,11 +161,8 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = tutor.createPasswordResetToken();
   await tutor.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/tutors/resetPassword/${resetToken}`;
+  const resetURL = process.env.RESET_URL_TUTOR + `${resetToken}`;
 
-  // const message = `Forgot your password? Copy and paste this URL on your browser: ${resetURL}. \nIf you didn't forget your password, ignore this email`;
   try {
     await new Email(tutor, resetURL).sendPasswordReset();
     res.status(200).json({
