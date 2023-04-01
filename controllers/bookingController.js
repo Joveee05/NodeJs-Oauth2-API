@@ -1,8 +1,11 @@
 const express = require('express');
 const Booking = require('../models/bookingModel');
 const Schedule = require('../models/scheduleModel');
+const User = require('../models/userModel');
+const Tutor = require('../models/tutorModel');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
+const bookingEmail = require('../utils/bookingEmail');
 const catchAsync = require('../utils/catchAsync');
 
 const updateSchedule = async function (id) {
@@ -18,16 +21,22 @@ const updateSchedule = async function (id) {
 exports.bookSession = catchAsync(async (req, res, next) => {
   const body = {
     courseName: req.body.courseName,
-    topic: req.body.topic,
+    description: req.body.description,
     duration: req.body.duration,
+    price: req.body.price,
     tutor: req.params.tutorId,
     sessionType: req.body.sessionType,
     bookedBy: req.user.id,
     time: req.body.time,
-    day: req.body.day,
   };
+  const user = await User.findById(body.bookedBy);
+  const tutor = await Tutor.findById(body.tutor);
   const booking = await Booking.create(body);
   updateSchedule(req.query.schedule);
+  if (booking) {
+    await new bookingEmail(user, tutor, booking).confirmBooking();
+    await new bookingEmail(tutor, user, booking).notifyTutor();
+  }
   res.status(201).json({
     status: 'success',
     message: 'Live Session Booked successfully',
