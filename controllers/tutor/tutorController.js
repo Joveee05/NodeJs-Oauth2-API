@@ -8,6 +8,7 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
+let { updateQuestion, updateNumOfAns } = require('../tutor/helpers');
 
 const multerStorage = multer.memoryStorage();
 
@@ -132,20 +133,14 @@ exports.updateTutor = catchAsync(async (req, res, next) => {
   });
   if (!tutor) {
     return next(new AppError('No tutor found with this ID', 404));
+  } else {
+    await new Email(tutor).tutorVerify();
+    res.status(200).json({
+      status: 'success',
+      message: 'Tutor modification successful',
+      data: tutor,
+    });
   }
-  // else {
-  //   await new Email(tutor).tutorVerify();
-  //   res.status(200).json({
-  //     status: 'success',
-  //     message: 'Tutor modification successful',
-  //     data: tutor,
-  //   });
-  // }
-  res.status(200).json({
-    status: 'success',
-    message: 'Tutor modification successful',
-    data: tutor,
-  });
 });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -215,19 +210,9 @@ exports.tutorAnswer = catchAsync(async (req, res, next) => {
     answerModifiedTimeStamp: new Date(),
   };
 
-  const answer = await Answer.create(body).then(
-    await Question.findByIdAndUpdate(questionId, {
-      $push: {
-        answeredBy: {
-          user: req.user.fullName,
-          role: req.user.role,
-          image: req.user.image,
-          answer: req.body.answer,
-        },
-      },
-      $inc: { answers: 1 },
-    })
-  );
+  const answer = await Answer.create(body);
+  updateQuestion(questionId, req);
+  updateNumOfAns(req.user.id);
   res.status(201).json({
     status: 'success',
     message: 'Answer created successfully',
