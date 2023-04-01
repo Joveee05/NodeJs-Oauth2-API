@@ -4,8 +4,8 @@ const pug = require('pug');
 
 module.exports = class Email {
   constructor(user, url) {
-    this.to = user.email;
     this.fullName = user.fullName;
+    this.to = user.email;
     this.url = url;
     this.from = `Pisqre <${process.env.EMAIL_FROM}>`;
   }
@@ -53,11 +53,15 @@ module.exports = class Email {
   }
 
   async contactUs() {
-    await this.send('contactUs', 'Thank You for Contacting Us!');
+    await this.send('contactUs', 'Pisqre - Thank You for Contacting Us!');
   }
 
   async tutorWelcome() {
-    await this.send('tutorWelcome', 'Become a Mentor');
+    await this.send('tutorWelcome', 'Pisqre - Become a Tutor');
+  }
+
+  async tutorVerify() {
+    await this.send('tutorVerify', 'Pisqre - Documents Received');
   }
 
   async sendPasswordReset() {
