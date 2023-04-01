@@ -20,6 +20,14 @@ const tutorSchema = new mongoose.Schema(
     emailToken: {
       type: String,
     },
+    numOfAnswers: {
+      type: Number,
+      default: 0,
+    },
+    numOfAssignments: {
+      type: Number,
+      default: 0,
+    },
     languageSpoken: {
       type: String,
     },
