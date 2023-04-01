@@ -7,9 +7,8 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A user must provide a course'],
     },
-    topic: {
+    description: {
       type: String,
-      required: [true, 'A user must provide a topic'],
     },
     duration: {
       type: String,
@@ -26,14 +25,14 @@ const bookingSchema = new mongoose.Schema(
     },
     time: {
       type: String,
+      required: [true, 'A user must provide a date'],
     },
     bookedBy: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
     },
-    day: {
+    price: {
       type: String,
-      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     },
   },
   {
