@@ -45,6 +45,8 @@ router.post('/ask_questions', tutorController.askQuestion);
 
 router.post('/answers/:id', tutorController.tutorAnswer);
 
+router.delete('/answers/:id', tutorController.deleteAnswer);
+
 router.get('/me/my_questions', tutorController.myQuestions);
 
 router.get('/me/all_my_answers', tutorController.myAnswers);
@@ -588,6 +590,8 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *                                  string node
  *                                        ]
  *                              id: 63b8c881464647yehe93
+ *        401:
+ *          description: You are not logged in. Please log in to get access
  *        404:
  *          description: Oops... No questions found!!
  */
@@ -617,8 +621,32 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *                             views: 0
  *                             votes: 0
  *                             id: 65408ftegh5464ydgd99
+ *        401:
+ *          description: You are not logged in. Please log in to get access
  *        404:
  *          description: Oops... No answers found!!
+ */
+
+/**
+ * @swagger
+ * /tutors/answers/{id}:
+ *    delete:
+ *      summary: Delete Answer
+ *      tags: [Tutors]
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          schema:
+ *             type: string
+ *          required: true
+ *          description: The answer id
+ *      responses:
+ *          200:
+ *            description: Answer deleted successfully
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          404:
+ *            description: No answer found with this id
  */
 
 /**
