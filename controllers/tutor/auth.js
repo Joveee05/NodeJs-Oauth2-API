@@ -73,7 +73,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     emailToken: crypto.randomBytes(64).toString('hex'),
   });
   const newTutor = await tutor.save({ validateBeforeSave: true });
-  const url = process.env.WELCOME_URL_TUTOR + `${user.emailToken}`;
+  const url = process.env.WELCOME_URL_TUTOR + `${tutor.emailToken}`;
   await new Email(newTutor, url).tutorWelcome();
   sendAccessToken(newTutor, 201, res);
 });
