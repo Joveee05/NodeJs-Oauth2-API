@@ -18,6 +18,19 @@ const updateSchedule = async function (id) {
   }
 };
 
+const updateNumOfBookings = async function (id) {
+  const result = await Tutor.findByIdAndUpdate(
+    id,
+    { $inc: { numOfBookings: 1 } },
+    { new: true }
+  );
+  if (result) {
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid tutor id', 400);
+  }
+};
+
 exports.bookSession = catchAsync(async (req, res, next) => {
   const body = {
     courseName: req.body.courseName,
@@ -32,10 +45,11 @@ exports.bookSession = catchAsync(async (req, res, next) => {
   const user = await User.findById(body.bookedBy);
   const tutor = await Tutor.findById(body.tutor);
   const booking = await Booking.create(body);
-  updateSchedule(req.query.schedule);
   if (booking) {
     await new bookingEmail(user, tutor, booking).confirmBooking();
     await new bookingEmail(tutor, user, booking).notifyTutor();
+    updateSchedule(req.query.schedule);
+    updateNumOfBookings(body.tutor);
   }
   res.status(201).json({
     status: 'success',
