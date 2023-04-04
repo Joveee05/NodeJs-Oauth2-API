@@ -86,9 +86,9 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     return next(new AppError('No user found with this ID', 404));
   }
 
-  res.status(204).json({
+  res.status(200).json({
     status: 'success',
-    data: null,
+    message: 'User deleted successfully',
   });
 });
 
