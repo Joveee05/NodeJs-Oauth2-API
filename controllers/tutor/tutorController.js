@@ -8,7 +8,11 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
-let { updateQuestion, updateNumOfAns } = require('../tutor/helpers');
+let {
+  updateQuestion,
+  updateNumOfAns,
+  removeNumOfAns,
+} = require('../tutor/helpers');
 
 const multerStorage = multer.memoryStorage();
 
@@ -259,6 +263,21 @@ exports.myAnswers = catchAsync(async (req, res, next) => {
     allMyAnswers: allMyAnswers.length,
     results: getMyAnswers.length,
     data: getMyAnswers,
+  });
+});
+
+exports.deleteAnswer = catchAsync(async (req, res, next) => {
+  const answer = await Answer.findByIdAndDelete(req.params.id);
+
+  if (!answer) {
+    return next(new AppError('No answer found with this id', 404));
+  }
+
+  await removeNumOfAns(req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Answer deleted successfully',
   });
 });
 
