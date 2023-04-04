@@ -24,6 +24,10 @@ const tutorSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    numOfBookings: {
+      type: Number,
+      default: 0,
+    },
     numOfAssignments: {
       type: Number,
       default: 0,
