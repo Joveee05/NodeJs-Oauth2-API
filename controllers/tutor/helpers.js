@@ -28,11 +28,30 @@ const updateQuestion = async function (id, req) {
 };
 
 const updateNumOfAns = async function (id) {
-  const result = await Tutor.findByIdAndUpdate(id, {
-    $inc: { numOfAnswers: 1 },
-  });
+  const result = await Tutor.findByIdAndUpdate(
+    id,
+    {
+      $inc: { numOfAnswers: 1 },
+    },
+    { new: true }
+  );
   if (result) {
-    return true;
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Invalid tutor id', 400);
+  }
+};
+
+const removeNumOfAns = async function (id) {
+  const result = await Tutor.findByIdAndUpdate(
+    id,
+    {
+      $inc: { numOfAnswers: -1 },
+    },
+    { new: true }
+  );
+  if (result) {
+    await result.save({ validateBeforeSave: false });
   } else {
     return new AppError('Invalid tutor id', 400);
   }
@@ -41,4 +60,5 @@ const updateNumOfAns = async function (id) {
 module.exports = {
   updateQuestion,
   updateNumOfAns,
+  removeNumOfAns,
 };
