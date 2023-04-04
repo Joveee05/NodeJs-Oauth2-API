@@ -53,15 +53,15 @@ module.exports = class Email {
   }
 
   async contactUs() {
-    await this.send('contactUs', 'Pisqre - Thank You for Contacting Us!');
+    await this.send('contactUs', 'Thank You for Contacting Us!');
   }
 
   async tutorWelcome() {
-    await this.send('tutorWelcome', 'Pisqre - Become a Tutor');
+    await this.send('tutorWelcome', 'Become a Tutor');
   }
 
   async tutorVerify() {
-    await this.send('tutorVerify', 'Pisqre - Documents Received');
+    await this.send('tutorVerify', 'Documents Received');
   }
 
   async sendPasswordReset() {
