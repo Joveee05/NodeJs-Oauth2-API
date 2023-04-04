@@ -62,10 +62,10 @@ module.exports = class Email {
   }
 
   async confirmBooking() {
-    await this.send('userBooking', 'Pisqre - Booking Successful');
+    await this.send('userBooking', 'Booking Successful');
   }
 
   async notifyTutor() {
-    await this.send('tutorBooking', 'Pisqre - Booking Notification');
+    await this.send('tutorBooking', 'Booking Notification');
   }
 };
