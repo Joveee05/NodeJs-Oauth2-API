@@ -118,9 +118,7 @@ router.get('/', async (req, res) => {
  */
 
 router.get('/:id', async (req, res, next) => {
-  const question = await Question.findById(req.params.id).populate(
-    'answeredBy'
-  );
+  const question = await Question.findById(req.params.id);
   if (question) {
     const userIp = req.ip;
     if (!question.iP.includes(userIp)) {
