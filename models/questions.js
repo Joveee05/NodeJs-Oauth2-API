@@ -66,7 +66,7 @@ const questionPageSchema = new Schema(
 
 questionPageSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'user answeredBy tutor',
+    path: 'user tutor',
     select: 'fullName role image',
   });
   next();
