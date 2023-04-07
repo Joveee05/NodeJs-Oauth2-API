@@ -8,6 +8,7 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
+let { createNotification } = require('../utility');
 let {
   updateQuestion,
   updateNumOfAns,
@@ -213,10 +214,18 @@ exports.tutorAnswer = catchAsync(async (req, res, next) => {
     answerTimeStamp: new Date(),
     answerModifiedTimeStamp: new Date(),
   };
+  const question = await Question.findById(questionId);
+  const userID = question.user._id;
+  const tutor = await Tutor.findById(req.user.id);
+  const message = `${tutor.fullName} answered one of your questions`;
 
   const answer = await Answer.create(body);
-  updateQuestion(questionId, req);
-  updateNumOfAns(req.user.id);
+  const answerID = answer._id;
+  if (answer) {
+    updateQuestion(questionId, req);
+    updateNumOfAns(req.user.id);
+    await createNotification(message, userID, questionId, answerID);
+  }
   res.status(201).json({
     status: 'success',
     message: 'Answer created successfully',
