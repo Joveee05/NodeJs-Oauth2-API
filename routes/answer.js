@@ -1,9 +1,11 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const Answer = require('../models/answer');
+const User = require('../models/userModel');
 const APIFeatures = require('../utils/apiFeatures');
 const router = express.Router();
 const AppError = require('../utils/appError');
+let { createNotification } = require('../controllers/utility');
 let {
   getAllAnswers,
   getAnswerById,
@@ -47,7 +49,7 @@ router.get('/myAnswers', async (req, res, next) => {
     .paginate();
   const getMyAnswers = await features.query;
 
-  if (getMyAnswers.length < 1) {
+  if (getMyAnswers.length < 1 || allMyAnswers.length < 1) {
     return next(new AppError('Oops... No answers found!!', 404));
   }
   res.status(200).json({
@@ -82,6 +84,7 @@ router.get('/myAnswers', async (req, res, next) => {
  */
 router.post('/:questionId', async (req, res) => {
   const questionId = req.params.questionId;
+
   let body = {
     answeredBy: req.user.id,
     question: questionId,
@@ -90,21 +93,20 @@ router.post('/:questionId', async (req, res) => {
     answerModifiedTimeStamp: new Date(),
   };
 
+  const question = await QuestionPageSchema.findById(questionId);
+  const userID = question.user._id;
+  const user = await User.findById(req.user.id);
+  const message = `${user.fullName} answered one of your questions`;
+
   const response = await addAnswer(body).then(
     await QuestionPageSchema.findByIdAndUpdate(questionId, {
-      $push: {
-        answeredBy: {
-          user: req.user.fullName,
-          role: req.user.role,
-          image: req.user.image,
-          answer: req.body.answer,
-        },
-      },
       $inc: { answers: 1 },
     })
   );
+  const answerID = response.data._id;
 
   if (response.success == true) {
+    await createNotification(message, userID, questionId, answerID);
     res.status(201).json(response);
   } else {
     res.status(404).json(response);
