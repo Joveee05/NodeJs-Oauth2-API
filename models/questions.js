@@ -53,6 +53,12 @@ const questionPageSchema = new Schema(
     ],
   },
   {
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.iP;
+        delete ret.answeredBy;
+      },
+    },
     versionKey: false,
     timestamps: true,
   }
