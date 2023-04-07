@@ -38,7 +38,7 @@ const answerSchema = new Schema({
 
 answerSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'question answeredByTutor',
+    path: 'question answeredBy answeredByTutor',
     select: 'fullName role image title',
   });
   next();
