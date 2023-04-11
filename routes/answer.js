@@ -137,9 +137,18 @@ router.post('/:questionId', async (req, res) => {
  *         description: Updated Answer
  */
 router.patch('/:id', async (req, res) => {
-  let response = await updateAnswer(req.params.id, req.body);
+  const answerID = req.params.id;
+  const answer = await Answer.findById(answerID);
+  const questionId = answer.question._id;
+
+  const question = await QuestionPageSchema.findById(questionId);
+  const userID = question.user._id;
+  const user = await User.findById(req.user.id);
+  const message = `${user.fullName} updated an answer`;
+  let response = await updateAnswer(answerID, req.body);
 
   if (response.success == true) {
+    await createNotification(message, userID, questionId, answerID);
     res.status(201).json(response);
   } else {
     res.status(404).json(response);
