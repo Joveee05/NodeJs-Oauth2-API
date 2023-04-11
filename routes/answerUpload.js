@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const Question = require('../models/questions');
+const User = require('../models/userModel');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const fs = require('fs');
 const router = express.Router();
+let { createNotification } = require('../controllers/utility');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
@@ -67,10 +70,21 @@ const upload = multer({ storage }).single('answer');
  */
 
 router.post('/upload_answers/:id', async (req, res) => {
-  upload(req, res, (err) => {
+  const questionId = req.params.id;
+  const question = await Question.findById(questionId);
+  const userID = question.user._id;
+  // const user = await User.findById(req.user.id);
+  const message = 'You have an answer to one of your questions';
+
+  await Question.findByIdAndUpdate(questionId, {
+    $inc: { answers: 1 },
+  });
+
+  const response = upload(req, res, (err) => {
     if (err) {
       return res.status(400).send({ error: err });
     } else {
+      createNotification(message, userID, questionId, req.file.id);
       return res.status(200).json({
         status: 'success',
         message: 'Document uploaded successfully',
