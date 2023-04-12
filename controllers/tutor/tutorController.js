@@ -54,17 +54,19 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.getAllTutors = catchAsync(async (req, res, next) => {
-  const tutors = await Tutor.find().sort('-createdAt');
-  if (tutors.length < 1) {
+  const allTutors = await Tutor.find();
+  const features = new APIFeatures(Tutor.find(), req.query).sort().paginate();
+
+  const tutors = await features.query;
+  if (tutors.length < 1 || allTutors.length < 1) {
     return next(new AppError('No tutors found in the database.', 404));
   }
   res.status(200).json({
     status: 'success',
-    message: 'Tutors found',
+    message: `${allTutors.length} tutors found in database`,
+    allTutors: allTutors.length,
     results: tutors.length,
-    data: {
-      tutors,
-    },
+    data: tutors,
   });
 });
 
