@@ -104,12 +104,19 @@ router.post('/:questionId', async (req, res) => {
     })
   );
   const answerID = response.data._id;
-
-  if (response.success == true) {
-    await createNotification(message, userID, questionId, answerID);
-    res.status(201).json(response);
+  if (userID == req.user.id) {
+    if (response.success == true) {
+      return res.status(201).json(response);
+    } else {
+      return res.status(404).json(response);
+    }
   } else {
-    res.status(404).json(response);
+    if (response.success == true) {
+      await createNotification(message, userID, questionId, answerID);
+      return res.status(201).json(response);
+    } else {
+      return res.status(404).json(response);
+    }
   }
 });
 
