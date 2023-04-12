@@ -6,7 +6,15 @@ const router = express.Router({ mergeParams: true });
 
 router.post('/signup', authController.signup);
 
-router.post('/contactUs', authController.contactUs);
+router.post('/contactUs', userController.contactUs);
+
+router.post('/contactUs/admin_reply/:id', userController.adminReply);
+
+router.get('/contactUs/:id', userController.getContact);
+
+router.delete('/delete_contact/:id', userController.deleteContact);
+
+router.get('/all_emails', userController.getAllContacts);
 
 router.post('/login', authController.isLoggedIn, authController.login);
 
@@ -395,6 +403,92 @@ router
 
 /**
  * @swagger
+ * /users/contactUs/admin_reply/{id}:
+ *       post:
+ *          summary: Admin Reply to contact from users
+ *          tags: [Users]
+ *          parameters:
+ *             - in: path
+ *               name: id
+ *               required: true
+ *               description: The contact Id to be replied to
+ *          requestBody:
+ *             content:
+ *                application/json:
+ *                   schema:
+ *                      type: string
+ *                      example:
+ *                         message: We have provided a solution for you.
+ *             required: true
+ *             description: The email response message
+ *          responses:
+ *             200:
+ *                description: Admin response has been sent successfully
+ *             400:
+ *                description: Please input a message and a contact Id
+ *             401:
+ *                description: You are not logged in. Please log in to get access.
+ *
+ */
+
+/**
+ * @swagger
+ * /users/contactUs/{id}:
+ *      get:
+ *        summary: Get contact by id
+ *        tags: [Users]
+ *        parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: The contact id
+ *        responses:
+ *          200:
+ *            description: success
+ *
+ *          404:
+ *            description: No contact found with this ID
+ *
+ */
+
+/**
+ * @swagger
+ * /users/all_emails:
+ *      get:
+ *        summary: Get all contactUs emails
+ *        tags: [Users]
+ *        responses:
+ *          200:
+ *            description: 30 contactUs emails found in the database
+ *          404:
+ *            description: No contactUs emails found in the database
+ *
+ */
+
+/**
+ * @swagger
+ * /users/delete_contact/{id}:
+ *    delete:
+ *      summary: Delete contactUs Email
+ *      tags: [Users]
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          schema:
+ *             type: string
+ *          required: true
+ *          description: The contact id
+ *      responses:
+ *          200:
+ *            description: Contact Deleted Successfully
+ *          404:
+ *            description: No contactUs email found in the database with that Id
+ */
+
+/**
+ * @swagger
  * /users/resetPassword/{token}:
  *    patch:
  *      summary: Reset user password via token
@@ -488,7 +582,7 @@ router
  *        tags: [Users]
  *        responses:
  *          200:
- *            description: Users found
+ *            description: 40 users found in database
  *            content:
  *                application/json:
  *                  schema:
