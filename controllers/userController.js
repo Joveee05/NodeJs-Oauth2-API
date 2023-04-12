@@ -1,5 +1,9 @@
 const express = require('express');
 const User = require('../models/userModel');
+const Contact = require('../models/contactUs');
+const Email = require('../utils/email');
+const adminEmail = require('../utils/adminEmail');
+const APIFeatures = require('../utils/apiFeatures');
 const multer = require('multer');
 const sharp = require('sharp');
 const AppError = require('../utils/appError');
@@ -44,18 +48,20 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const allUsers = await User.find().sort('-createdAt');
+  const allUsers = await User.find();
+  const features = new APIFeatures(User.find(), req.query).sort().paginate();
 
-  if (allUsers.length < 1) {
+  const users = await features.query;
+
+  if (allUsers.length < 1 || users.length < 1) {
     return next(new AppError('No users found in the database.', 404));
   }
   res.status(200).json({
     status: 'success',
-    message: 'Users found',
-    results: allUsers.length,
-    data: {
-      allUsers,
-    },
+    message: `${allUsers.length} users found in the database`,
+    allUsers: allUsers.length,
+    results: users.length,
+    data: users,
   });
 });
 
@@ -70,6 +76,82 @@ exports.getUser = catchAsync(async (req, res, next) => {
     data: {
       user,
     },
+  });
+});
+
+exports.getAllContacts = catchAsync(async (req, res, next) => {
+  const allContacts = await Contact.find();
+  const features = new APIFeatures(Contact.find(), req.query).sort().paginate();
+
+  const contacts = await features.query;
+
+  if (allContacts.length < 1 || contacts.length < 1) {
+    return next(
+      new AppError('No contactUs emails found in the database.', 404)
+    );
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${allContacts.length} contactUs emails found in the database`,
+    allContacts: allContacts.length,
+    results: contacts.length,
+    data: contacts,
+  });
+});
+
+exports.getContact = catchAsync(async (req, res, next) => {
+  const contact = await Contact.findById(req.params.id);
+  if (!contact) {
+    return next(new AppError('No contact found with this ID', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: 'contact found',
+    data: contact,
+  });
+});
+
+exports.contactUs = catchAsync(async (req, res, next) => {
+  const { fullName, email, message } = req.body;
+  if (!fullName || !email || !message) {
+    return next(new AppError('Please input all fields'));
+  }
+  const user = await Contact.create(req.body);
+  await new Email(user).contactUs();
+  res.status(201).json({
+    status: 'success',
+    message: 'Email sent successfully',
+  });
+});
+
+exports.adminReply = catchAsync(async (req, res, next) => {
+  const message = req.body.message;
+  const contact = await Contact.findById(req.params.id);
+  if (!message || !contact) {
+    return next(
+      new AppError('Please input a message and a valid contact Id', 400)
+    );
+  }
+  const fullName = contact.fullName;
+  const email = contact.email;
+
+  await new adminEmail(fullName, email, message).sendReply();
+  res.status(200).json({
+    status: 'success',
+    message: 'Admin response has been sent successfully',
+  });
+});
+
+exports.deleteContact = catchAsync(async (req, res, next) => {
+  const contact = await Contact.findByIdAndDelete(req.params.id);
+
+  if (!contact) {
+    return next(new AppError('No contact found with this ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Contact deleted successfully',
   });
 });
 
