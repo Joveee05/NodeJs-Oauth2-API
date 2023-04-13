@@ -70,6 +70,32 @@ exports.getAllTutors = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getUnverifiedTutors = catchAsync(async (req, res, next) => {
+  const allUnverifiedTutors = await Tutor.find({
+    adminVerified: { $ne: true },
+  });
+  const features = new APIFeatures(
+    Tutor.find({ adminVerified: { $ne: true } }),
+    req.query
+  )
+    .sort()
+    .paginate();
+
+  const tutors = await features.query;
+  if (tutors.length < 1 || allUnverifiedTutors.length < 1) {
+    return next(
+      new AppError('No unverified tutors found in the database.', 404)
+    );
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${allUnverifiedTutors.length} unverified tutors found in database`,
+    allTutors: allUnverifiedTutors.length,
+    results: tutors.length,
+    data: tutors,
+  });
+});
+
 exports.findTutor = catchAsync(async (req, res, next) => {
   const tutor = await Tutor.find({
     $or: [{ course: { $regex: req.body.course } }],
