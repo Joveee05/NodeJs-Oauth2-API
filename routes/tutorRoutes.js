@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const tutorController = require('../controllers/tutor/tutorController');
 const auth = require('../controllers/tutor/auth');
+const authController = require('../controllers/authController');
 const router = express.Router();
 
 router.post('/signup', auth.signup);
@@ -16,7 +17,12 @@ router.patch('/resetPassword/:token', auth.resetPassword);
 
 router.get('/verify-email', auth.verifyEmail);
 
-router.get('/verify-tutor/:id', tutorController.verifyTutor);
+router.patch(
+  '/verify-tutor/:id',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.verifyTutor
+);
 
 router.get('/search_tutors', tutorController.searchTutor);
 
@@ -26,7 +32,19 @@ router
   .patch(tutorController.updateTutor)
   .delete(tutorController.deleteTutor);
 
-router.get('/', tutorController.getAllTutors);
+router.get(
+  '/',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.getAllTutors
+);
+
+router.get(
+  '/all_tutors/unverified',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.getUnverifiedTutors
+);
 
 router.use(auth.protect);
 
@@ -674,6 +692,34 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *         description: Returns the requested tutors who teach the courses searched for
  *       404:
  *         description: Oops... No tutor found. This may be due to a spelling error. Try searching again.
+ */
+
+/**
+ * @swagger
+ * /tutors/all_tutors/unverified:
+ *      get:
+ *        summary: Get all admin unverified tutors
+ *        tags: [Tutors]
+ *        parameters:
+ *            - in: query
+ *              name: page
+ *              description: page number
+ *            - in: query
+ *              name: limit
+ *              description: limit
+ *        responses:
+ *          200:
+ *            description: success
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Tutor'
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *          404:
+ *            description: No unverified tutors found in the database.
+ *
  */
 
 module.exports = router;
