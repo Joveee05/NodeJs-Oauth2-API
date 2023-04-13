@@ -81,6 +81,23 @@ exports.signup = catchAsync(async (req, res, next) => {
   sendAccessToken(newUser, 201, res);
 });
 
+exports.adminSignUp = catchAsync(async (req, res, next) => {
+  const user = new User({
+    email: 'admin@pisqre.com',
+    fullName: req.body.fullName,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+    isVerified: true,
+    role: 'admin',
+  });
+  const adminCheck = await User.findOne({ email: user.email });
+  if (adminCheck) {
+    return next(new AppError('Admin already exists', 403));
+  }
+  const admin = await user.save({ validateBeforeSave: true });
+  sendAccessToken(admin, 201, res);
+});
+
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
@@ -140,16 +157,19 @@ exports.isLoggedIn = async (req, res, next) => {
   next();
 };
 
-// exports.restrictTo =
-//   (...roles) =>
-//   (req, res, next) => {
-//     if (!roles.includes(req.user.role)) {
-//       return next(
-//         new AppError('You do not have permission to perform this action.', 403)
-//       );
-//     }
-//     next();
-//   };
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError(
+          'You do not have permission to perform this action. Please, Login as Admin to proceed',
+          403
+        )
+      );
+    }
+    next();
+  };
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
