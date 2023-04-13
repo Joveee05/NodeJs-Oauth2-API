@@ -6,15 +6,9 @@ const router = express.Router({ mergeParams: true });
 
 router.post('/signup', authController.signup);
 
+router.post('/admin/sign_up', authController.adminSignUp);
+
 router.post('/contactUs', userController.contactUs);
-
-router.post('/contactUs/admin_reply/:id', userController.adminReply);
-
-router.get('/contactUs/:id', userController.getContact);
-
-router.delete('/delete_contact/:id', userController.deleteContact);
-
-router.get('/all_emails', userController.getAllContacts);
 
 router.post('/login', authController.isLoggedIn, authController.login);
 
@@ -26,9 +20,45 @@ router.patch('/resetPassword/:token', authController.resetPassword);
 
 router.get('/verify-email', authController.verifyEmail);
 
-router.get('/', userController.getAllUsers);
-
 router.use(authController.protect);
+
+router.get('/', authController.restrictTo('admin'), userController.getAllUsers);
+
+router.patch(
+  '/add_admin',
+  authController.restrictTo('admin'),
+  userController.addAdmin
+);
+
+router.patch(
+  '/remove_admin',
+  authController.restrictTo('admin'),
+  userController.removeAdmin
+);
+
+router.post(
+  '/contactUs/admin_reply/:id',
+  authController.restrictTo('admin'),
+  userController.adminReply
+);
+
+router.get(
+  '/contactUs/:id',
+  authController.restrictTo('admin'),
+  userController.getContact
+);
+
+router.delete(
+  '/delete_contact/:id',
+  authController.restrictTo('admin'),
+  userController.deleteContact
+);
+
+router.get(
+  '/all_emails',
+  authController.restrictTo('admin'),
+  userController.getAllContacts
+);
 
 router.patch(
   '/updateMe',
@@ -44,7 +74,7 @@ router.patch('/updateMyPassword', authController.updatePassword);
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(userController.updateUser)
+  .patch(authController.restrictTo('admin'), userController.updateUser)
   .delete(userController.deleteUser);
 
 /**
@@ -207,20 +237,20 @@ router
  *                  passwordConfirm: test1234
  *      responses:
  *          201:
- *            description: Hello, this is the Pisqre API
+ *            description: success
  *            content:
  *                application/json:
  *                    schema:
  *                       $ref: '#/components/schemas/User'
  *                    example:
  *                        id: 65648ffa94874749b5
- *                        displayName: Monica Jules
+ *                        fullName: Monica Jules
  *                        firstName: Monica
  *                        lastName: Jules
+ *                        image: default.jpg
  *                        email: monica@example.com
  *                        password: test1234
  *                        passwordConfirm: test1234
- *                        photo: default.jpg
  *          403:
  *            description: User already exits
  *
@@ -580,6 +610,13 @@ router
  *      get:
  *        summary: Get all users
  *        tags: [Users]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
  *        responses:
  *          200:
  *            description: 40 users found in database
@@ -590,6 +627,118 @@ router
  *          404:
  *            description: No users found in the database
  *
+ */
+
+/**
+ * @swagger
+ * /users/admin/sign_up:
+ *    post:
+ *      summary: Admin signup
+ *      tags: [Users]
+ *      requestBody:
+ *        required: true
+ *        description: The email field has a default value of admin@pisqre.com. No need for admin to enter email address
+ *        content:
+ *          application/json:
+ *              schema:
+ *                 $ref: '#/components/schemas/User'
+ *              example:
+ *                  fullName: Monica Jules
+ *                  email: admin@pisqre.com
+ *                  password: test1234
+ *                  passwordConfirm: test1234
+ *      responses:
+ *          201:
+ *            description: success
+ *            content:
+ *                application/json:
+ *                    schema:
+ *                       $ref: '#/components/schemas/User'
+ *                    example:
+ *                        id: 65648ffa94874749b5
+ *                        fullName: Monica Jules
+ *                        email: monica@example.com
+ *                        image: default.jpg
+ *                        role: admin
+ *                        password: test1234
+ *                        passwordConfirm: test1234
+ *          403:
+ *            description: Admin already exits
+ *
+ *          500:
+ *            description: Internal server error. Try again
+ */
+
+/**
+ * @swagger
+ * /users/add_admin:
+ *    patch:
+ *      summary: Add new admin
+ *      tags: [Users]
+ *      requestBody:
+ *        required: true
+ *        description: The email address of the user to be made admin
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *            example:
+ *               email: abc@example.com
+ *      responses:
+ *        200:
+ *          description: John Doe has successfully been made an admin
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/User'
+ *              example:
+ *                 _id: 64075674ffgrte6474ac
+ *                 fullName: John Doe
+ *                 email: abc@example.com
+ *                 role: admin
+ *                 updatedAt: 2023-04-09
+ *        403:
+ *          description: This user is already an admin
+ *        404:
+ *          description: No user found with the email provided
+ *        500:
+ *          description: Internal server error. Try again
+ */
+
+/**
+ * @swagger
+ * /users/remove_admin:
+ *    patch:
+ *      summary: Remove admin
+ *      tags: [Users]
+ *      requestBody:
+ *        required: true
+ *        description: The email address of the user to be removed from admin role
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/User'
+ *            example:
+ *               email: abc@example.com
+ *      responses:
+ *        200:
+ *          description: John Doe has successfully been made a student
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/User'
+ *              example:
+ *                 _id: 64075674ffgrte6474ac
+ *                 fullName: John Doe
+ *                 email: abc@example.com
+ *                 role: student
+ *                 updatedAt: 2023-04-09
+ *        403:
+ *          description: This user is already a student
+ *        404:
+ *          description: No user found with the email provided
+ *        500:
+ *          description: Internal server error. Try again
  */
 
 module.exports = router;
