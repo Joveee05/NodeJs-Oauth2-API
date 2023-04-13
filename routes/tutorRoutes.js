@@ -387,6 +387,13 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *      get:
  *        summary: Get all tutors
  *        tags: [Tutors]
+ *        parameters:
+ *            - in: query
+ *              name: page
+ *              description: page number
+ *            - in: query
+ *              name: limit
+ *              description: limit
  *        responses:
  *          200:
  *            description: Tutors found
