@@ -2,6 +2,7 @@
 const Vote = require('../models/vote');
 const Notification = require('../models/notificationModel');
 const AppError = require('../utils/appError');
+const Contact = require('../models/contactUs');
 
 async function removeVotesForObjectId(id) {
   try {
@@ -44,8 +45,19 @@ const updateNotification = async function (id) {
   }
 };
 
+const updateReply = async function (id) {
+  const contact = await Contact.findByIdAndUpdate(id, { new: true });
+  if (contact) {
+    contact.replied = true;
+    await contact.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid contact id', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
+  updateReply,
   updateNotification,
 };
