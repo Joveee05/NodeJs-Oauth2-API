@@ -631,46 +631,6 @@ router
 
 /**
  * @swagger
- * /users/admin/sign_up:
- *    post:
- *      summary: Admin signup
- *      tags: [Users]
- *      requestBody:
- *        required: true
- *        description: The email field has a default value of admin@pisqre.com. No need for admin to enter email address
- *        content:
- *          application/json:
- *              schema:
- *                 $ref: '#/components/schemas/User'
- *              example:
- *                  fullName: Monica Jules
- *                  email: admin@pisqre.com
- *                  password: test1234
- *                  passwordConfirm: test1234
- *      responses:
- *          201:
- *            description: success
- *            content:
- *                application/json:
- *                    schema:
- *                       $ref: '#/components/schemas/User'
- *                    example:
- *                        id: 65648ffa94874749b5
- *                        fullName: Monica Jules
- *                        email: monica@example.com
- *                        image: default.jpg
- *                        role: admin
- *                        password: test1234
- *                        passwordConfirm: test1234
- *          403:
- *            description: Admin already exits
- *
- *          500:
- *            description: Internal server error. Try again
- */
-
-/**
- * @swagger
  * /users/add_admin:
  *    patch:
  *      summary: Add new admin
