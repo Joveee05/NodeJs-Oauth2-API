@@ -84,7 +84,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.adminSignUp = catchAsync(async (req, res, next) => {
   const user = new User({
     email: 'admin@pisqre.com',
-    fullName: req.body.fullName,
+    fullName: 'Pisqre Community',
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     isVerified: true,
