@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     },
     fullName: {
       type: String,
-      required: true,
+      required: [true, 'Please provide a fullName'],
     },
     firstName: {
       type: String,
@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
+      required: [true, 'Please enter an email address'],
       validate: [validator.isEmail, 'Please provide a valid email address'],
       lowercase: true,
       trim: true,
@@ -38,6 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
+      enum: ['student', 'admin'],
       default: 'student',
     },
     password: {
