@@ -8,6 +8,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const { updateReply } = require('./utility');
 
 const multerStorage = multer.memoryStorage();
 
@@ -116,17 +117,19 @@ exports.contactUs = catchAsync(async (req, res, next) => {
   if (!fullName || !email || !message) {
     return next(new AppError('Please input all fields'));
   }
-  const user = await Contact.create(req.body);
-  await new Email(user).contactUs();
+  const contact = await Contact.create(req.body);
+  await new Email(contact).contactUs();
   res.status(201).json({
     status: 'success',
     message: 'Email sent successfully',
+    data: contact,
   });
 });
 
 exports.adminReply = catchAsync(async (req, res, next) => {
+  const contactId = req.params.id;
   const message = req.body.message;
-  const contact = await Contact.findById(req.params.id);
+  const contact = await Contact.findById(contactId);
   if (!message || !contact) {
     return next(
       new AppError('Please input a message and a valid contact Id', 400)
@@ -136,10 +139,51 @@ exports.adminReply = catchAsync(async (req, res, next) => {
   const email = contact.email;
 
   await new adminEmail(fullName, email, message).sendReply();
+  updateReply(contactId);
   res.status(200).json({
     status: 'success',
     message: 'Admin response has been sent successfully',
   });
+});
+
+exports.addAdmin = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email }).select(
+    'fullName email role'
+  );
+
+  if (!user) {
+    return next(new AppError('No user found with the email provided', 404));
+  } else if (user.role === 'admin') {
+    return next(new AppError('This user is already an admin', 403));
+  } else {
+    user.role = 'admin';
+    const newAdmin = await user.save({ validateBeforeSave: false });
+    return res.status(200).json({
+      status: 'success',
+      message: `${user.fullName} has successfully been made an admin`,
+      data: newAdmin,
+    });
+  }
+});
+
+exports.removeAdmin = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email }).select(
+    'fullName email role'
+  );
+
+  if (!user) {
+    return next(new AppError('No user found with the email provided', 404));
+  } else if (user.role === 'student') {
+    return next(new AppError('This user is already a student', 403));
+  } else {
+    user.role = 'student';
+    const newStudent = await user.save({ validateBeforeSave: false });
+    return res.status(200).json({
+      status: 'success',
+      message: `${user.fullName} has successfully been made a student`,
+      data: newStudent,
+    });
+  }
 });
 
 exports.deleteContact = catchAsync(async (req, res, next) => {
