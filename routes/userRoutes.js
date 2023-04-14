@@ -24,6 +24,12 @@ router.use(authController.protect);
 
 router.get('/', authController.restrictTo('admin'), userController.getAllUsers);
 
+router.get(
+  '/all_admins',
+  authController.restrictTo('admin'),
+  userController.getAllAdmins
+);
+
 router.patch(
   '/add_admin',
   authController.restrictTo('admin'),
@@ -69,13 +75,15 @@ router.patch(
 
 router.get('/me', userController.getMe, userController.getUser);
 
+router.delete('/delete_me', userController.getMe, userController.deleteUser);
+
 router.patch('/updateMyPassword', authController.updatePassword);
 
 router
   .route('/:id')
   .get(userController.getUser)
   .patch(authController.restrictTo('admin'), userController.updateUser)
-  .delete(userController.deleteUser);
+  .delete(authController.restrictTo('admin'), userController.deleteUser);
 
 /**
  * @swagger
@@ -214,6 +222,19 @@ router
  *            description: No content
  *          404:
  *            description: Not found
+ */
+
+/**
+ * @swagger
+ * /users/delete_me:
+ *    delete:
+ *      summary: Delete my account
+ *      tags: [Users]
+ *      responses:
+ *          200:
+ *            description: User account deleted successfully
+ *          404:
+ *            description: No user found with this ID
  */
 
 /**
@@ -693,12 +714,49 @@ router
  *                 email: abc@example.com
  *                 role: student
  *                 updatedAt: 2023-04-09
+ *        401:
+ *          description: You are not logged in. Please log in to get access
  *        403:
  *          description: This user is already a student
  *        404:
  *          description: No user found with the email provided
  *        500:
  *          description: Internal server error. Try again
+ */
+
+/**
+ * @swagger
+ * /users/all_admins:
+ *      get:
+ *        summary: Get all admins
+ *        tags: [Users]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
+ *        responses:
+ *          200:
+ *            description: 2 admins found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/User'
+ *                  example:
+ *                      id: 645947hehe6363h
+ *                      fullName: Pisqre Community
+ *                      email: admin@pisqre.com
+ *                      role: admin
+ *                      image: deafult.jpg
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: No admin found
+ *
  */
 
 module.exports = router;
