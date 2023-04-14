@@ -207,8 +207,12 @@ exports.verifyTutor = catchAsync(async (req, res, next) => {
       status: 'success',
       message: 'Tutor verification successful',
     });
+  } else if (tutor.adminVerified == true) {
+    return next(new AppError('This tutor has already been verified', 400));
   } else {
-    return next(new AppError('Tutor verification failed'));
+    return next(
+      new AppError('Tutor verification failed. No tutor found.', 404)
+    );
   }
 });
 
