@@ -146,9 +146,28 @@ exports.adminReply = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getAllAdmins = catchAsync(async (req, res, next) => {
+  const allAdmin = await User.find({ role: 'admin' });
+  const features = new APIFeatures(User.find({ role: 'admin' }), req.query)
+    .sort()
+    .paginate();
+  const admin = await features.query.select('fullName email role image');
+
+  if (allAdmin.length < 1 || admin.length < 1) {
+    return next(new AppError('No admin found', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${allAdmin.length} admins found`,
+    allAdmin: allAdmin.length,
+    results: admin.length,
+    data: admin,
+  });
+});
+
 exports.addAdmin = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email }).select(
-    'fullName email role'
+    'fullName email role image'
   );
 
   if (!user) {
@@ -168,7 +187,7 @@ exports.addAdmin = catchAsync(async (req, res, next) => {
 
 exports.removeAdmin = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email }).select(
-    'fullName email role'
+    'fullName email role image'
   );
 
   if (!user) {
