@@ -137,12 +137,12 @@ exports.deleteTutor = catchAsync(async (req, res, next) => {
   const tutor = await Tutor.findByIdAndDelete(req.params.id);
 
   if (!tutor) {
-    return next(new AppError('No user found with this ID', 404));
+    return next(new AppError('No tutor found with this ID', 404));
   }
 
-  res.status(204).json({
+  res.status(200).json({
     status: 'success',
-    data: null,
+    message: 'Tutor account deleted successfully',
   });
 });
 
