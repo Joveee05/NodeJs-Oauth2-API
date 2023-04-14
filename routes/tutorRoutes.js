@@ -29,7 +29,7 @@ router.get('/search_tutors', tutorController.searchTutor);
 router
   .route('/:id')
   .get(tutorController.getTutor)
-  .patch(tutorController.updateTutor)
+  .patch(auth.protect, tutorController.updateTutor)
   .delete(tutorController.deleteTutor);
 
 router.get(
@@ -720,6 +720,30 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *          404:
  *            description: No unverified tutors found in the database.
  *
+ */
+
+/**
+ * @swagger
+ * /tutors/verify-tutor/{id}:
+ *    patch:
+ *      summary: Verify tutor by admin
+ *      tags: [Tutors]
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          description: The tutor id to be verified by admin
+ *      responses:
+ *          200:
+ *            description: Tutor verification successful
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          400:
+ *            description: This tutor has already been verified
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: Tutor verification failed.
  */
 
 module.exports = router;
