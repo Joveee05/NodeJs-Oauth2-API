@@ -743,7 +743,7 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *          403:
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
- *            description: Tutor verification failed.
+ *            description: Tutor verification failed. No tutor found.
  */
 
 module.exports = router;
