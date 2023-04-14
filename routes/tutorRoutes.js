@@ -30,7 +30,11 @@ router
   .route('/:id')
   .get(tutorController.getTutor)
   .patch(auth.protect, tutorController.updateTutor)
-  .delete(tutorController.deleteTutor);
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin'),
+    tutorController.deleteTutor
+  );
 
 router.get(
   '/',
@@ -56,6 +60,12 @@ router.patch(
 );
 
 router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
+
+router.delete(
+  '/me/delete_me',
+  tutorController.getMe,
+  tutorController.deleteTutor
+);
 
 router.patch('/me/updateMyPassword', auth.updatePassword);
 
@@ -251,6 +261,19 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *            description: No content
  *          404:
  *            description: Not found
+ */
+
+/**
+ * @swagger
+ * /tutors/me/delete_me:
+ *    delete:
+ *      summary: Delete my account
+ *      tags: [Tutors]
+ *      responses:
+ *         200:
+ *            description: Tutot account deleted successfully
+ *         404:
+ *            description: No tutor found with this ID
  */
 
 /**
