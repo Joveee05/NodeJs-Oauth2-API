@@ -96,23 +96,6 @@ exports.getUnverifiedTutors = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.findTutor = catchAsync(async (req, res, next) => {
-  const tutor = await Tutor.find({
-    $or: [{ course: { $regex: req.body.course } }],
-  });
-  if (tutor.length < 1) {
-    return next(
-      new AppError('Oops... No tutor found. Try searching again.', 404)
-    );
-  } else {
-    res.status(200).json({
-      status: 'success',
-      result: tutor.length,
-      tutor,
-    });
-  }
-});
-
 exports.getTutor = catchAsync(async (req, res, next) => {
   const tutor = await Tutor.findById(req.params.id);
   if (!tutor) {
