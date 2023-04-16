@@ -7,29 +7,7 @@ const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const bookingEmail = require('../utils/bookingEmail');
 const catchAsync = require('../utils/catchAsync');
-
-const updateSchedule = async function (id) {
-  const result = await Schedule.findByIdAndUpdate(id, { new: true });
-  if (result) {
-    result.booked = true;
-    await result.save({ validateBeforeSave: false });
-  } else {
-    return new AppError('Inavlid schedule id', 400);
-  }
-};
-
-const updateNumOfBookings = async function (id) {
-  const result = await Tutor.findByIdAndUpdate(
-    id,
-    { $inc: { numOfBookings: 1 } },
-    { new: true }
-  );
-  if (result) {
-    await result.save({ validateBeforeSave: false });
-  } else {
-    return new AppError('Inavlid tutor id', 400);
-  }
-};
+const { updateNumOfBookings, updateSchedule } = require('./utility');
 
 exports.bookSession = catchAsync(async (req, res, next) => {
   const body = {
@@ -94,7 +72,9 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(
     Booking.find({ tutor: req.user.id }),
     req.query
-  ).paginate();
+  )
+    .sort()
+    .paginate();
   const myBookings = await features.query;
   if (myBookings.length < 1) {
     return next(new AppError('Oops... No bookings found!!', 404));
