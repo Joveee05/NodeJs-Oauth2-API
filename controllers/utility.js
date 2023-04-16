@@ -55,9 +55,34 @@ const updateReply = async function (id) {
   }
 };
 
+const updateSchedule = async function (id) {
+  const result = await Schedule.findByIdAndUpdate(id, { new: true });
+  if (result) {
+    result.booked = true;
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid schedule id', 400);
+  }
+};
+
+const updateNumOfBookings = async function (id) {
+  const result = await Tutor.findByIdAndUpdate(
+    id,
+    { $inc: { numOfBookings: 1 } },
+    { new: true }
+  );
+  if (result) {
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid tutor id', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
   updateReply,
+  updateNumOfBookings,
+  updateSchedule,
   updateNotification,
 };
