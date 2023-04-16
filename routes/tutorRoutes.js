@@ -18,7 +18,7 @@ router.patch('/resetPassword/:token', auth.resetPassword);
 router.get('/verify-email', auth.verifyEmail);
 
 router.patch(
-  '/verify-tutor/:id',
+  '/verify-tutor',
   authController.protect,
   authController.restrictTo('admin'),
   tutorController.verifyTutor
@@ -36,12 +36,7 @@ router
     tutorController.deleteTutor
   );
 
-router.get(
-  '/',
-  authController.protect,
-  authController.restrictTo('admin'),
-  tutorController.getAllTutors
-);
+router.get('/', tutorController.getAllTutors);
 
 router.get(
   '/all_tutors/unverified',
@@ -747,12 +742,12 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
 
 /**
  * @swagger
- * /tutors/verify-tutor/{id}:
+ * /tutors/verify-tutor:
  *    patch:
  *      summary: Verify tutor by admin
  *      tags: [Tutors]
  *      parameters:
- *        - in: path
+ *        - in: body
  *          name: id
  *          required: true
  *          description: The tutor id to be verified by admin
