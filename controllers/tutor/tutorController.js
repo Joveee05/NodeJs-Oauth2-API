@@ -181,7 +181,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyTutor = catchAsync(async (req, res, next) => {
-  const tutorId = req.params.id;
+  const tutorId = req.body.id;
   const tutor = await Tutor.findOne({ _id: tutorId });
   if (tutor) {
     tutor.adminVerified = true;
