@@ -24,6 +24,13 @@ router.patch(
   tutorController.verifyTutor
 );
 
+router.patch(
+  '/cancel_verification',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.unverifyTutor
+);
+
 router.get('/search_tutors', tutorController.searchTutor);
 
 router
@@ -755,6 +762,10 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *      parameters:
  *        - in: body
  *          name: id
+ *          schema:
+ *             properties:
+ *                 id:
+ *                  type: string
  *          required: true
  *          description: The tutor id to be verified by admin
  *      responses:
@@ -768,6 +779,34 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: Tutor verification failed. No tutor found.
+ */
+
+/**
+ * @swagger
+ * /tutors/cancel_verification:
+ *    patch:
+ *      summary: Cancel/Revoke tutor verification by admin
+ *      tags: [Tutors]
+ *      parameters:
+ *        - in: body
+ *          name: id
+ *          schema:
+ *              properties:
+ *                 id:
+ *                  type: string
+ *          required: true
+ *          description: The tutor id to be unverified by admin
+ *      responses:
+ *          200:
+ *            description: Tutor verification has been revoked
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          400:
+ *            description: This tutor verification has already been revoked
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: No tutor found.
  */
 
 /**
