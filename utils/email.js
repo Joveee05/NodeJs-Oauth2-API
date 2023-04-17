@@ -60,8 +60,12 @@ module.exports = class Email {
     await this.send('tutorWelcome', 'Become a Tutor');
   }
 
-  async tutorVerify() {
-    await this.send('tutorVerify', 'Documents Received');
+  async tutorDocuments() {
+    await this.send('tutorDocuments', 'Documents Received');
+  }
+
+  async tutorVerified() {
+    await this.send('tutorVerified', 'Congratulations - You are now a Tutor');
   }
 
   async sendPasswordReset() {
