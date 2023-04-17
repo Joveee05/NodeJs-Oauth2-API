@@ -130,6 +130,22 @@ exports.deleteTutor = catchAsync(async (req, res, next) => {
 });
 
 exports.updateTutor = catchAsync(async (req, res, next) => {
+  const tutor = await Tutor.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!tutor) {
+    return next(new AppError('No tutor found with this ID', 404));
+  } else {
+    res.status(200).json({
+      status: 'success',
+      message: 'Tutor modification successful',
+      data: tutor,
+    });
+  }
+});
+
+exports.tutorDocuments = catchAsync(async (req, res, next) => {
   if (
     req.body.password ||
     req.body.passwordConfirm ||
@@ -150,10 +166,10 @@ exports.updateTutor = catchAsync(async (req, res, next) => {
   if (!tutor) {
     return next(new AppError('No tutor found with this ID', 404));
   } else {
-    await new Email(tutor).tutorVerify();
+    await new Email(tutor).tutorDocuments();
     res.status(200).json({
       status: 'success',
-      message: 'Tutor modification successful',
+      message: 'Tutor profile updated successfully',
       data: tutor,
     });
   }
@@ -183,15 +199,16 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 exports.verifyTutor = catchAsync(async (req, res, next) => {
   const tutorId = req.body.id;
   const tutor = await Tutor.findOne({ _id: tutorId });
-  if (tutor) {
+  if (tutor.adminVerified == true) {
+    return next(new AppError('This tutor has already been verified', 400));
+  } else if (tutor) {
     tutor.adminVerified = true;
     await tutor.save({ validateBeforeSave: false });
+    await new Email(tutor).tutorVerified();
     res.status(200).json({
       status: 'success',
       message: 'Tutor verification successful',
     });
-  } else if (tutor.adminVerified == true) {
-    return next(new AppError('This tutor has already been verified', 400));
   } else {
     return next(
       new AppError('Tutor verification failed. No tutor found.', 404)
