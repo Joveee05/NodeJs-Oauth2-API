@@ -29,7 +29,11 @@ router.get('/search_tutors', tutorController.searchTutor);
 router
   .route('/:id')
   .get(tutorController.getTutor)
-  .patch(authController.restrictTo('admin'), tutorController.updateTutor)
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin'),
+    tutorController.updateTutor
+  )
   .delete(
     authController.protect,
     authController.restrictTo('admin'),
