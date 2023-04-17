@@ -29,7 +29,7 @@ router.get('/search_tutors', tutorController.searchTutor);
 router
   .route('/:id')
   .get(tutorController.getTutor)
-  .patch(auth.protect, tutorController.updateTutor)
+  .patch(authController.restrictTo('admin'), tutorController.updateTutor)
   .delete(
     authController.protect,
     authController.restrictTo('admin'),
@@ -65,6 +65,8 @@ router.delete(
 router.patch('/me/updateMyPassword', auth.updatePassword);
 
 router.post('/ask_questions', tutorController.askQuestion);
+
+router.patch('/update_tutor/:id', tutorController.tutorDocuments);
 
 router.post('/answers/:id', tutorController.tutorAnswer);
 
@@ -762,6 +764,41 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: Tutor verification failed. No tutor found.
+ */
+
+/**
+ * @swagger
+ * /tutors/update_tutor/{id}:
+ *    patch:
+ *      summary: Edit or update tutor documents
+ *      tags: [Tutors]
+ *      parameters:
+ *      - in: path
+ *        name: The tutor id
+ *        required: true
+ *        description: The tutor id
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Tutor'
+ *            example:
+ *               university: University of India
+ *               degree: Bachelor of Engineering
+ *               course: Mathematics
+ *               languageSpoken: English
+ *      responses:
+ *        200:
+ *          description: Tutor profile updated successfully
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Tutor'
+ *        404:
+ *          description: The tutor was not found
+ *        500:
+ *          description: Server error
  */
 
 module.exports = router;
