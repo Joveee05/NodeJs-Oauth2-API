@@ -216,6 +216,25 @@ exports.verifyTutor = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.unverifyTutor = catchAsync(async (req, res, next) => {
+  const tutorId = req.body.id;
+  const tutor = await Tutor.findOne({ _id: tutorId });
+  if (tutor.adminVerified == false) {
+    return next(
+      new AppError('This tutor verification has already been revoked', 400)
+    );
+  } else if (tutor) {
+    tutor.adminVerified = false;
+    await tutor.save({ validateBeforeSave: false });
+    res.status(200).json({
+      status: 'success',
+      message: 'Tutor verification has been revoked',
+    });
+  } else {
+    return next(new AppError('No tutor found.', 404));
+  }
+});
+
 exports.askQuestion = catchAsync(async (req, res, next) => {
   let keywords = [];
   if (req.body.keywords) keywords = req.body.keywords;
