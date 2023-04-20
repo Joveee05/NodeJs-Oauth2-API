@@ -4,17 +4,22 @@ const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+const { createNotification } = require('./utility');
+
+const message =
+  'We have recieved your assignment. A solution will be provided shortly - Admin';
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
   const body = {
     courseName: req.body.courseName,
-    email: req.body.email,
     description: req.body.description,
     amount: req.body.amount,
     postedBy: req.user.id,
     deadLine: req.body.deadLine,
   };
+  const userId = body.postedBy;
   const assignment = await Assignment.create(body);
+  await createNotification(message, userId, assignment._id);
 
   res.status(201).json({
     status: 'success',
