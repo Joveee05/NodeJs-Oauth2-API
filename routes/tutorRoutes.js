@@ -17,6 +17,13 @@ router.patch('/resetPassword/:token', auth.resetPassword);
 
 router.get('/verify-email', auth.verifyEmail);
 
+router.post(
+  '/send_assignment/:id',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.sendToTutor
+);
+
 router.patch(
   '/verify-tutor',
   authController.protect,
@@ -842,6 +849,38 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *          description: The tutor was not found
  *        500:
  *          description: Server error
+ */
+
+/**
+ * @swagger
+ * /tutors/send_assignment/{id}:
+ *    post:
+ *      summary: Send assignment to tutor by admin
+ *      tags: [Tutors]
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          description: The tutor id
+ *          required: true
+ *        - in: body
+ *          name: id
+ *          schema:
+ *              properties:
+ *                 id:
+ *                  type: string
+ *          required: true
+ *          description: The assignment id
+ *      responses:
+ *          200:
+ *            description: Assignment sent to tutor
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          400:
+ *            description: Please provide the tutor and assignment id
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: No tutor found with this id
  */
 
 module.exports = router;
