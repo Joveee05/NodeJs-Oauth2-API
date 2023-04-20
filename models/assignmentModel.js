@@ -7,13 +7,6 @@ const assignmentSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide a courseName'],
     },
-    email: {
-      type: String,
-      required: [true, 'Please enter an email address'],
-      validate: [validator.isEmail, 'Please provide a valid email address'],
-      lowercase: true,
-      trim: true,
-    },
     description: {
       type: String,
       required: [true, 'Please provide a description'],
