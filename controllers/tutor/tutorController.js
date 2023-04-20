@@ -235,6 +235,26 @@ exports.unverifyTutor = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.sendToTutor = catchAsync(async (req, res, next) => {
+  const tutorId = req.params.id;
+  const assignmentId = req.body.assignmentId;
+  const tutor = await Tutor.findById(tutorId);
+  if (!tutorId || !assignmentId) {
+    return next(
+      new AppError('Please provide the tutor and assignment id', 400)
+    );
+  } else if (!tutor) {
+    return next(new AppError('No tutor found with this id', 404));
+  }
+  const message = `Hi ${tutor.fullName}, a student needs your help with an assignment - Admin`;
+  await createNotification(message, tutorId, assignmentId);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Assignment sent to tutor',
+  });
+});
+
 exports.askQuestion = catchAsync(async (req, res, next) => {
   let keywords = [];
   if (req.body.keywords) keywords = req.body.keywords;
