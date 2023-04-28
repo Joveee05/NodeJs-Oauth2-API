@@ -8,12 +8,13 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
-let { createNotification } = require('../utility');
+let { createNotification, saveAssignmentDetails } = require('../utility');
 let {
   updateQuestion,
   updateNumOfAns,
   removeNumOfAns,
 } = require('../tutor/helpers');
+const Detail = require('../../models/saveAssignmentModel');
 
 const multerStorage = multer.memoryStorage();
 
@@ -247,11 +248,46 @@ exports.sendToTutor = catchAsync(async (req, res, next) => {
     return next(new AppError('No tutor found with this id', 404));
   }
   const message = `Hi ${tutor.fullName}, a student needs your help with an assignment - Admin`;
+  await saveAssignmentDetails(tutorId, assignmentId);
   await createNotification(message, tutorId, assignmentId);
 
   res.status(200).json({
     status: 'success',
     message: 'Assignment sent to tutor',
+  });
+});
+
+exports.acceptAssignment = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const assignment = await Detail.findOne({ assignmentID: id }).exec();
+  if (!id) {
+    return next(new AppError('Please provide the assignment id', 400));
+  } else if (!assignment) {
+    return next(new AppError('No assignment found with this id', 404));
+  } else if (assignment) {
+    assignment.accepted = true;
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Assignment accepted by tutor',
+  });
+});
+
+exports.rejectAssignment = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const assignment = await Detail.findOne({ assignmentID: id }).exec();
+  if (!id) {
+    return next(new AppError('Please provide the assignment id', 400));
+  } else if (!assignment) {
+    return next(new AppError('No assignment found with this id', 404));
+  } else if (assignment) {
+    assignment.rejected = true;
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Assignment rejected by tutor',
   });
 });
 
