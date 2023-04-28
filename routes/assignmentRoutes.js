@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const assignmentController = require('../controllers/assignmentController');
 const authController = require('../controllers/authController');
+const assignment = require('../controllers/sentAssignments');
 
 router.use(authController.protect);
 
@@ -14,6 +15,18 @@ router.get(
 router.get('/me/my_assignments', assignmentController.getMyAssignments);
 
 router.post('/new_assignment', assignmentController.createAssignment);
+
+router.get(
+  '/all_accepted_assignments',
+  authController.restrictTo('admin'),
+  assignment.acceptedAssignment
+);
+
+router.get(
+  '/all_rejected_assignments',
+  authController.restrictTo('admin'),
+  assignment.rejectedAssignment
+);
 
 router
   .route('/:id')
@@ -238,6 +251,56 @@ router
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: Oops... You have no assignments!!
+ *
+ */
+
+/**
+ * @swagger
+ * /assignments/all_accepted_assignments:
+ *      get:
+ *        summary: Get all accepted assignments
+ *        tags: [Assignments]
+ *        parameters:
+ *            - in: query
+ *              name: page
+ *              description: page number
+ *            - in: query
+ *              name: limit
+ *              description: limit
+ *        responses:
+ *          200:
+ *            description: 5 assignments found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *          404:
+ *            description: No accepted assignments found in the database
+ *
+ */
+
+/**
+ * @swagger
+ * /assignments/all_rejected_assignments:
+ *      get:
+ *        summary: Get all rejected assignments
+ *        tags: [Assignments]
+ *        parameters:
+ *            - in: query
+ *              name: page
+ *              description: page number
+ *            - in: query
+ *              name: limit
+ *              description: limit
+ *        responses:
+ *          200:
+ *            description: 5 rejected assignments found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *          404:
+ *            description: No accepted assignments found in the database
  *
  */
 
