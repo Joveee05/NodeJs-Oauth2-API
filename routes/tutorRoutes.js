@@ -3,7 +3,7 @@ const passport = require('passport');
 const tutorController = require('../controllers/tutor/tutorController');
 const auth = require('../controllers/tutor/auth');
 const authController = require('../controllers/authController');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.post('/signup', auth.signup);
 
@@ -16,6 +16,10 @@ router.post('/forgotPassword', auth.forgotPassword);
 router.patch('/resetPassword/:token', auth.resetPassword);
 
 router.get('/verify-email', auth.verifyEmail);
+
+router.get('/accept_assignment/:id', tutorController.acceptAssignment);
+
+router.get('/reject_assignment/:id', tutorController.rejectAssignment);
 
 router.post(
   '/send_assignment/:id',
@@ -881,6 +885,52 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: No tutor found with this id
+ */
+
+/**
+ * @swagger
+ * /tutors/accept_assignment/{id}:
+ *      get:
+ *        summary: Accept assignment
+ *        tags: [Tutors]
+ *        parameters:
+ *          - in: path
+ *            name: Assignmentid
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: The assignment id
+ *        responses:
+ *          200:
+ *            description: Assignment accepted by tutor
+ *          400:
+ *            description: Please provide the assignment id
+ *          404:
+ *            description: No assignment found with this id
+ *
+ */
+
+/**
+ * @swagger
+ * /tutors/reject_assignment/{id}:
+ *      get:
+ *        summary: Reject assignment
+ *        tags: [Tutors]
+ *        parameters:
+ *          - in: path
+ *            name: Assignmentid
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: The assignment id
+ *        responses:
+ *          200:
+ *            description: Assignment rejected by tutor
+ *          400:
+ *            description: Please provide the assignment id
+ *          404:
+ *            description: No assignment found with this id
+ *
  */
 
 module.exports = router;
