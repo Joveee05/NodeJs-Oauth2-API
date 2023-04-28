@@ -3,6 +3,7 @@ const Vote = require('../models/vote');
 const Notification = require('../models/notificationModel');
 const AppError = require('../utils/appError');
 const Contact = require('../models/contactUs');
+const Detail = require('../models/saveAssignmentModel');
 
 async function removeVotesForObjectId(id) {
   try {
@@ -78,11 +79,24 @@ const updateNumOfBookings = async function (id) {
   }
 };
 
+const saveAssignmentDetails = async function (tutorID, assignmentID) {
+  try {
+    const payload = {
+      tutorID,
+      assignmentID,
+    };
+    const result = await Detail.create(payload);
+  } catch (err) {
+    return new AppError('Failed to create new assignment entry', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
   updateReply,
   updateNumOfBookings,
   updateSchedule,
+  saveAssignmentDetails,
   updateNotification,
 };
