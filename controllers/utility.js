@@ -1,6 +1,7 @@
 //For resolving circular dependencies
 const Vote = require('../models/vote');
 const Notification = require('../models/notificationModel');
+const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
 const Contact = require('../models/contactUs');
 const Detail = require('../models/saveAssignmentModel');
@@ -36,7 +37,7 @@ async function createNotification(message, userID, questionID, answerID) {
 }
 
 const updateNotification = async function (id) {
-  const result = await Notification.findByIdAndUpdate(id, { new: true });
+  const result = await Notification.findById(id);
   if (result) {
     result.read = true;
     const notification = await result.save({ validateBeforeSave: false });
@@ -47,7 +48,7 @@ const updateNotification = async function (id) {
 };
 
 const updateReply = async function (id) {
-  const contact = await Contact.findByIdAndUpdate(id, { new: true });
+  const contact = await Contact.findById(id);
   if (contact) {
     contact.replied = true;
     await contact.save({ validateBeforeSave: false });
@@ -57,7 +58,7 @@ const updateReply = async function (id) {
 };
 
 const updateSchedule = async function (id) {
-  const result = await Schedule.findByIdAndUpdate(id, { new: true });
+  const result = await Schedule.findById(id);
   if (result) {
     result.booked = true;
     await result.save({ validateBeforeSave: false });
@@ -91,6 +92,16 @@ const saveAssignmentDetails = async function (tutorID, assignmentID) {
   }
 };
 
+const updateAssignmentStatus = async function (id) {
+  const response = await Assignment.findById(id);
+  if (response) {
+    response.status = 'sent to tutor';
+    await response.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid assignment id', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
@@ -99,4 +110,5 @@ module.exports = {
   updateSchedule,
   saveAssignmentDetails,
   updateNotification,
+  updateAssignmentStatus,
 };
