@@ -6,17 +6,45 @@ const catchAsync = require('../utils/catchAsync');
 let { updateNotification } = require('../controllers/utility');
 const APIFeatures = require('../utils/apiFeatures');
 
+exports.getAllSentAssignments = catchAsync(async (req, res, next) => {
+  const allSentAssignments = await Detail.find();
+  const features = new APIFeatures(Detail.find(), req.query).sort().paginate();
+
+  const assignments = await features.query;
+  if (allSentAssignments.length < 1 || assignments.length < 1) {
+    return next(new AppError('No assignments found in the database.', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${allSentAssignments.length} assignments found`,
+    allSentAssignments: allSentAssignments.length,
+    results: assignments.length,
+    data: assignments,
+  });
+});
+
 exports.getTutorAssignment = catchAsync(async (req, res, next) => {
   const tutor = await Detail.find({ tutorID: req.params.id });
-  if (!tutor) {
+  const features = new APIFeatures(
+    Detail.find({ tutorID: req.params.id }),
+    req.query
+  )
+    .sort()
+    .paginate();
+
+  const result = await features.query;
+
+  if (tutor.length < 1 || result.length < 1) {
     return next(
       new AppError('Oops... No assignments found for this tutor', 404)
     );
   }
   res.status(200).json({
     status: 'success',
-    message: `${tutor.length} assignments found`,
-    data: tutor,
+    allAssignments: tutor.length,
+    results: result.length,
+    message: `${result.length} assignments found`,
+    data: result,
   });
 });
 
@@ -59,5 +87,20 @@ exports.rejectedAssignment = catchAsync(async (req, res, next) => {
     allRejectedAssignments: allRejectedAssignments.length,
     result: assignments.length,
     data: assignments,
+  });
+});
+
+exports.findAcceptedAssignments = catchAsync(async (req, res, next) => {
+  const assignment = await Detail.find({ assignmentID: req.params.id })
+    .where('accepted')
+    .equals(true)
+    .exec();
+  if (assignment.length < 1) {
+    return next(new AppError('No tutor has accepted this assignment', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${assignment.length} accepted assignment(s) `,
+    data: assignment,
   });
 });
