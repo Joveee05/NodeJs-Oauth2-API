@@ -7,9 +7,33 @@ const assignment = require('../controllers/sentAssignments');
 router.use(authController.protect);
 
 router.get(
+  '/tutors_accepted/:id',
+  authController.restrictTo('admin'),
+  assignment.findAcceptedAssignments
+);
+
+router.get(
+  '/tutors/:id',
+  authController.restrictTo('admin'),
+  assignment.getTutorAssignment
+);
+
+router.get(
   '/',
   authController.restrictTo('admin'),
   assignmentController.getAllAssignments
+);
+
+router.get(
+  '/tutors/all_sent_assignments',
+  authController.restrictTo('admin'),
+  assignment.getAllSentAssignments
+);
+
+router.get(
+  '/users/:id',
+  authController.restrictTo('admin'),
+  assignmentController.getAssignmentsForUser
 );
 
 router.get('/me/my_assignments', assignmentController.getMyAssignments);
@@ -274,6 +298,10 @@ router
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Assignment'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: No accepted assignments found in the database
  *
@@ -299,9 +327,135 @@ router
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Assignment'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: No accepted assignments found in the database
  *
+ */
+
+/**
+ * @swagger
+ * /assignments/users/{id}:
+ *   get:
+ *     summary: Returns all assignments of particular user
+ *     tags: [Assignments]
+ *     parameters:
+ *         - in: path
+ *           name: userid
+ *           required: true
+ *           description: The user Id
+ *         - in: query
+ *           name: page
+ *           description: page number
+ *         - in: query
+ *           name: limit
+ *           description: limit
+ *     responses:
+ *        200:
+ *          description: This user has 5 assignments
+ *          content:
+ *              applicaton/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *        401:
+ *            description: You are not logged in. Please log in to get access
+ *        403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *        404:
+ *          description: Oops... No assignments for this user!!
+ */
+
+/**
+ * @swagger
+ * /assignments/tutors/{id}:
+ *   get:
+ *     summary: Returns all assignments sent to tutor
+ *     tags: [Assignments]
+ *     parameters:
+ *         - in: path
+ *           name: tutorid
+ *           required: true
+ *           description: The tutor id
+ *         - in: query
+ *           name: page
+ *           description: page number
+ *         - in: query
+ *           name: limit
+ *           description: limit
+ *     responses:
+ *        200:
+ *          description: 5 assignments found
+ *          content:
+ *              applicaton/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *        401:
+ *            description: You are not logged in. Please log in to get access
+ *        403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *        404:
+ *          description: Oops... No assignments found for this tutor
+ */
+
+/**
+ * @swagger
+ * /assignments/tutors/all_sent_assignments:
+ *      get:
+ *        summary: Get all sent aassignments
+ *        tags: [Assignments]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
+ *        responses:
+ *          200:
+ *            description: 200 assignments found
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: No assignments found in the database.
+ *
+ */
+
+/**
+ * @swagger
+ * /assignments/tutors_accepted/{id}:
+ *   get:
+ *     summary: Returns all assignments and list of tutors that have accepted assignments
+ *     tags: [Assignments]
+ *     parameters:
+ *         - in: path
+ *           name: assignmentid
+ *           required: true
+ *           description: The assignment Id
+ *     responses:
+ *        200:
+ *          description: 5 accepted assignment(s)
+ *          content:
+ *              applicaton/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *        401:
+ *            description: You are not logged in. Please log in to get access
+ *        403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *        404:
+ *          description: No tutor has accepted this assignment
  */
 
 module.exports = router;
