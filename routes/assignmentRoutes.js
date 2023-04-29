@@ -4,18 +4,14 @@ const assignmentController = require('../controllers/assignmentController');
 const authController = require('../controllers/authController');
 const assignment = require('../controllers/sentAssignments');
 
+router.get('/tutors/:id', assignment.getTutorAssignment);
+
 router.use(authController.protect);
 
 router.get(
   '/tutors_accepted/:id',
   authController.restrictTo('admin'),
   assignment.findAcceptedAssignments
-);
-
-router.get(
-  '/tutors/:id',
-  authController.restrictTo('admin'),
-  assignment.getTutorAssignment
 );
 
 router.get(
