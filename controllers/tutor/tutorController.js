@@ -8,7 +8,11 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
-let { createNotification, saveAssignmentDetails } = require('../utility');
+let {
+  createNotification,
+  saveAssignmentDetails,
+  updateAssignmentStatus,
+} = require('../utility');
 let {
   updateQuestion,
   updateNumOfAns,
@@ -249,6 +253,7 @@ exports.sendToTutor = catchAsync(async (req, res, next) => {
   }
   const message = `Hi ${tutor.fullName}, a student needs your help with an assignment - Admin`;
   await saveAssignmentDetails(tutorId, assignmentId);
+  await updateAssignmentStatus(assignmentId);
   await createNotification(message, tutorId, assignmentId);
 
   res.status(200).json({
