@@ -83,6 +83,27 @@ exports.getMyAssignments = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getAssignmentsForUser = catchAsync(async (req, res, next) => {
+  const allUserAssignments = await Assignment.find({ postedBy: req.params.id });
+  const features = new APIFeatures(
+    Assignment.find({ postedBy: req.params.id }),
+    req.query
+  )
+    .sort()
+    .paginate();
+  const assignments = await features.query;
+  if (assignments.length < 1 || allUserAssignments.length < 1) {
+    return next(new AppError('Oops... You have no assignments!!', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `This user has ${allUserAssignments.length} assignments`,
+    allUserAssignments: allUserAssignments.length,
+    results: assignments.length,
+    data: assignments,
+  });
+});
+
 exports.updateAssignment = catchAsync(async (req, res, next) => {
   const assignment = await Assignment.findByIdAndUpdate(
     req.params.id,
