@@ -23,6 +23,10 @@ const assignmentSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'User',
     },
+    status: {
+      type: String,
+      default: 'submitted',
+    },
     assignmentID: {
       type: mongoose.Schema.ObjectId,
     },
