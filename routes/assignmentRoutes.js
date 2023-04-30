@@ -10,8 +10,14 @@ router.use(authController.protect);
 
 router.get(
   '/tutors_accepted/:id',
-  authController.restrictTo('admin'),
+
   assignment.findAcceptedAssignments
+);
+
+router.get(
+  '/tutors/one_assignment/:id',
+  authController.restrictTo('admin'),
+  assignment.findTutors
 );
 
 router.get(
@@ -432,6 +438,33 @@ router
  * /assignments/tutors_accepted/{id}:
  *   get:
  *     summary: Returns all assignments and list of tutors that have accepted assignments
+ *     tags: [Assignments]
+ *     parameters:
+ *         - in: path
+ *           name: assignmentid
+ *           required: true
+ *           description: The assignment Id
+ *     responses:
+ *        200:
+ *          description: 5 accepted assignment(s)
+ *          content:
+ *              applicaton/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *        401:
+ *            description: You are not logged in. Please log in to get access
+ *        403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *        404:
+ *          description: No tutor has accepted this assignment
+ */
+
+/**
+ * @swagger
+ * /assignments/tutors/one_assignment/{id}:
+ *   get:
+ *     summary: Returns list of tutors that have been sent a particular assignment
  *     tags: [Assignments]
  *     parameters:
  *         - in: path
