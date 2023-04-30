@@ -104,3 +104,17 @@ exports.findAcceptedAssignments = catchAsync(async (req, res, next) => {
     data: assignment,
   });
 });
+
+exports.findTutors = catchAsync(async (req, res, next) => {
+  const assignment = await Detail.find({ assignmentID: req.params.id });
+  if (assignment.length < 1) {
+    return next(
+      new AppError('This assignment has not been sent to a tutor', 404)
+    );
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${assignment.length} tutors have been sent this assignment `,
+    data: assignment,
+  });
+});
