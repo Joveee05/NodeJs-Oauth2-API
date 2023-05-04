@@ -52,6 +52,14 @@ module.exports = class Email {
     await this.send('welcome', 'Welcome to the Pisqre Community!');
   }
 
+  async sendAssignment() {
+    await this.send('assignment', 'URGENT!!! - You have a new Assignment');
+  }
+
+  async notifyUser() {
+    await this.send('notifyUser', 'Solution to your Assignment');
+  }
+
   async contactUs() {
     await this.send('contactUs', 'Thank You for Contacting Us!');
   }
