@@ -17,7 +17,7 @@ const app = require('./app');
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
   console.log(
-    `Pisqre App running in ${process.env.NODE_ENV} mode on port ${port}...`
+    `Pisqre API running in ${process.env.NODE_ENV} mode on port ${port}...`
   );
 });
 
