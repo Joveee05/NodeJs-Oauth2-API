@@ -5,6 +5,7 @@ const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
 const Contact = require('../models/contactUs');
 const Detail = require('../models/saveAssignmentModel');
+const Tutor = require('../models/tutorModel');
 
 async function removeVotesForObjectId(id) {
   try {
@@ -102,6 +103,27 @@ const updateAssignmentStatus = async function (id) {
   }
 };
 
+const assignToTutorStatus = async function (id, tutorId) {
+  const tutor = await Tutor.findById(tutorId);
+  const response = await Assignment.findById(id);
+  if (response) {
+    response.status = `assigned to ${tutor.fullName}`;
+    await response.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid assignment or tutor id', 400);
+  }
+};
+
+const assignmentCompletedStatus = async function (id) {
+  const response = await Assignment.findById(id);
+  if (response) {
+    response.status = 'assignment completed';
+    await response.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid assignment or tutor id', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
@@ -110,5 +132,7 @@ module.exports = {
   updateSchedule,
   saveAssignmentDetails,
   updateNotification,
+  assignToTutorStatus,
+  assignmentCompletedStatus,
   updateAssignmentStatus,
 };
