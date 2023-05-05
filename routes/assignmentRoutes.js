@@ -1,18 +1,20 @@
 const express = require('express');
-const router = express.Router({ mergeParams: true });
 const assignmentController = require('../controllers/assignmentController');
 const authController = require('../controllers/authController');
 const assignment = require('../controllers/sentAssignments');
+const router = express.Router({ mergeParams: true });
 
 router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.use(authController.protect);
 
 router.get(
-  '/tutors_accepted/:id',
-
-  assignment.findAcceptedAssignments
+  '/:id/users/:userId',
+  authController.restrictTo('admin'),
+  assignmentController.sendToStudent
 );
+
+router.get('/tutors_accepted/:id', assignment.findAcceptedAssignments);
 
 router.get(
   '/tutors/one_assignment/:id',
@@ -485,6 +487,35 @@ router
  *
  *        404:
  *          description: No tutor has accepted this assignment
+ */
+
+/**
+ * @swagger
+ * /assignments/{id}/users/{userId}:
+ *      get:
+ *        summary: Notify users after assignment is completed
+ *        tags: [Assignments]
+ *        parameters:
+ *          - in: path
+ *            name: id
+ *            description: The assignment Id
+ *            required: true
+ *          - in: path
+ *            name: userId
+ *            description: The user Id who posted the assignment
+ *            required: true
+ *        responses:
+ *          200:
+ *            description: User notified successfully
+ *          400:
+ *            description: Please provide user and assignment id
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: Invalid user id
+ *
  */
 
 module.exports = router;
