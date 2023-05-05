@@ -4,7 +4,8 @@ const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const { createNotification } = require('./utility');
+const { createNotification, assignmentCompletedStatus } = require('./utility');
+const Email = require('../utils/email');
 
 const message =
   'We have recieved your assignment. A solution will be provided shortly - Admin';
@@ -138,4 +139,25 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
       message: 'Assignment deleted successfully',
     });
   }
+});
+
+exports.sendToStudent = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+  const assignmentId = req.params.id;
+  const user = await User.findById(userId);
+  if (!userId || !assignmentId) {
+    return next(new AppError('Please provide user and assignment id', 400));
+  } else if (!user) {
+    return next(new AppError('Invalid user id', 404));
+  }
+  const message = `Hi ${user.fullName}, the solution to your assignment is now available`;
+
+  await assignmentCompletedStatus(assignmentId);
+  await createNotification(message, userId, assignmentId);
+  await new Email(user).notifyUser();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'User notified successfully',
+  });
 });
