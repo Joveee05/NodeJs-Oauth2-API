@@ -12,6 +12,8 @@ let {
   createNotification,
   saveAssignmentDetails,
   updateAssignmentStatus,
+  assignToTutorStatus,
+  updateAssignmentDetails,
 } = require('../utility');
 let {
   updateQuestion,
@@ -259,6 +261,28 @@ exports.sendToTutor = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: 'Assignment sent to tutor',
+  });
+});
+
+exports.assignToTutor = catchAsync(async (req, res, next) => {
+  const tutorId = req.params.id;
+  const assignmentId = req.body.assignmentId;
+  const tutor = await Tutor.findById(tutorId);
+  if (!tutorId || !assignmentId) {
+    return next(
+      new AppError('Please provide the tutor and assignment id', 400)
+    );
+  } else if (!tutor) {
+    return next(new AppError('No tutor found with this id', 404));
+  }
+  const message = `Hi ${tutor.fullName}, thanks for accepting to take on this assignment. Please provide the solution within 24hours - Admin`;
+  await assignToTutorStatus(assignmentId, tutorId);
+  await createNotification(message, tutorId, assignmentId);
+  await new Email(tutor).sendAssignment();
+
+  res.status(200).json({
+    status: 'success',
+    message: `Assignment assigned to ${tutor.fullName}`,
   });
 });
 
