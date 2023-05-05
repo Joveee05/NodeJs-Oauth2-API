@@ -22,6 +22,13 @@ router.get('/accept_assignment/:id', tutorController.acceptAssignment);
 router.get('/reject_assignment/:id', tutorController.rejectAssignment);
 
 router.post(
+  '/assign_to_tutor/:id',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.assignToTutor
+);
+
+router.post(
   '/send_assignment/:id',
   authController.protect,
   authController.restrictTo('admin'),
@@ -870,7 +877,7 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *          name: id
  *          schema:
  *              properties:
- *                 id:
+ *                 assignmentId:
  *                  type: string
  *          required: true
  *          description: The assignment id
@@ -931,6 +938,38 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *          404:
  *            description: No assignment found with this id
  *
+ */
+
+/**
+ * @swagger
+ * /tutors/assign_to_tutor/{id}:
+ *    post:
+ *      summary: Assign an assignment to tutor by admin
+ *      tags: [Tutors]
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          description: The tutor id
+ *          required: true
+ *        - in: body
+ *          name: assignmentId
+ *          schema:
+ *              properties:
+ *                 assignmentId:
+ *                  type: string
+ *          required: true
+ *          description: The assignment id
+ *      responses:
+ *          200:
+ *            description: Assignment assigned to Aarav Larma
+ *          401:
+ *            description: You are not logged in. Please log in to get access
+ *          400:
+ *            description: Please provide the tutor and assignment id
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *          404:
+ *            description: No tutor found with this id
  */
 
 module.exports = router;
