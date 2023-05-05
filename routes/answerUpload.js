@@ -8,6 +8,7 @@ const fs = require('fs');
 const router = express.Router();
 let { createNotification } = require('../controllers/utility');
 const dotenv = require('dotenv');
+const AppError = require('../utils/appError');
 
 dotenv.config({ path: './config.env' });
 
@@ -69,11 +70,13 @@ const upload = multer({ storage }).single('answer');
  *         description: Document Uploaded
  */
 
-router.post('/upload_answers/:id', async (req, res) => {
+router.post('/upload_answers/:id', async (req, res, next) => {
   const questionId = req.params.id;
   const question = await Question.findById(questionId);
+  if (!question || !questionId) {
+    return next(new AppError('Invalid or no question id', 400));
+  }
   const userID = question.user._id;
-  // const user = await User.findById(req.user.id);
   const message = 'You have an answer to one of your questions';
 
   await Question.findByIdAndUpdate(questionId, {
