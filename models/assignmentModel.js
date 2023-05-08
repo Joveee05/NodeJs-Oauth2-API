@@ -27,6 +27,9 @@ const assignmentSchema = new mongoose.Schema(
       type: String,
       default: 'submitted',
     },
+    pisqreId: {
+      type: String,
+    },
     assignmentID: {
       type: mongoose.Schema.ObjectId,
     },
