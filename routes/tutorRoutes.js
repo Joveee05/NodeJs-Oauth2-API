@@ -17,9 +17,9 @@ router.patch('/resetPassword/:token', auth.resetPassword);
 
 router.get('/verify-email', auth.verifyEmail);
 
-router.get('/accept_assignment/:id', tutorController.acceptAssignment);
+router.get('/:tutorId/accept_assignment/:id', tutorController.acceptAssignment);
 
-router.get('/reject_assignment/:id', tutorController.rejectAssignment);
+router.get('/:tutorId/reject_assignment/:id', tutorController.rejectAssignment);
 
 router.post(
   '/assign_to_tutor/:id',
@@ -896,15 +896,17 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
 
 /**
  * @swagger
- * /tutors/accept_assignment/{id}:
+ * /tutors/{tutorId}/accept_assignment/{id}:
  *      get:
  *        summary: Accept assignment
  *        tags: [Tutors]
  *        parameters:
  *          - in: path
+ *            name: tutorId
+ *            required: true
+ *            description: The tutor id
+ *          - in: path
  *            name: Assignmentid
- *            schema:
- *              type: string
  *            required: true
  *            description: The assignment id
  *        responses:
@@ -919,15 +921,17 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
 
 /**
  * @swagger
- * /tutors/reject_assignment/{id}:
+ * /tutors/{tutorId}/reject_assignment/{id}:
  *      get:
  *        summary: Reject assignment
  *        tags: [Tutors]
  *        parameters:
  *          - in: path
+ *            name: tutorId
+ *            required: true
+ *            description: The tutor id
+ *          - in: path
  *            name: Assignmentid
- *            schema:
- *              type: string
  *            required: true
  *            description: The assignment id
  *        responses:
