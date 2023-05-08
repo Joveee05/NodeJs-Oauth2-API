@@ -288,13 +288,18 @@ exports.assignToTutor = catchAsync(async (req, res, next) => {
 
 exports.acceptAssignment = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  const assignment = await Detail.findOne({ assignmentID: id }).exec();
+  const tutorId = req.params.tutorId;
+  const assignment = await Detail.findOne({ assignmentID: id })
+    .where('tutorID')
+    .equals(tutorId)
+    .exec();
   if (!id) {
     return next(new AppError('Please provide the assignment id', 400));
   } else if (!assignment) {
     return next(new AppError('No assignment found with this id', 404));
   } else if (assignment) {
     assignment.accepted = true;
+    await assignment.save({ validateBeforeSave: false });
   }
 
   res.status(200).json({
@@ -305,13 +310,18 @@ exports.acceptAssignment = catchAsync(async (req, res, next) => {
 
 exports.rejectAssignment = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  const assignment = await Detail.findOne({ assignmentID: id }).exec();
+  const tutorId = req.params.tutorId;
+  const assignment = await Detail.findOne({ assignmentID: id })
+    .where('tutorID')
+    .equals(tutorId)
+    .exec();
   if (!id) {
     return next(new AppError('Please provide the assignment id', 400));
   } else if (!assignment) {
     return next(new AppError('No assignment found with this id', 404));
   } else if (assignment) {
     assignment.rejected = true;
+    await assignment.save({ validateBeforeSave: false });
   }
 
   res.status(200).json({
