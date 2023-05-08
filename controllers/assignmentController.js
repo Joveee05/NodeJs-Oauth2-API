@@ -17,8 +17,12 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
     amount: req.body.amount,
     postedBy: req.user.id,
     deadLine: req.body.deadLine,
+    pisqreId: Math.floor(Math.random() * 100000000 + 1),
   };
   const userId = body.postedBy;
+  if (!body) {
+    return next(new AppError('No request body object', 400));
+  }
   const assignment = await Assignment.create(body);
   await createNotification(message, userId, assignment._id);
 
@@ -160,4 +164,25 @@ exports.sendToStudent = catchAsync(async (req, res, next) => {
     status: 'success',
     message: 'User notified successfully',
   });
+});
+
+exports.searchAssignment = catchAsync(async (req, res, next) => {
+  const data = await Assignment.find({
+    $text: { $search: req.query.pisqreId, $caseSensitive: false },
+  });
+
+  if (data.length < 1) {
+    return next(
+      new AppError(
+        'Oops... No assignment found. Please check that the pisqreId is correct',
+        404
+      )
+    );
+  } else {
+    res.status(200).json({
+      status: 'success',
+      results: data.length,
+      data,
+    });
+  }
 });
