@@ -9,6 +9,12 @@ router.get('/tutors/:id', assignment.getTutorAssignment);
 router.use(authController.protect);
 
 router.get(
+  '/search_assignments',
+  authController.restrictTo('admin'),
+  assignmentController.searchAssignment
+);
+
+router.get(
   '/:id/users/:userId',
   authController.restrictTo('admin'),
   assignmentController.sendToStudent
