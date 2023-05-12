@@ -23,9 +23,10 @@ async function removeVotesForObjectId(id) {
   }
 }
 
-async function createNotification(message, userID, questionID, answerID) {
+async function createNotification(type, message, userID, questionID, answerID) {
   try {
     const payload = {
+      type,
       message,
       userID,
       questionID,
