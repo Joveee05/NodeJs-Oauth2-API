@@ -101,13 +101,13 @@ router.post('/upload_answers/:id', async (req, res, next) => {
  * @swagger
  * /uploads/answer_info/{id}:
  *   get:
- *     description: Returns all answer info corresponding to a particular question
+ *     description: Returns answer info
  *     tags: [Answers]
  *     parameters:
  *       - in: path
  *         name: id
  *         type: string
- *         description: Question id
+ *         description: The answer file id
  *         required: true
  *     responses:
  *       200:
@@ -116,9 +116,7 @@ router.post('/upload_answers/:id', async (req, res, next) => {
 
 router.get('/answer_info/:id', async (req, res) => {
   bucket
-    .find({
-      metadata: { questionID: new mongoose.Types.ObjectId(req.params.id) },
-    })
+    .find({ _id: new mongoose.Types.ObjectId(req.params.id) })
     .toArray((message, files) => {
       if (!files || files.length === 0) {
         return res.status(404).json({
