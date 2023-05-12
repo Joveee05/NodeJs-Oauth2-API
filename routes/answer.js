@@ -112,7 +112,13 @@ router.post('/:questionId', async (req, res) => {
     }
   } else {
     if (response.success == true) {
-      await createNotification(message, userID, questionId, answerID);
+      await createNotification(
+        'answer to question',
+        message,
+        userID,
+        questionId,
+        answerID
+      );
       return res.status(201).json(response);
     } else {
       return res.status(404).json(response);
@@ -155,7 +161,13 @@ router.patch('/:id', async (req, res) => {
   let response = await updateAnswer(answerID, req.body);
 
   if (response.success == true) {
-    await createNotification(message, userID, questionId, answerID);
+    await createNotification(
+      'updated answer to question',
+      message,
+      userID,
+      questionId,
+      answerID
+    );
     res.status(201).json(response);
   } else {
     res.status(404).json(response);
