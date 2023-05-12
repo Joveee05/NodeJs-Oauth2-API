@@ -21,20 +21,15 @@ const notificationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    type: {
+      type: String,
+    },
   },
   {
     versionKey: false,
     timestamps: true,
   }
 );
-
-// notificationSchema.pre(/^find/, function (next) {
-//   this.populate({
-//     path: 'userID',
-//     select: 'fullName role image',
-//   });
-//   next();
-// });
 
 const Notification = mongoose.model('Notification', notificationSchema);
 
