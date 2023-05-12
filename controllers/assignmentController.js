@@ -8,7 +8,7 @@ const { createNotification, assignmentCompletedStatus } = require('./utility');
 const Email = require('../utils/email');
 
 const message =
-  'We have recieved your assignment. A solution will be provided shortly - Admin';
+  'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
   const body = {
@@ -24,7 +24,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
     return next(new AppError('No request body object', 400));
   }
   const assignment = await Assignment.create(body);
-  await createNotification(message, userId, assignment._id);
+  await createNotification('new_assignment', message, userId, assignment._id);
 
   res.status(201).json({
     status: 'success',
@@ -157,7 +157,12 @@ exports.sendToStudent = catchAsync(async (req, res, next) => {
   const message = `Hi ${user.fullName}, the solution to your assignment is now available`;
 
   await assignmentCompletedStatus(assignmentId);
-  await createNotification(message, userId, assignmentId);
+  await createNotification(
+    'assignment_complete',
+    message,
+    userId,
+    assignmentId
+  );
   await new Email(user).notifyUser();
 
   res.status(200).json({
