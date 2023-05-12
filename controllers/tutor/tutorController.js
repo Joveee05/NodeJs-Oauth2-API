@@ -256,7 +256,12 @@ exports.sendToTutor = catchAsync(async (req, res, next) => {
   const message = `Hi ${tutor.fullName}, a student needs your help with an assignment - Admin`;
   await saveAssignmentDetails(tutorId, assignmentId);
   await updateAssignmentStatus(assignmentId);
-  await createNotification(message, tutorId, assignmentId);
+  await createNotification(
+    'send assignment to tutor',
+    message,
+    tutorId,
+    assignmentId
+  );
 
   res.status(200).json({
     status: 'success',
@@ -277,7 +282,7 @@ exports.assignToTutor = catchAsync(async (req, res, next) => {
   }
   const message = `Hi ${tutor.fullName}, thanks for accepting to take on this assignment. Please provide the solution within 24hours - Admin`;
   await assignToTutorStatus(assignmentId, tutorId);
-  await createNotification(message, tutorId, assignmentId);
+  await createNotification('assign to tutor', message, tutorId, assignmentId);
   await new Email(tutor).sendAssignment();
 
   res.status(200).json({
@@ -370,7 +375,13 @@ exports.tutorAnswer = catchAsync(async (req, res, next) => {
   if (answer) {
     updateQuestion(questionId, req);
     updateNumOfAns(req.user.id);
-    await createNotification(message, userID, questionId, answerID);
+    await createNotification(
+      'tutor answer to question',
+      message,
+      userID,
+      questionId,
+      answerID
+    );
   }
   res.status(201).json({
     status: 'success',
