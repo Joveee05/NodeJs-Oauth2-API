@@ -31,7 +31,8 @@ const storage = new GridFsStorage({
         filename: filename,
         bucketName: 'answers',
         metadata: {
-          questionID: new mongoose.Types.ObjectId(req.params.id),
+          questionID: new mongoose.Types.ObjectId(req.params.questionId),
+          answerID: new mongoose.Types.ObjectId(req.params.id),
         },
       };
       resolve(fileInfo);
@@ -50,7 +51,7 @@ const upload = multer({ storage }).single('answer');
 
 /**
  * @swagger
- * /uploads/upload_answers/{id}:
+ * /uploads/upload_answers/{id}/questions/{questionId}:
  *   post:
  *     description: Upload an answer file
  *     tags: [Answers]
@@ -63,6 +64,11 @@ const upload = multer({ storage }).single('answer');
  *       - in: path
  *         name: id
  *         type: string
+ *         description: Answer id
+ *         required: true
+ *       - in: path
+ *         name: QuestionId
+ *         type: string
  *         description: Question id
  *         required: true
  *     responses:
@@ -70,32 +76,42 @@ const upload = multer({ storage }).single('answer');
  *         description: Document Uploaded
  */
 
-router.post('/upload_answers/:id', async (req, res, next) => {
-  const questionId = req.params.id;
-  const question = await Question.findById(questionId);
-  if (!question || !questionId) {
-    return next(new AppError('Invalid or no question id', 400));
-  }
-  const userID = question.user._id;
-  const message = 'You have an answer to one of your questions';
-
-  await Question.findByIdAndUpdate(questionId, {
-    $inc: { answers: 1 },
-  });
-
-  const response = upload(req, res, (err) => {
-    if (err) {
-      return res.status(400).send({ error: err });
-    } else {
-      createNotification(message, userID, questionId, req.file.id);
-      return res.status(200).json({
-        status: 'success',
-        message: 'Document uploaded successfully',
-        data: req.file,
-      });
+router.post(
+  '/upload_answers/:id/questions/:questionId',
+  async (req, res, next) => {
+    const answerId = req.params.id;
+    const questionId = req.params.questionId;
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return next(new AppError('Invalid or no question id', 400));
     }
-  });
-});
+    const userID = question.user._id;
+    const message = 'You have an answer to one of your questions';
+
+    await Question.findByIdAndUpdate(questionId, {
+      $inc: { answers: 1 },
+    });
+
+    const response = upload(req, res, (err) => {
+      if (err) {
+        return res.status(400).send({ error: err });
+      } else {
+        createNotification(
+          'answer to question',
+          message,
+          userID,
+          questionId,
+          answerId
+        );
+        return res.status(200).json({
+          status: 'success',
+          message: 'Document uploaded successfully',
+          data: req.file,
+        });
+      }
+    });
+  }
+);
 
 /**
  * @swagger
@@ -107,7 +123,7 @@ router.post('/upload_answers/:id', async (req, res, next) => {
  *       - in: path
  *         name: id
  *         type: string
- *         description: The answer file id
+ *         description: The answer id
  *         required: true
  *     responses:
  *       200:
@@ -116,10 +132,13 @@ router.post('/upload_answers/:id', async (req, res, next) => {
 
 router.get('/answer_info/:id', async (req, res) => {
   bucket
-    .find({ _id: new mongoose.Types.ObjectId(req.params.id) })
+    .find({
+      'metadata.answerID': new mongoose.Types.ObjectId(req.params.id),
+    })
     .toArray((message, files) => {
       if (!files || files.length === 0) {
         return res.status(404).json({
+          status: 'failed',
           message: 'No document exists',
         });
       }
