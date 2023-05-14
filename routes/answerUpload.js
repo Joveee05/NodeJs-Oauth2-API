@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const Question = require('../models/questions');
+const Answer = require('../models/answer');
 const User = require('../models/userModel');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const fs = require('fs');
@@ -79,11 +80,10 @@ router.post('/upload_answers/:id/questions/:questionId', async (req, res, next) 
   const answerId = req.params.id;
   const questionId = req.params.questionId;
   const question = await Question.findById(questionId);
-  if (!question) {
-    return next(new AppError('Invalid or no question id', 400));
+  const answer = await Answer.findById(answerId);
+  if (!question || !answerId) {
+    return next(new AppError('Invalid no question or answer id', 400));
   }
-  const userID = question.user._id;
-  const message = 'You have an answer to one of your questions';
 
   const response = upload(req, res, (err) => {
     if (!req.file) {

@@ -6,6 +6,8 @@ const router = express.Router({ mergeParams: true });
 
 router.get('/tutors/:id', assignment.getTutorAssignment);
 
+router.get('/:id', assignmentController.getAssignment);
+
 router.use(authController.protect);
 
 router.get('/search_assignments', authController.restrictTo('admin'), assignmentController.searchAssignment);
@@ -30,11 +32,7 @@ router.get('/all_accepted_assignments', authController.restrictTo('admin'), assi
 
 router.get('/all_rejected_assignments', authController.restrictTo('admin'), assignment.rejectedAssignment);
 
-router
-  .route('/:id')
-  .get(assignmentController.getAssignment)
-  .patch(assignmentController.updateAssignment)
-  .delete(assignmentController.deleteAssignment);
+router.route('/:id').patch(assignmentController.updateAssignment).delete(assignmentController.deleteAssignment);
 
 /**
  * @swagger
