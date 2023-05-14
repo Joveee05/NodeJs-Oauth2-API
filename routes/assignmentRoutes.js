@@ -8,59 +8,27 @@ router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.use(authController.protect);
 
-router.get(
-  '/search_assignments',
-  authController.restrictTo('admin'),
-  assignmentController.searchAssignment
-);
+router.get('/search_assignments', authController.restrictTo('admin'), assignmentController.searchAssignment);
 
-router.get(
-  '/:id/users/:userId',
-  authController.restrictTo('admin'),
-  assignmentController.sendToStudent
-);
+router.get('/:id/users/:userId', authController.restrictTo('admin'), assignmentController.sendToStudent);
 
 router.get('/tutors_accepted/:id', assignment.findAcceptedAssignments);
 
-router.get(
-  '/tutors/one_assignment/:id',
-  authController.restrictTo('admin'),
-  assignment.findTutors
-);
+router.get('/tutors/one_assignment/:id', authController.restrictTo('admin'), assignment.findTutors);
 
-router.get(
-  '/',
-  authController.restrictTo('admin'),
-  assignmentController.getAllAssignments
-);
+router.get('/', authController.restrictTo('admin'), assignmentController.getAllAssignments);
 
-router.get(
-  '/tutors/all_sent_assignments',
-  authController.restrictTo('admin'),
-  assignment.getAllSentAssignments
-);
+router.get('/tutors/all_sent_assignments', authController.restrictTo('admin'), assignment.getAllSentAssignments);
 
-router.get(
-  '/users/:id',
-  authController.restrictTo('admin'),
-  assignmentController.getAssignmentsForUser
-);
+router.get('/users/:id', authController.restrictTo('admin'), assignmentController.getAssignmentsForUser);
 
 router.get('/me/my_assignments', assignmentController.getMyAssignments);
 
 router.post('/new_assignment', assignmentController.createAssignment);
 
-router.get(
-  '/all_accepted_assignments',
-  authController.restrictTo('admin'),
-  assignment.acceptedAssignment
-);
+router.get('/all_accepted_assignments', authController.restrictTo('admin'), assignment.acceptedAssignment);
 
-router.get(
-  '/all_rejected_assignments',
-  authController.restrictTo('admin'),
-  assignment.rejectedAssignment
-);
+router.get('/all_rejected_assignments', authController.restrictTo('admin'), assignment.rejectedAssignment);
 
 router
   .route('/:id')
@@ -522,6 +490,33 @@ router
  *          404:
  *            description: Invalid user id
  *
+ */
+
+/**
+ * @swagger
+ * /assignments/search_assignments:
+ *   get:
+ *     summary: Returns assignment with pisqreId
+ *     tags: [Assignments]
+ *     parameters:
+ *         - in: query
+ *           name: pisqreId
+ *           required: true
+ *           description: The pisqreId of the assignment
+ *     responses:
+ *        200:
+ *          description: success
+ *          content:
+ *              applicaton/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *        401:
+ *            description: You are not logged in. Please log in to get access
+ *        403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *        404:
+ *          description: Oops... No assignments found for this tutor
  */
 
 module.exports = router;
