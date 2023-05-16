@@ -12,6 +12,10 @@ router.use(authController.protect);
 
 router.get('/search_assignments', authController.restrictTo('admin'), assignmentController.searchAssignment);
 
+router.post('/:assignmentId/send_answer', authController.restrictTo('admin'), assignmentController.assignmentAnswer);
+
+router.get('/:id/answers', assignmentController.getAssignmentAnswer);
+
 router.get('/:id/users/:userId', authController.restrictTo('admin'), assignmentController.sendToStudent);
 
 router.get('/tutors_accepted/:id', assignment.findAcceptedAssignments);
@@ -515,6 +519,53 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *
  *        404:
  *          description: Oops... No assignments found for this tutor
+ */
+
+/**
+ * @swagger
+ * /assignments/{assignmentId}/send_answer:
+ *   post:
+ *     summary: Create answer to assignment
+ *     tags: [Assignments]
+ *     parameters:
+ *      - in: path
+ *        name: assignmentId
+ *        required: true
+ *        description: The assignment id
+ *      - in: body
+ *        name: answer
+ *        description: New answer
+ *        schema:
+ *          type: object
+ *          properties:
+ *            answer:
+ *              type: string
+ *     responses:
+ *       201:
+ *         description: Created Answer
+ *       401:
+ *            description: You are not logged in. Please log in to get access
+ *       403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ */
+
+/**
+ * @swagger
+ * /assignments/{id}/answers:
+ *   get:
+ *     summary: Get all answers for particular assignment
+ *     tags: [Assignments]
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The assignment id.
+ *     description: Get all answers for particular assignment
+ *     responses:
+ *       200:
+ *         description: Returns the requested answers
  */
 
 module.exports = router;
