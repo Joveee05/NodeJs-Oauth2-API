@@ -41,12 +41,7 @@ router.use(authController.protect);
 
 router.get('/myAnswers', async (req, res, next) => {
   const allMyAnswers = await Answer.find({ answeredBy: req.user.id });
-  const features = new APIFeatures(
-    Answer.find({ answeredBy: req.user.id }),
-    req.query
-  )
-    .sortByTimeStamp()
-    .paginate();
+  const features = new APIFeatures(Answer.find({ answeredBy: req.user.id }), req.query).sortByTimeStamp().paginate();
   const getMyAnswers = await features.query;
 
   if (getMyAnswers.length < 1 || allMyAnswers.length < 1) {
@@ -98,11 +93,12 @@ router.post('/:questionId', async (req, res) => {
   const user = await User.findById(req.user.id);
   const message = `${user.fullName} answered one of your questions`;
 
-  const response = await addAnswer(body).then(
-    await QuestionPageSchema.findByIdAndUpdate(questionId, {
-      $inc: { answers: 1 },
-    })
-  );
+  const response = await addAnswer(body);
+
+  const newData = await QuestionPageSchema.findByIdAndUpdate(questionId, {
+    $inc: { answers: 1 },
+  });
+
   const answerID = response.data._id;
   if (userID == req.user.id) {
     if (response.success == true) {
@@ -112,13 +108,7 @@ router.post('/:questionId', async (req, res) => {
     }
   } else {
     if (response.success == true) {
-      await createNotification(
-        'answer to question',
-        message,
-        userID,
-        questionId,
-        answerID
-      );
+      await createNotification('answer to question', message, userID, questionId, answerID);
       return res.status(201).json(response);
     } else {
       return res.status(404).json(response);
@@ -161,13 +151,7 @@ router.patch('/:id', async (req, res) => {
   let response = await updateAnswer(answerID, req.body);
 
   if (response.success == true) {
-    await createNotification(
-      'updated answer to question',
-      message,
-      userID,
-      questionId,
-      answerID
-    );
+    await createNotification('updated answer to question', message, userID, questionId, answerID);
     res.status(201).json(response);
   } else {
     res.status(404).json(response);
@@ -223,9 +207,7 @@ router.delete('/:id/question/:questionId', async (req, res) => {
  */
 router.get('/', async (req, res) => {
   const allAnswers = await Answer.find();
-  const features = new APIFeatures(Answer.find(), req.query)
-    .sortByTimeStamp()
-    .paginate();
+  const features = new APIFeatures(Answer.find(), req.query).sortByTimeStamp().paginate();
   const answers = await features.query;
   res.status(200).json({
     status: 'success',
