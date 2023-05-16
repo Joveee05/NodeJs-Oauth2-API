@@ -127,7 +127,7 @@ app.use('/api/documents', documentRouter);
 app.use('/api/schedules', scheduleRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/tutors', tutorRouter);
-app.use('/api/assignments', assignmentRouter, assignmentUpload);
+app.use('/api/assignments', assignmentUpload, assignmentRouter);
 app.use('/api/uploads', uploadRouter);
 app.use('/api/live_session', bookingRouter);
 app.use('/auth', authRouter);
