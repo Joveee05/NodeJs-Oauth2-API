@@ -5,10 +5,10 @@ const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const { createNotification, assignmentCompletedStatus } = require('./utility');
+const { addAnswer, getAnswerByOptions } = require('./answerController');
 const Email = require('../utils/email');
 
-const message =
-  'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
+const message = 'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
   const body = {
@@ -35,9 +35,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
 
 exports.getAllAssignments = catchAsync(async (req, res, next) => {
   const allAssignments = await Assignment.find();
-  const features = new APIFeatures(Assignment.find(), req.query)
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Assignment.find(), req.query).sort().paginate();
 
   const assignments = await features.query;
   if (allAssignments.length < 1 || assignments.length < 1) {
@@ -55,9 +53,7 @@ exports.getAllAssignments = catchAsync(async (req, res, next) => {
 exports.getAssignment = catchAsync(async (req, res, next) => {
   const assignment = await Assignment.findById(req.params.id);
   if (!assignment) {
-    return next(
-      new AppError('No assignment found in the database with this id.', 404)
-    );
+    return next(new AppError('No assignment found in the database with this id.', 404));
   } else {
     return res.status(200).json({
       status: 'success',
@@ -69,12 +65,7 @@ exports.getAssignment = catchAsync(async (req, res, next) => {
 
 exports.getMyAssignments = catchAsync(async (req, res, next) => {
   const allMyAssignments = await Assignment.find({ postedBy: req.user.id });
-  const features = new APIFeatures(
-    Assignment.find({ postedBy: req.user.id }),
-    req.query
-  )
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Assignment.find({ postedBy: req.user.id }), req.query).sort().paginate();
   const myAssignments = await features.query;
   if (myAssignments.length < 1 || allMyAssignments.length < 1) {
     return next(new AppError('Oops... You have no assignments!!', 404));
@@ -90,12 +81,7 @@ exports.getMyAssignments = catchAsync(async (req, res, next) => {
 
 exports.getAssignmentsForUser = catchAsync(async (req, res, next) => {
   const allUserAssignments = await Assignment.find({ postedBy: req.params.id });
-  const features = new APIFeatures(
-    Assignment.find({ postedBy: req.params.id }),
-    req.query
-  )
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Assignment.find({ postedBy: req.params.id }), req.query).sort().paginate();
   const assignments = await features.query;
   if (assignments.length < 1 || allUserAssignments.length < 1) {
     return next(new AppError('Oops... You have no assignments!!', 404));
@@ -110,18 +96,12 @@ exports.getAssignmentsForUser = catchAsync(async (req, res, next) => {
 });
 
 exports.updateAssignment = catchAsync(async (req, res, next) => {
-  const assignment = await Assignment.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const assignment = await Assignment.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
   if (!assignment) {
-    return next(
-      new AppError('No assignment found in the database with this id.', 404)
-    );
+    return next(new AppError('No assignment found in the database with this id.', 404));
   } else {
     res.status(200).json({
       status: 'success',
@@ -134,9 +114,7 @@ exports.updateAssignment = catchAsync(async (req, res, next) => {
 exports.deleteAssignment = catchAsync(async (req, res, next) => {
   const assignment = await Assignment.findByIdAndDelete(req.params.id);
   if (!assignment) {
-    return next(
-      new AppError('No assignment found in the database with this id.', 404)
-    );
+    return next(new AppError('No assignment found in the database with this id.', 404));
   } else {
     res.status(200).json({
       status: 'success',
@@ -157,12 +135,7 @@ exports.sendToStudent = catchAsync(async (req, res, next) => {
   const message = `Hi ${user.fullName}, the solution to your assignment is now available`;
 
   await assignmentCompletedStatus(assignmentId);
-  await createNotification(
-    'assignment_complete',
-    message,
-    userId,
-    assignmentId
-  );
+  await createNotification('assignment_complete', message, userId, assignmentId);
   await new Email(user).notifyUser();
 
   res.status(200).json({
@@ -177,12 +150,7 @@ exports.searchAssignment = catchAsync(async (req, res, next) => {
   });
 
   if (data.length < 1) {
-    return next(
-      new AppError(
-        'Oops... No assignment found. Please check that the pisqreId is correct',
-        404
-      )
-    );
+    return next(new AppError('Oops... No assignment found. Please check that the pisqreId is correct', 404));
   } else {
     res.status(200).json({
       status: 'success',
@@ -190,4 +158,28 @@ exports.searchAssignment = catchAsync(async (req, res, next) => {
       data,
     });
   }
+});
+
+exports.assignmentAnswer = catchAsync(async (req, res) => {
+  const assignmentId = req.params.assignmentId;
+
+  let body = {
+    answeredBy: req.user.id,
+    question: assignmentId,
+    answer: req.body.answer,
+    answerTimeStamp: new Date(),
+    answerModifiedTimeStamp: new Date(),
+  };
+
+  const response = await addAnswer(body);
+  if (response.success == true) {
+    return res.status(201).json(response);
+  } else {
+    return res.status(404).json(response);
+  }
+});
+
+exports.getAssignmentAnswer = catchAsync(async (req, res, next) => {
+  let response = await getAnswerByOptions({ question: req.params.id });
+  res.json(response);
 });
