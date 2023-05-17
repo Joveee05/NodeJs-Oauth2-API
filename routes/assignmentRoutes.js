@@ -6,11 +6,11 @@ const router = express.Router({ mergeParams: true });
 
 router.get('/tutors/:id', assignment.getTutorAssignment);
 
+router.get('/search_assignments', assignmentController.searchAssignment);
+
 router.get('/:id', assignmentController.getAssignment);
 
 router.use(authController.protect);
-
-router.get('/search_assignments', authController.restrictTo('admin'), assignmentController.searchAssignment);
 
 router.post('/:assignmentId/send_answer', authController.restrictTo('admin'), assignmentController.assignmentAnswer);
 
