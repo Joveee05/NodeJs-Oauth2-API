@@ -14,7 +14,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
   const body = {
     courseName: req.body.courseName,
     description: req.body.description,
-    amount: req.body.amount,
+    amount: '$' + req.body.amount,
     postedBy: req.user.id,
     deadLine: req.body.deadLine,
     pisqreId: Math.floor(Math.random() * 100000000 + 1),

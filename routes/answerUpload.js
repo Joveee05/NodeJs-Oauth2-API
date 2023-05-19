@@ -76,14 +76,9 @@ const upload = multer({ storage }).single('answer');
  *         description: Document Uploaded
  */
 
-router.post('/upload_answers/:id/questions/:questionId', async (req, res, next) => {
+router.post('/upload_answers/:id/questions/:questionId', async (req, res) => {
   const answerId = req.params.id;
   const questionId = req.params.questionId;
-  const question = await Question.findById(questionId);
-  const answer = await Answer.findById(answerId);
-  if (!question || !answerId) {
-    return next(new AppError('Invalid no question or answer id', 400));
-  }
 
   const response = upload(req, res, (err) => {
     if (!req.file) {
