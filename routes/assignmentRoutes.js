@@ -16,8 +16,6 @@ router.post('/:assignmentId/send_answer', authController.restrictTo('admin'), as
 
 router.get('/:id/answers', assignmentController.getAssignmentAnswer);
 
-router.get('/:id/users/:userId', authController.restrictTo('admin'), assignmentController.sendToStudent);
-
 router.get('/tutors_accepted/:id', assignment.findAcceptedAssignments);
 
 router.get('/tutors/one_assignment/:id', authController.restrictTo('admin'), assignment.findTutors);
@@ -463,35 +461,6 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *
  *        404:
  *          description: No tutor has accepted this assignment
- */
-
-/**
- * @swagger
- * /assignments/{id}/users/{userId}:
- *      get:
- *        summary: Notify users after assignment is completed
- *        tags: [Assignments]
- *        parameters:
- *          - in: path
- *            name: id
- *            description: The assignment Id
- *            required: true
- *          - in: path
- *            name: userId
- *            description: The user Id who posted the assignment
- *            required: true
- *        responses:
- *          200:
- *            description: User notified successfully
- *          400:
- *            description: Please provide user and assignment id
- *          401:
- *            description: You are not logged in. Please log in to get access
- *          403:
- *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
- *          404:
- *            description: Invalid user id
- *
  */
 
 /**
