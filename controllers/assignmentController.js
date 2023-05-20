@@ -123,27 +123,6 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.sendToStudent = catchAsync(async (req, res, next) => {
-  const userId = req.params.userId;
-  const assignmentId = req.params.id;
-  const user = await User.findById(userId);
-  if (!userId || !assignmentId) {
-    return next(new AppError('Please provide user and assignment id', 400));
-  } else if (!user) {
-    return next(new AppError('Invalid user id', 404));
-  }
-  const message = `Hi ${user.fullName}, the solution to your assignment is now available`;
-
-  await assignmentCompletedStatus(assignmentId);
-  await createNotification('assignment_complete', message, userId, assignmentId);
-  await new Email(user).notifyUser();
-
-  res.status(200).json({
-    status: 'success',
-    message: 'User notified successfully',
-  });
-});
-
 exports.searchAssignment = catchAsync(async (req, res, next) => {
   const data = await Assignment.find({
     $text: { $search: req.query.pisqreId, $caseSensitive: false },
@@ -160,9 +139,8 @@ exports.searchAssignment = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.assignmentAnswer = catchAsync(async (req, res) => {
+exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   const assignmentId = req.params.assignmentId;
-
   let body = {
     answeredBy: req.user.id,
     question: assignmentId,
@@ -170,9 +148,17 @@ exports.assignmentAnswer = catchAsync(async (req, res) => {
     answerTimeStamp: new Date(),
     answerModifiedTimeStamp: new Date(),
   };
+  const assignment = await Assignment.findById(assignmentId);
+  if (!assignment) {
+    return next(new AppError('Invalid or no assignment Id', 404));
+  }
+  const user = assignment.postedBy;
 
+  const message2 = `Hi ${user.fullName}, the solution to your assignment is now available`;
   const response = await addAnswer(body);
+  const answerId = response.data.id;
   if (response.success == true) {
+    await createNotification('assignment complete', message2, user, assignmentId, answerId);
     return res.status(201).json(response);
   } else {
     return res.status(404).json(response);
