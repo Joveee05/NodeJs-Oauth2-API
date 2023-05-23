@@ -1,44 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const multer = require('multer');
-const Assignment = require('../models/assignmentModel');
-const User = require('../models/userModel');
-const { GridFsStorage } = require('multer-gridfs-storage');
-const fs = require('fs');
 const router = express.Router();
-// const { createNotification } = require('../controllers/utility');
-const dotenv = require('dotenv');
-
-dotenv.config({ path: './config.env' });
-
-let bucket;
-
-mongoose.connection.on('connected', () => {
-  var client = mongoose.connections[0].client;
-  var db = mongoose.connections[0].db;
-  bucket = new mongoose.mongo.GridFSBucket(db, {
-    bucketName: 'assignmentFiles',
-  });
-});
-
-const storage = new GridFsStorage({
-  url: process.env.MONGO_URI,
-  file: (req, file) => {
-    return new Promise((resolve, reject) => {
-      const filename = file.originalname;
-      const fileInfo = {
-        filename: filename,
-        bucketName: 'assignmentFiles',
-        metadata: {
-          assignmentID: new mongoose.Types.ObjectId(req.params.id),
-        },
-      };
-      resolve(fileInfo);
-    });
-  },
-});
-
-const upload = multer({ storage }).single('assignment');
+const assignmentUpload = require('../controllers/assignmentUpload');
 
 /**
  * @swagger
@@ -63,19 +25,7 @@ const upload = multer({ storage }).single('assignment');
  *         description: Assignment Uploaded
  */
 
-router.post('/upload_assignment/:id', async (req, res) => {
-  const response = upload(req, res, (err) => {
-    if (err) {
-      return res.status(400).send({ error: err });
-    } else {
-      return res.status(200).json({
-        status: 'success',
-        message: 'Document uploaded successfully',
-        data: req.file,
-      });
-    }
-  });
-});
+router.post('/upload_assignment/:id', assignmentUpload.uploadAssignment);
 
 /**
  * @swagger
@@ -95,24 +45,7 @@ router.post('/upload_assignment/:id', async (req, res) => {
  *         description: Assignment document found
  */
 
-router.get('/assignment_info/:id', async (req, res) => {
-  bucket
-    .find({
-      metadata: { assignmentID: new mongoose.Types.ObjectId(req.params.id) },
-    })
-    .toArray((message, files) => {
-      if (!files || files.length === 0) {
-        return res.status(404).json({
-          message: 'No assignment document exists',
-        });
-      }
-      res.status(200).json({
-        status: 'success',
-        message: 'Assignment document found',
-        data: files,
-      });
-    });
-});
+router.get('/assignment_info/:id', assignmentUpload.assignmentInfo);
 
 /**
  * @swagger
@@ -132,21 +65,7 @@ router.get('/assignment_info/:id', async (req, res) => {
  *         description: Assignment downloaded
  */
 
-router.get('/download_assignment/:id', async (req, res) => {
-  bucket
-    .find({
-      _id: new mongoose.Types.ObjectId(req.params.id),
-    })
-    .toArray((message, file) => {
-      if (!file || file.length === 0) {
-        return res.status(404).json({
-          message: 'No assignment exists',
-        });
-      }
-      var readStream = bucket.openDownloadStream(file[0]._id);
-      readStream.pipe(res);
-    });
-});
+router.get('/download_assignment/:id', assignmentUpload.downloadAssignment);
 
 /**
  * @swagger
@@ -166,22 +85,6 @@ router.get('/download_assignment/:id', async (req, res) => {
  *         description: Assignment deleted
  */
 
-router.delete('/delete_file/:id', async (req, res) => {
-  bucket
-    .find({ _id: new mongoose.Types.ObjectId(req.params.id) })
-    .toArray((err, file) => {
-      if (!file || file.length == 0) {
-        res.status(200).json({
-          status: 'failed',
-          message: 'No assignment exists',
-        });
-      }
-      bucket.delete(file[0]._id);
-      res.status(200).json({
-        status: 'success',
-        message: 'Assignment deleted',
-      });
-    });
-});
+router.delete('/delete_file/:id', assignmentUpload.deleteAssignment);
 
 module.exports = router;
