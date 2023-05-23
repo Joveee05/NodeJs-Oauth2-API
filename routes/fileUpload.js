@@ -1,39 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const multer = require('multer');
-const { GridFsStorage } = require('multer-gridfs-storage');
-const fs = require('fs');
+const fileController = require('../controllers/fileUpload');
 const router = express.Router();
-require('dotenv').config();
-
-let bucket;
-
-mongoose.connection.on('connected', () => {
-  var client = mongoose.connections[0].client;
-  var db = mongoose.connections[0].db;
-  bucket = new mongoose.mongo.GridFSBucket(db, {
-    bucketName: 'questionFiles',
-  });
-});
-
-const storage = new GridFsStorage({
-  url: process.env.MONGO_URI,
-  file: (req, file) => {
-    return new Promise((resolve, reject) => {
-      const filename = file.originalname;
-      const fileInfo = {
-        filename: filename,
-        bucketName: 'questionFiles',
-        metadata: {
-          questionID: new mongoose.Types.ObjectId(req.params.id),
-        },
-      };
-      resolve(fileInfo);
-    });
-  },
-});
-
-const upload = multer({ storage }).single('uploadFile1');
 
 /**
  * @swagger
@@ -55,15 +22,9 @@ const upload = multer({ storage }).single('uploadFile1');
  *       200:
  *         description: File Uploaded
  */
-router.post('/upload/:id', async (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(400).send({ error: err });
-      return;
-    }
-    return res.status(200).send('File uploaded successfully');
-  });
-});
+
+router.post('/upload/:id', fileController.uploadFile);
+
 /**
  * @swagger
  * /file/info/{id}:
@@ -79,20 +40,8 @@ router.post('/upload/:id', async (req, res) => {
  *       200:
  *         description: Returned File Info
  */
-router.get('/info/:id', async (req, res) => {
-  bucket
-    .find({
-      metadata: { questionID: new mongoose.Types.ObjectId(req.params.id) },
-    })
-    .toArray((err, files) => {
-      if (!files || files.length === 0) {
-        return res.status(404).json({
-          err: 'no files exist',
-        });
-      }
-      return res.status(200).json({ success: true, message: files });
-    });
-});
+
+router.get('/info/:id', fileController.getFileInfo);
 
 /**
  * @swagger
@@ -109,21 +58,7 @@ router.get('/info/:id', async (req, res) => {
  *       200:
  *         description: File Downloaded
  */
-router.get('/download/:id', async (req, res) => {
-  bucket
-    .find({
-      _id: new mongoose.Types.ObjectId(req.params.id),
-    })
-    .toArray((err, file) => {
-      if (!file || file.length === 0) {
-        return res.status(404).json({
-          err: 'no file exist',
-        });
-      }
-      var readStream = bucket.openDownloadStream(file[0]._id);
-      readStream.pipe(res);
-    });
-});
+router.get('/download/:id', fileController.downloadFile);
 
 /**
  * @swagger
@@ -140,16 +75,6 @@ router.get('/download/:id', async (req, res) => {
  *       200:
  *         description: File Deleted
  */
-router.delete('/:fileId', async (req, res) => {
-  bucket
-    .find({ _id: new mongoose.Types.ObjectId(req.params.fileId) })
-    .toArray((err, file) => {
-      if (!file || file.length == 0) {
-        return res.status(404).json({ err: 'no file exist' });
-      }
-      bucket.delete(file[0]._id);
-      return res.status(200).json({ message: 'File Deleted' });
-    });
-});
+router.delete('/:fileId', fileController.deleteFile);
 
 module.exports = router;
