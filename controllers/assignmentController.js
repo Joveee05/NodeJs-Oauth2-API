@@ -7,6 +7,7 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const { createNotification, assignmentCompletedStatus } = require('./utility');
 const { addAnswer, getAnswerByOptions } = require('./answerController');
+const { deleteAssignmentFile } = require('./assignmentUpload');
 const Email = require('../utils/email');
 
 const message = 'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
@@ -117,6 +118,7 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
   if (!assignment) {
     return next(new AppError('No assignment found in the database with this id.', 404));
   } else {
+    await deleteAssignmentFile(req.params.id);
     res.status(200).json({
       status: 'success',
       message: 'Assignment deleted successfully',
