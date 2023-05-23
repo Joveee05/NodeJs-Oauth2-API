@@ -5,7 +5,8 @@ const User = require('../models/userModel');
 const APIFeatures = require('../utils/apiFeatures');
 const router = express.Router();
 const AppError = require('../utils/appError');
-let { createNotification } = require('../controllers/utility');
+const { createNotification } = require('../controllers/utility');
+const { deleteAnswerFile } = require('../controllers/answerUpload');
 let {
   getAllAnswers,
   getAnswerById,
@@ -188,6 +189,7 @@ router.delete('/:id/question/:questionId', async (req, res) => {
       await QuestionPageSchema.findByIdAndUpdate(questionId, {
         $inc: { answers: -1 },
       });
+      await deleteAnswerFile(req.params.id);
     }
     res.status(200).json(response);
   } catch (err) {
@@ -237,26 +239,6 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   let response = await getAnswerById(req.params.id);
-  res.json(response);
-});
-
-/**
- * @swagger
- * /answers/user/{id}:
- *   get:
- *     parameters:
- *      - in: path
- *        name: id
- *        required: true
- *        type: string
- *        description: The user ID.
- *     description: Get all answers for particular user
- *     responses:
- *       200:
- *         description: Returns the requested answers
- */
-router.get('/user/:id', async (req, res) => {
-  let response = await getAnswerByOptions({ userId: req.params.id });
   res.json(response);
 });
 
