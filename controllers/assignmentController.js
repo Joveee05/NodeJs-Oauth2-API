@@ -1,4 +1,5 @@
 const express = require('express');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/userModel');
 const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
@@ -14,7 +15,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
   const body = {
     courseName: req.body.courseName,
     description: req.body.description,
-    amount: '$' + req.body.amount,
+    amount: req.body.amount,
     postedBy: req.user.id,
     deadLine: req.body.deadLine,
     pisqreId: Math.floor(Math.random() * 100000000 + 1),
@@ -169,3 +170,40 @@ exports.getAssignmentAnswer = catchAsync(async (req, res, next) => {
   let response = await getAnswerByOptions({ question: req.params.id });
   res.json(response);
 });
+
+// exports.getCheckoutSession = catchAsync(async (req, res, next) => {
+//   const assignmentId = req.params.assignmentId;
+//   const userId = req.user.id;
+//   const assignment = await Assignment.findById(assignmentId);
+//   const user = await User.findById(userId);
+
+//   const session = await stripe.checkout.sessions.create({
+//     payment_method_types: ['card'],
+//     success_url: `${req.protocol}://${req.get('host')}/?assignment=${assignmentId}&user=${req.user.id}&amount=${
+//       assignment.amount
+//     }`,
+//     cancel_url: `${req.protocol}://${req.get('host')}/assignment/${assignment.courseName}`,
+//     customer_email: req.user.email,
+//     client_reference_id: assignmentId,
+//     line_items: [
+//       {
+//         price_data: {
+//           currency: 'usd',
+//           product_data: {
+//             name: `${assignment.courseName} Assignment`,
+//             description: assignment.description,
+//             images: [`https://pisqre-app-4m3x3.ondigitalocean.app/img/users/${user.image}`],
+//           },
+//           unit_amount: assignment.amount * 100,
+//         },
+//         quantity: 1,
+//       },
+//     ],
+//     mode: 'payment',
+//   });
+
+//   res.status(200).json({
+//     status: 'success',
+//     session,
+//   });
+// });
