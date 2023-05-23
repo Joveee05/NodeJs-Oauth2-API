@@ -12,7 +12,7 @@ const assignmentSchema = new mongoose.Schema(
       required: [true, 'Please provide a description'],
     },
     amount: {
-      type: String,
+      type: Number,
       required: [true, 'Please enter an amount'],
     },
     deadLine: {
