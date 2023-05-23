@@ -12,6 +12,8 @@ router.get('/:id', assignmentController.getAssignment);
 
 router.use(authController.protect);
 
+// router.post('/create-checkout-session/:assignmentId', assignmentController.getCheckoutSession);
+
 router.post('/:assignmentId/send_answer', authController.restrictTo('admin'), assignmentController.assignmentAnswer);
 
 router.get('/:id/answers', assignmentController.getAssignmentAnswer);
@@ -62,7 +64,7 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *              type: String
  *              description: A brief descrition by the user
  *           amount:
- *              type: String
+ *              type: Number
  *              description: The amount the user wishes to pay for his assignment to be answered
  *           deadLine:
  *              type: Date
