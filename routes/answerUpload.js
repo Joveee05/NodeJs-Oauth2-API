@@ -1,46 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const multer = require('multer');
-const Question = require('../models/questions');
-const Answer = require('../models/answer');
-const User = require('../models/userModel');
-const { GridFsStorage } = require('multer-gridfs-storage');
-const fs = require('fs');
 const router = express.Router();
-const dotenv = require('dotenv');
-const AppError = require('../utils/appError');
-
-dotenv.config({ path: './config.env' });
-
-let bucket;
-
-mongoose.connection.on('connected', () => {
-  var client = mongoose.connections[0].client;
-  var db = mongoose.connections[0].db;
-  bucket = new mongoose.mongo.GridFSBucket(db, {
-    bucketName: 'answers',
-  });
-});
-
-const storage = new GridFsStorage({
-  url: process.env.MONGO_URI,
-  file: (req, file) => {
-    return new Promise((resolve, reject) => {
-      const filename = file.originalname;
-      const fileInfo = {
-        filename: filename,
-        bucketName: 'answers',
-        metadata: {
-          questionID: new mongoose.Types.ObjectId(req.params.questionId),
-          answerID: new mongoose.Types.ObjectId(req.params.id),
-        },
-      };
-      resolve(fileInfo);
-    });
-  },
-});
-
-const upload = multer({ storage }).single('answer');
+const answerFileController = require('../controllers/answerUpload');
 
 /**
  * @swagger
@@ -76,22 +36,7 @@ const upload = multer({ storage }).single('answer');
  *         description: Document Uploaded
  */
 
-router.post('/upload_answers/:id/questions/:questionId', async (req, res) => {
-  const answerId = req.params.id;
-  const questionId = req.params.questionId;
-
-  const response = upload(req, res, (err) => {
-    if (!req.file) {
-      return res.status(400).send({ error: 'No file attached. Please attach a file' });
-    } else {
-      return res.status(200).json({
-        status: 'success',
-        message: 'Document uploaded successfully',
-        data: req.file,
-      });
-    }
-  });
-});
+router.post('/upload_answers/:id/questions/:questionId', answerFileController.uploadAnswer);
 
 /**
  * @swagger
@@ -110,25 +55,7 @@ router.post('/upload_answers/:id/questions/:questionId', async (req, res) => {
  *         description: Document found
  */
 
-router.get('/answer_info/:id', async (req, res) => {
-  bucket
-    .find({
-      'metadata.answerID': new mongoose.Types.ObjectId(req.params.id),
-    })
-    .toArray((message, files) => {
-      if (!files || files.length === 0) {
-        return res.status(404).json({
-          status: 'failed',
-          message: 'No document exists',
-        });
-      }
-      res.status(200).json({
-        status: 'success',
-        message: 'Document found',
-        data: files,
-      });
-    });
-});
+router.get('/answer_info/:id', answerFileController.getAnswerFileInfo);
 
 /**
  * @swagger
@@ -147,21 +74,7 @@ router.get('/answer_info/:id', async (req, res) => {
  *         description: Document downloaded
  */
 
-router.get('/download_answer/:id', async (req, res) => {
-  bucket
-    .find({
-      _id: new mongoose.Types.ObjectId(req.params.id),
-    })
-    .toArray((message, file) => {
-      if (!file || file.length === 0) {
-        return res.status(404).json({
-          message: 'No documents exist',
-        });
-      }
-      var readStream = bucket.openDownloadStream(file[0]._id);
-      readStream.pipe(res);
-    });
-});
+router.get('/download_answer/:id', answerFileController.downloadAnswer);
 
 /**
  * @swagger
@@ -180,20 +93,6 @@ router.get('/download_answer/:id', async (req, res) => {
  *         description: Answer deleted
  */
 
-router.delete('/:id', async (req, res) => {
-  bucket.find({ _id: new mongoose.Types.ObjectId(req.params.id) }).toArray((err, file) => {
-    if (!file || file.length == 0) {
-      res.status(200).json({
-        status: 'failed',
-        message: 'No document exist',
-      });
-    }
-    bucket.delete(file[0]._id);
-    res.status(200).json({
-      status: 'success',
-      message: 'Document deleted',
-    });
-  });
-});
+router.delete('/:id', answerFileController.deleteAnswer);
 
 module.exports = router;
