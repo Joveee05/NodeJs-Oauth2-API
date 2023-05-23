@@ -5,12 +5,8 @@ const questionController = require('../controllers/questionController');
 const APIFeatures = require('../utils/apiFeatures');
 const Question = require('../models/questions');
 const router = express.Router({ mergeParams: true });
-let {
-  addQuestion,
-  updateView,
-  updateQuestion,
-  removeQuestion,
-} = require('../controllers/questionController');
+let { addQuestion, updateView, updateQuestion, removeQuestion } = require('../controllers/questionController');
+const { deleteQuestionFile } = require('../controllers/fileUpload');
 const AppError = require('../utils/appError');
 
 /**
@@ -25,9 +21,7 @@ const AppError = require('../utils/appError');
 
 router.get('/top_questions', async (req, res, next) => {
   const allQuestions = await Question.find();
-  const features = new APIFeatures(Question.find(), req.query)
-    .sortByAnswers()
-    .paginate();
+  const features = new APIFeatures(Question.find(), req.query).sortByAnswers().paginate();
   const topQuestion = await features.query;
   res.status(200).json({
     status: 'success',
@@ -62,10 +56,7 @@ router.get('/search', async (req, res, next) => {
 
   if (data.length < 1) {
     return next(
-      new AppError(
-        'Oops... No question found. This may be due to a spelling error. Try searching again.',
-        404
-      )
+      new AppError('Oops... No question found. This may be due to a spelling error. Try searching again.', 404)
     );
   } else {
     res.status(200).json({
@@ -87,9 +78,7 @@ router.get('/search', async (req, res, next) => {
  */
 router.get('/', async (req, res) => {
   const allQuestions = await Question.find();
-  const features = new APIFeatures(Question.find(), req.query)
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Question.find(), req.query).sort().paginate();
   const questions = await features.query;
   res.status(200).json({
     status: 'success',
@@ -148,12 +137,7 @@ router.use(authController.protect);
 
 router.get('/me/myQuestions', async (req, res, next) => {
   const allMyQuestions = await Question.find({ user: req.user.id });
-  const features = new APIFeatures(
-    Question.find({ user: req.user.id }),
-    req.query
-  )
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Question.find({ user: req.user.id }), req.query).sort().paginate();
   const getMyQuestions = await features.query;
 
   if (getMyQuestions.length < 1) {
@@ -270,6 +254,7 @@ router.patch('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   let response = await removeQuestion(req.params.id);
+  await deleteQuestionFile(req.params.id);
   try {
     res.status(200).json(response);
   } catch (err) {
