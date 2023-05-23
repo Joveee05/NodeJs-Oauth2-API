@@ -70,11 +70,7 @@ const updateSchedule = async function (id) {
 };
 
 const updateNumOfBookings = async function (id) {
-  const result = await Tutor.findByIdAndUpdate(
-    id,
-    { $inc: { numOfBookings: 1 } },
-    { new: true }
-  );
+  const result = await Tutor.findByIdAndUpdate(id, { $inc: { numOfBookings: 1 } }, { new: true });
   if (result) {
     await result.save({ validateBeforeSave: false });
   } else {
