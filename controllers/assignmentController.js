@@ -52,6 +52,20 @@ exports.getAllAssignments = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.protectAssignment = catchAsync(async (req, res, next) => {
+  const assignment = await Assignment.findById(req.params.id);
+  if (!assignment) {
+    return next(new AppError('No assignment found in the database with this id.', 404));
+  } else if (
+    !(assignment.postedBy._id == req.user.id) &&
+    !(req.user.role === 'tutor') &&
+    !(req.user.role === 'admin')
+  ) {
+    return next(new AppError('Oops.. You do not have the permission to view this assignment', 403));
+  }
+  next();
+});
+
 exports.getAssignment = catchAsync(async (req, res, next) => {
   const assignment = await Assignment.findById(req.params.id);
   if (!assignment) {
