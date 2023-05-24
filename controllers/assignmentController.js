@@ -175,6 +175,7 @@ exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   const response = await addAnswer(body);
   const answerId = response.data.id;
   if (response.success == true) {
+    await assignmentCompletedStatus(assignmentId);
     await createNotification('assignment complete', message2, user, assignmentId, answerId);
     return res.status(201).json(response);
   } else {
