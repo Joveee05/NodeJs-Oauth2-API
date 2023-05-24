@@ -8,9 +8,9 @@ router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.get('/search_assignments', assignmentController.searchAssignment);
 
-router.get('/:id', assignmentController.getAssignment);
-
 router.use(authController.protect);
+
+router.get('/:id', assignmentController.protectAssignment, assignmentController.getAssignment);
 
 // router.post('/create-checkout-session/:assignmentId', assignmentController.getCheckoutSession);
 
@@ -142,6 +142,8 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *                      $ref: '#/components/schemas/Assignment'
  *          401:
  *            description: You are not logged in. Please log in to proceed.
+ *          403:
+ *            description: Oops.. You do not have the permission to view this assignment.
  *          404:
  *            description: No assignment found in the database with this id
  *
