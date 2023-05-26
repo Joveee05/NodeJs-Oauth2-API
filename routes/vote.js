@@ -1,15 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-let {
-  findVote,
-  addVote,
-  removeVote,
-  getVotesForUser,
-  getVotesForObject,
-} = require('../controllers/voteController');
-
-router.use(authController.protect);
+let { findVote, addVote, removeVote, getVotesForUser, getVotesForObject } = require('../controllers/voteController');
 
 /**
  * @swagger
