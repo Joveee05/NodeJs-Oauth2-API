@@ -9,6 +9,7 @@ const { createNotification, assignmentCompletedStatus } = require('./utility');
 const { addAnswer, getAnswerByOptions } = require('./answerController');
 const { deleteAssignmentFile } = require('./assignmentUpload');
 const Email = require('../utils/email');
+const Tutor = require('../models/tutorModel');
 
 const message = 'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
 
@@ -50,6 +51,17 @@ exports.getAllAssignments = catchAsync(async (req, res, next) => {
     results: assignments.length,
     data: assignments,
   });
+});
+
+exports.checkUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.query.user);
+  if (!user) {
+    const tutor = await Tutor.findById(req.query.user);
+    req.user = tutor;
+  } else {
+    req.user = user;
+  }
+  next();
 });
 
 exports.protectAssignment = catchAsync(async (req, res, next) => {
