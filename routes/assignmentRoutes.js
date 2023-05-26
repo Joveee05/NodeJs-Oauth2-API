@@ -8,9 +8,14 @@ router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.get('/search_assignments', assignmentController.searchAssignment);
 
-router.use(authController.protect);
+router.get(
+  '/:id',
+  assignmentController.checkUser,
+  assignmentController.protectAssignment,
+  assignmentController.getAssignment
+);
 
-router.get('/:id', assignmentController.protectAssignment, assignmentController.getAssignment);
+router.use(authController.protect);
 
 // router.post('/create-checkout-session/:assignmentId', assignmentController.getCheckoutSession);
 
@@ -127,10 +132,12 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *        summary: Get assignment by id
  *        tags: [Assignments]
  *        parameters:
+ *          - in: query
+ *            name: user
+ *            required: true
+ *            description: The user Id
  *          - in: path
  *            name: id
- *            schema:
- *              type: string
  *            required: true
  *            description: The assignment id
  *        responses:
