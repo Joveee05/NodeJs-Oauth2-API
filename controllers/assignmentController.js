@@ -73,7 +73,7 @@ exports.protectAssignment = catchAsync(async (req, res, next) => {
     !(req.user.role === 'tutor') &&
     !(req.user.role === 'admin')
   ) {
-    return next(new AppError('Oops.. You do not have the permission to view this assignment', 403));
+    return next(new AppError('Oops.. You do not have the permission to view this assignment answer', 403));
   }
   next();
 });
