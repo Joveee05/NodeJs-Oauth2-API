@@ -35,12 +35,7 @@ router.post(
   tutorController.sendToTutor
 );
 
-router.patch(
-  '/verify-tutor',
-  authController.protect,
-  authController.restrictTo('admin'),
-  tutorController.verifyTutor
-);
+router.patch('/verify-tutor', authController.protect, authController.restrictTo('admin'), tutorController.verifyTutor);
 
 router.patch(
   '/cancel_verification',
@@ -54,16 +49,8 @@ router.get('/search_tutors', tutorController.searchTutor);
 router
   .route('/:id')
   .get(tutorController.getTutor)
-  .patch(
-    authController.protect,
-    authController.restrictTo('admin'),
-    tutorController.updateTutor
-  )
-  .delete(
-    authController.protect,
-    authController.restrictTo('admin'),
-    tutorController.deleteTutor
-  );
+  .patch(authController.protect, authController.restrictTo('admin'), tutorController.updateTutor)
+  .delete(authController.protect, authController.restrictTo('admin'), tutorController.deleteTutor);
 
 router.get('/', tutorController.getAllTutors);
 
@@ -72,6 +59,13 @@ router.get(
   authController.protect,
   authController.restrictTo('admin'),
   tutorController.getUnverifiedTutors
+);
+
+router.get(
+  '/all_tutors/verified',
+  authController.protect,
+  authController.restrictTo('admin'),
+  tutorController.getVerifiedTutors
 );
 
 router.use(auth.protect);
@@ -85,11 +79,7 @@ router.patch(
 
 router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
 
-router.delete(
-  '/me/delete_me',
-  tutorController.getMe,
-  tutorController.deleteTutor
-);
+router.delete('/me/delete_me', tutorController.getMe, tutorController.deleteTutor);
 
 router.patch('/me/updateMyPassword', auth.updatePassword);
 
@@ -748,6 +738,34 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  * /tutors/all_tutors/unverified:
  *      get:
  *        summary: Get all admin unverified tutors
+ *        tags: [Tutors]
+ *        parameters:
+ *            - in: query
+ *              name: page
+ *              description: page number
+ *            - in: query
+ *              name: limit
+ *              description: limit
+ *        responses:
+ *          200:
+ *            description: success
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Tutor'
+ *          403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ *          404:
+ *            description: No unverified tutors found in the database.
+ *
+ */
+
+/**
+ * @swagger
+ * /tutors/all_tutors/verified:
+ *      get:
+ *        summary: Get all admin verified tutors
  *        tags: [Tutors]
  *        parameters:
  *            - in: query
