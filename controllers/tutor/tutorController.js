@@ -15,11 +15,7 @@ let {
   assignToTutorStatus,
   updateAssignmentDetails,
 } = require('../utility');
-let {
-  updateQuestion,
-  updateNumOfAns,
-  removeNumOfAns,
-} = require('../tutor/helpers');
+let { updateQuestion, updateNumOfAns, removeNumOfAns } = require('../tutor/helpers');
 const Detail = require('../../models/saveAssignmentModel');
 
 const multerStorage = multer.memoryStorage();
@@ -77,22 +73,34 @@ exports.getAllTutors = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getVerifiedTutors = catchAsync(async (req, res, next) => {
+  const allVerifiedTutors = await Tutor.find({
+    adminVerified: { $ne: false },
+  });
+  const features = new APIFeatures(Tutor.find({ adminVerified: { $ne: false } }), req.query).sort().paginate();
+
+  const tutors = await features.query;
+  if (tutors.length < 1 || allVerifiedTutors.length < 1) {
+    return next(new AppError('No unverified tutors found in the database.', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${allVerifiedTutors.length} verified tutors found in database`,
+    allTutors: allVerifiedTutors.length,
+    results: tutors.length,
+    data: tutors,
+  });
+});
+
 exports.getUnverifiedTutors = catchAsync(async (req, res, next) => {
   const allUnverifiedTutors = await Tutor.find({
     adminVerified: { $ne: true },
   });
-  const features = new APIFeatures(
-    Tutor.find({ adminVerified: { $ne: true } }),
-    req.query
-  )
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Tutor.find({ adminVerified: { $ne: true } }), req.query).sort().paginate();
 
   const tutors = await features.query;
   if (tutors.length < 1 || allUnverifiedTutors.length < 1) {
-    return next(
-      new AppError('No unverified tutors found in the database.', 404)
-    );
+    return next(new AppError('No unverified tutors found in the database.', 404));
   }
   res.status(200).json({
     status: 'success',
@@ -153,18 +161,8 @@ exports.updateTutor = catchAsync(async (req, res, next) => {
 });
 
 exports.tutorDocuments = catchAsync(async (req, res, next) => {
-  if (
-    req.body.password ||
-    req.body.passwordConfirm ||
-    req.body.email ||
-    req.body.fullName
-  ) {
-    return next(
-      new AppError(
-        'This route is not for password, name or email updates.',
-        400
-      )
-    );
+  if (req.body.password || req.body.passwordConfirm || req.body.email || req.body.fullName) {
+    return next(new AppError('This route is not for password, name or email updates.', 400));
   }
   const tutor = await Tutor.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -217,9 +215,7 @@ exports.verifyTutor = catchAsync(async (req, res, next) => {
       message: 'Tutor verification successful',
     });
   } else {
-    return next(
-      new AppError('Tutor verification failed. No tutor found.', 404)
-    );
+    return next(new AppError('Tutor verification failed. No tutor found.', 404));
   }
 });
 
@@ -227,9 +223,7 @@ exports.unverifyTutor = catchAsync(async (req, res, next) => {
   const tutorId = req.body.id;
   const tutor = await Tutor.findOne({ _id: tutorId });
   if (tutor.adminVerified == false) {
-    return next(
-      new AppError('This tutor verification has already been revoked', 400)
-    );
+    return next(new AppError('This tutor verification has already been revoked', 400));
   } else if (tutor) {
     tutor.adminVerified = false;
     await tutor.save({ validateBeforeSave: false });
@@ -247,21 +241,14 @@ exports.sendToTutor = catchAsync(async (req, res, next) => {
   const assignmentId = req.body.assignmentId;
   const tutor = await Tutor.findById(tutorId);
   if (!tutorId || !assignmentId) {
-    return next(
-      new AppError('Please provide the tutor and assignment id', 400)
-    );
+    return next(new AppError('Please provide the tutor and assignment id', 400));
   } else if (!tutor) {
     return next(new AppError('No tutor found with this id', 404));
   }
   const message = `Hi ${tutor.fullName}, a student needs your help with an assignment - Admin`;
   await saveAssignmentDetails(tutorId, assignmentId);
   await updateAssignmentStatus(assignmentId);
-  await createNotification(
-    'send assignment to tutor',
-    message,
-    tutorId,
-    assignmentId
-  );
+  await createNotification('send assignment to tutor', message, tutorId, assignmentId);
 
   res.status(200).json({
     status: 'success',
@@ -274,9 +261,7 @@ exports.assignToTutor = catchAsync(async (req, res, next) => {
   const assignmentId = req.body.assignmentId;
   const tutor = await Tutor.findById(tutorId);
   if (!tutorId || !assignmentId) {
-    return next(
-      new AppError('Please provide the tutor and assignment id', 400)
-    );
+    return next(new AppError('Please provide the tutor and assignment id', 400));
   } else if (!tutor) {
     return next(new AppError('No tutor found with this id', 404));
   }
@@ -294,10 +279,7 @@ exports.assignToTutor = catchAsync(async (req, res, next) => {
 exports.acceptAssignment = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const tutorId = req.params.tutorId;
-  const assignment = await Detail.findOne({ assignmentID: id })
-    .where('tutorID')
-    .equals(tutorId)
-    .exec();
+  const assignment = await Detail.findOne({ assignmentID: id }).where('tutorID').equals(tutorId).exec();
   if (!id) {
     return next(new AppError('Please provide the assignment id', 400));
   } else if (!assignment) {
@@ -316,10 +298,7 @@ exports.acceptAssignment = catchAsync(async (req, res, next) => {
 exports.rejectAssignment = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const tutorId = req.params.tutorId;
-  const assignment = await Detail.findOne({ assignmentID: id })
-    .where('tutorID')
-    .equals(tutorId)
-    .exec();
+  const assignment = await Detail.findOne({ assignmentID: id }).where('tutorID').equals(tutorId).exec();
   if (!id) {
     return next(new AppError('Please provide the assignment id', 400));
   } else if (!assignment) {
@@ -375,13 +354,7 @@ exports.tutorAnswer = catchAsync(async (req, res, next) => {
   if (answer) {
     updateQuestion(questionId, req);
     updateNumOfAns(req.user.id);
-    await createNotification(
-      'tutor answer to question',
-      message,
-      userID,
-      questionId,
-      answerID
-    );
+    await createNotification('tutor answer to question', message, userID, questionId, answerID);
   }
   res.status(201).json({
     status: 'success',
@@ -392,12 +365,7 @@ exports.tutorAnswer = catchAsync(async (req, res, next) => {
 
 exports.myQuestions = catchAsync(async (req, res, next) => {
   const allMyQuestions = await Question.find({ tutor: req.user.id });
-  const features = new APIFeatures(
-    Question.find({ tutor: req.user.id }),
-    req.query
-  )
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Question.find({ tutor: req.user.id }), req.query).sort().paginate();
   const getMyQuestions = await features.query;
 
   if (getMyQuestions.length < 1) {
@@ -413,10 +381,7 @@ exports.myQuestions = catchAsync(async (req, res, next) => {
 
 exports.myAnswers = catchAsync(async (req, res, next) => {
   const allMyAnswers = await Answer.find({ answeredByTutor: req.user.id });
-  const features = new APIFeatures(
-    Answer.find({ answeredByTutor: req.user.id }),
-    req.query
-  )
+  const features = new APIFeatures(Answer.find({ answeredByTutor: req.user.id }), req.query)
     .sortByTimeStamp()
     .paginate();
   const getMyAnswers = await features.query;
@@ -453,12 +418,7 @@ exports.searchTutor = catchAsync(async (req, res, next) => {
   });
 
   if (data.length < 1) {
-    return next(
-      new AppError(
-        'Oops... No tutor found. This may be due to a spelling error. Try searching again.',
-        404
-      )
-    );
+    return next(new AppError('Oops... No tutor found. This may be due to a spelling error. Try searching again.', 404));
   } else {
     res.status(200).json({
       status: 'success',
