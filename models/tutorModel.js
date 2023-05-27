@@ -32,9 +32,11 @@ const tutorSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    languageSpoken: {
-      type: String,
-    },
+    languageSpoken: [
+      {
+        type: String,
+      },
+    ],
     languageLevel: {
       type: String,
     },
@@ -184,10 +186,7 @@ tutorSchema.methods.correctPassword = async function (password) {
 
 tutorSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimeStamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10
-    );
+    const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
 
     return JWTTimestamp < changedTimeStamp;
   }
@@ -198,10 +197,7 @@ tutorSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 tutorSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
 
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
