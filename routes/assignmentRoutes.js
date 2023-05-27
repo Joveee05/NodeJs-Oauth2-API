@@ -8,11 +8,13 @@ router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.get('/search_assignments', assignmentController.searchAssignment);
 
+router.get('/:id', assignmentController.getAssignment);
+
 router.get(
-  '/:id',
+  '/:id/answers',
   assignmentController.checkUser,
   assignmentController.protectAssignment,
-  assignmentController.getAssignment
+  assignmentController.getAssignmentAnswer
 );
 
 router.use(authController.protect);
@@ -20,8 +22,6 @@ router.use(authController.protect);
 // router.post('/create-checkout-session/:assignmentId', assignmentController.getCheckoutSession);
 
 router.post('/:assignmentId/send_answer', authController.restrictTo('admin'), assignmentController.assignmentAnswer);
-
-router.get('/:id/answers', assignmentController.getAssignmentAnswer);
 
 router.get('/tutors_accepted/:id', assignment.findAcceptedAssignments);
 
@@ -132,10 +132,6 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *        summary: Get assignment by id
  *        tags: [Assignments]
  *        parameters:
- *          - in: query
- *            name: user
- *            required: true
- *            description: The user Id
  *          - in: path
  *            name: id
  *            required: true
@@ -537,6 +533,10 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *     summary: Get all answers for particular assignment
  *     tags: [Assignments]
  *     parameters:
+ *      - in: query
+ *        name: user
+ *        required: true
+ *        description: The user Id
  *      - in: path
  *        name: id
  *        required: true
