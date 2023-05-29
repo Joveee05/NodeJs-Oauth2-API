@@ -79,7 +79,7 @@ const tutorSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxLength: 500,
+      maxLength: 1500,
     },
     aboutMe: {
       type: String,
