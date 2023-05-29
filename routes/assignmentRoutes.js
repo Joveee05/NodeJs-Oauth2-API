@@ -4,11 +4,15 @@ const authController = require('../controllers/authController');
 const assignment = require('../controllers/sentAssignments');
 const router = express.Router({ mergeParams: true });
 
+router.get('/unanswered_assignments', assignmentController.getUnansweredAssignments);
+
 router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.get('/search_assignments', assignmentController.searchAssignment);
 
-router.get('/:id', assignmentController.getAssignment);
+router.get('/all_accepted_assignments', assignment.acceptedAssignment);
+
+router.get('/all_rejected_assignments', assignment.rejectedAssignment);
 
 router.get(
   '/:id/answers',
@@ -16,6 +20,8 @@ router.get(
   assignmentController.protectAssignment,
   assignmentController.getAssignmentAnswer
 );
+
+router.get('/:id', assignmentController.getAssignment);
 
 router.use(authController.protect);
 
@@ -36,10 +42,6 @@ router.get('/users/:id', authController.restrictTo('admin'), assignmentControlle
 router.get('/me/my_assignments', assignmentController.getMyAssignments);
 
 router.post('/new_assignment', assignmentController.createAssignment);
-
-router.get('/all_accepted_assignments', authController.restrictTo('admin'), assignment.acceptedAssignment);
-
-router.get('/all_rejected_assignments', authController.restrictTo('admin'), assignment.rejectedAssignment);
 
 router.route('/:id').patch(assignmentController.updateAssignment).delete(assignmentController.deleteAssignment);
 
@@ -68,6 +70,12 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *           description:
  *              type: String
  *              description: A brief descrition by the user
+ *           postedBy:
+ *              type: String
+ *              description: The user that posted the assignment
+ *           status:
+ *              type: String
+ *              description: The current assignment status
  *           amount:
  *              type: Number
  *              description: The amount the user wishes to pay for his assignment to be answered
@@ -79,6 +87,8 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *          courseName: PRE582
  *          email: max@example.com
  *          description: I need help doing this assignment
+ *          postedBy: 65648ffa94874749b5
+ *          status: submitted
  *          amount: $20
  *          deadLine: 2023-04-23
  *          assignmentID: 65463thd22gegge
@@ -546,6 +556,33 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *     responses:
  *       200:
  *         description: Returns the requested answers
+ */
+
+/**
+ * @swagger
+ * /assignments/unanswered_assignments:
+ *      get:
+ *        summary: Get all unanswered aassignments
+ *        tags: [Assignments]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
+ *        responses:
+ *          200:
+ *            description: 200 unanswered assignments
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *          404:
+ *            description: No unanswered assignments found.
+ *          500:
+ *            description: Internal server error.
+ *
  */
 
 module.exports = router;
