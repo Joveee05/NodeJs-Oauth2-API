@@ -200,6 +200,22 @@ exports.getAssignmentAnswer = catchAsync(async (req, res, next) => {
   res.json(response);
 });
 
+exports.getUnansweredAssignments = catchAsync(async (req, res, next) => {
+  const allAssignment = await Assignment.find({ status: 'submitted' });
+  const features = new APIFeatures(Assignment.find({ status: 'submitted' }), req.query).sort().paginate();
+  const assignment = await features.query;
+  if (assignment.length < 1 || allAssignment.length < 1) {
+    return next(new AppError('No unanswered assignments found', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${assignment.length} unanswered assignments`,
+    allAssignment: allAssignment.length,
+    result: assignment.length,
+    data: assignment,
+  });
+});
+
 // exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 //   const assignmentId = req.params.assignmentId;
 //   const userId = req.user.id;
