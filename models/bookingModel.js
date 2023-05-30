@@ -12,7 +12,7 @@ const bookingSchema = new mongoose.Schema(
     },
     duration: {
       type: String,
-      enum: ['1hour', '2hours'],
+      required: [true, 'A session must have a duration'],
     },
     sessionType: {
       type: String,
