@@ -6,6 +6,7 @@ const AppError = require('../utils/appError');
 const Contact = require('../models/contactUs');
 const Detail = require('../models/saveAssignmentModel');
 const Tutor = require('../models/tutorModel');
+const Schedule = require('../models/scheduleModel');
 
 async function removeVotesForObjectId(id) {
   try {
