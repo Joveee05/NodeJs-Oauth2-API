@@ -12,7 +12,7 @@ module.exports = class Email {
     this.description = booking.description;
     this.price = booking.price;
     this.time = booking.time;
-    this.id = booking._id;
+    this.id = booking.pisqreId;
     this.courseName = booking.courseName;
     this.from = `Pisqre <${process.env.EMAIL_FROM}>`;
   }
