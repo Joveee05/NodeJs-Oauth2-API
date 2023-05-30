@@ -4,27 +4,19 @@ const auth = require('../controllers/tutor/auth');
 const authController = require('../controllers/authController');
 const router = express.Router();
 
-router.post(
-  '/book_session/:tutorId',
-  authController.protect,
-  bookingController.bookSession
-);
+router.post('/book_session/:tutorId', authController.protect, bookingController.bookSession);
 
-router.get(
-  '/my-live-sessions',
-  authController.protect,
-  bookingController.getUserBookings
-);
+router.get('/my-live-sessions', authController.protect, bookingController.getUserBookings);
+
+router.get('/myBookings', auth.protect, bookingController.getMyBookings);
+
+router.get('/', bookingController.getAllBookings);
 
 router
   .route('/bookings/:id')
   .get(bookingController.getBooking)
   .patch(bookingController.updateBooking)
   .delete(bookingController.deleteBooking);
-
-router.get('/', bookingController.getAllBookings);
-
-router.get('/myBookings', auth.protect, bookingController.getMyBookings);
 
 /**
  * @swagger
@@ -226,6 +218,13 @@ router.get('/myBookings', auth.protect, bookingController.getMyBookings);
  *      get:
  *        summary: Get all bookings for a particular tutor who is logged in.
  *        tags: [Bookings]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
  *        responses:
  *          200:
  *            description: Bookings found
@@ -246,6 +245,13 @@ router.get('/myBookings', auth.protect, bookingController.getMyBookings);
  *      get:
  *        summary: Get all bookings for a particular logged in user
  *        tags: [Bookings]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
  *        responses:
  *          200:
  *            description: Bookings found
