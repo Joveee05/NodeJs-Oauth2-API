@@ -72,7 +72,7 @@ const tutorSchema = new mongoose.Schema(
       type: String,
     },
     phoneNumber: {
-      type: Number,
+      type: String,
     },
     timeAvailable: {
       type: Date,
@@ -174,11 +174,6 @@ tutorSchema.pre('save', function (next) {
 
   next();
 });
-
-// tutorSchema.pre(/^find/, function (next) {
-//   this.find({ active: { $ne: false } });
-//   next();
-// });
 
 tutorSchema.methods.correctPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
