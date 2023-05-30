@@ -16,7 +16,10 @@ const bookingSchema = new mongoose.Schema(
     },
     sessionType: {
       type: String,
-      enum: ['Live Session', 'Demo'],
+      required: [true, 'Please provide session type'],
+    },
+    pisqreId: {
+      type: String,
     },
     tutor: {
       type: mongoose.Schema.ObjectId,
@@ -32,7 +35,7 @@ const bookingSchema = new mongoose.Schema(
       ref: 'User',
     },
     price: {
-      type: String,
+      type: Number,
     },
   },
   {
