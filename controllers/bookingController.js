@@ -7,7 +7,7 @@ const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const bookingEmail = require('../utils/bookingEmail');
 const catchAsync = require('../utils/catchAsync');
-const { createNotification, updateNumOfBookings, updateSchedule } = require('./utility');
+const { createNotification, removeSchedule, updateNumOfBookings, updateSchedule } = require('./utility');
 
 const message1 = 'You have successfully booked a Live Session - Admin';
 const message2 = 'This is to notify you that you have an upcoming Live Session - Admin';
@@ -121,6 +121,7 @@ exports.deleteBooking = catchAsync(async (req, res, next) => {
   if (!booking) {
     return next(new AppError('No Live Session Booking found in the database with that ID.', 404));
   } else {
+    await removeSchedule(req.query.schedule);
     res.status(200).json({
       status: 'success',
       message: 'Booking deleted successfully',
