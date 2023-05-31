@@ -70,6 +70,16 @@ const updateSchedule = async function (id) {
   }
 };
 
+const removeSchedule = async function (id) {
+  const result = await Schedule.findById(id);
+  if (result) {
+    result.booked = false;
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid schedule id', 400);
+  }
+};
+
 const updateNumOfBookings = async function (id) {
   const result = await Tutor.findByIdAndUpdate(id, { $inc: { numOfBookings: 1 } }, { new: true });
   if (result) {
@@ -128,6 +138,7 @@ module.exports = {
   updateReply,
   updateNumOfBookings,
   updateSchedule,
+  removeSchedule,
   saveAssignmentDetails,
   updateNotification,
   assignToTutorStatus,
