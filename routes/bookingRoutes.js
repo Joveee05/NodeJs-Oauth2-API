@@ -99,8 +99,6 @@ router
  *            application/json:
  *              schema:
  *                $ref: '#/components/schemas/Booking'
- *        401:
- *            description: You are not logged in. Please log in to get access
  *        404:
  *          description: The Booking was not found
  *        500:
@@ -127,8 +125,6 @@ router
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
- *          401:
- *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: Not found
  *
@@ -147,8 +143,6 @@ router
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
- *          401:
- *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: No Live Session Booking found in the database
  *
@@ -167,11 +161,13 @@ router
  *             type: string
  *          required: true
  *          description: The Booking id
+ *        - in: query
+ *          name: schedule
+ *          required: true
+ *          description: The schedule id
  *      responses:
- *          204:
- *            description: No content
- *          401:
- *            description: You are not logged in. Please log in to get access
+ *          200:
+ *            description: Booking deleted successfully
  *          404:
  *            description: Not found
  */
@@ -206,8 +202,6 @@ router
  *                application/json:
  *                    schema:
  *                       $ref: '#/components/schemas/Booking'
- *          401:
- *            description: You are not logged in. Please log in to get access
  *          500:
  *            description: Internal server error. Try again
  */
@@ -232,8 +226,6 @@ router
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
- *          401:
- *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: Oops... No bookings found!!
  *
@@ -259,8 +251,6 @@ router
  *                application/json:
  *                  schema:
  *                      $ref: '#/components/schemas/Booking'
- *          401:
- *            description: You are not logged in. Please log in to get access
  *          404:
  *            description: Oops... No bookings found!!
  *
