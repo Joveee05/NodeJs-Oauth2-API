@@ -8,13 +8,7 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
-let {
-  createNotification,
-  saveAssignmentDetails,
-  updateAssignmentStatus,
-  assignToTutorStatus,
-  updateAssignmentDetails,
-} = require('../utility');
+let { createNotification, saveAssignmentDetails, updateAssignmentStatus, assignToTutorStatus } = require('../utility');
 let { updateQuestion, updateNumOfAns, removeNumOfAns } = require('../tutor/helpers');
 const Detail = require('../../models/saveAssignmentModel');
 
