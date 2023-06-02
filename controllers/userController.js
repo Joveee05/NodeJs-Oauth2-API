@@ -87,9 +87,7 @@ exports.getAllContacts = catchAsync(async (req, res, next) => {
   const contacts = await features.query;
 
   if (allContacts.length < 1 || contacts.length < 1) {
-    return next(
-      new AppError('No contactUs emails found in the database.', 404)
-    );
+    return next(new AppError('No contactUs emails found in the database.', 404));
   }
   res.status(200).json({
     status: 'success',
@@ -131,9 +129,7 @@ exports.adminReply = catchAsync(async (req, res, next) => {
   const message = req.body.message;
   const contact = await Contact.findById(contactId);
   if (!message || !contact) {
-    return next(
-      new AppError('Please input a message and a valid contact Id', 400)
-    );
+    return next(new AppError('Please input a message and a valid contact Id', 400));
   }
   const fullName = contact.fullName;
   const email = contact.email;
@@ -148,9 +144,7 @@ exports.adminReply = catchAsync(async (req, res, next) => {
 
 exports.getAllAdmins = catchAsync(async (req, res, next) => {
   const allAdmin = await User.find({ role: 'admin' });
-  const features = new APIFeatures(User.find({ role: 'admin' }), req.query)
-    .sort()
-    .paginate();
+  const features = new APIFeatures(User.find({ role: 'admin' }), req.query).sort().paginate();
   const admin = await features.query.select('fullName email role image');
 
   if (allAdmin.length < 1 || admin.length < 1) {
@@ -166,9 +160,7 @@ exports.getAllAdmins = catchAsync(async (req, res, next) => {
 });
 
 exports.addAdmin = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email }).select(
-    'fullName email role image'
-  );
+  const user = await User.findOne({ email: req.body.email }).select('fullName email role image');
 
   if (!user) {
     return next(new AppError('No user found with the email provided', 404));
@@ -186,9 +178,7 @@ exports.addAdmin = catchAsync(async (req, res, next) => {
 });
 
 exports.removeAdmin = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email }).select(
-    'fullName email role image'
-  );
+  const user = await User.findOne({ email: req.body.email }).select('fullName email role image');
 
   if (!user) {
     return next(new AppError('No user found with the email provided', 404));
