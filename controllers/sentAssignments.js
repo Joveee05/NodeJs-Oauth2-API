@@ -25,19 +25,12 @@ exports.getAllSentAssignments = catchAsync(async (req, res, next) => {
 
 exports.getTutorAssignment = catchAsync(async (req, res, next) => {
   const tutor = await Detail.find({ tutorID: req.params.id });
-  const features = new APIFeatures(
-    Detail.find({ tutorID: req.params.id }),
-    req.query
-  )
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Detail.find({ tutorID: req.params.id }), req.query).sort().paginate();
 
   const result = await features.query;
 
   if (tutor.length < 1 || result.length < 1) {
-    return next(
-      new AppError('Oops... No assignments found for this tutor', 404)
-    );
+    return next(new AppError('Oops... No assignments found for this tutor', 404));
   }
   res.status(200).json({
     status: 'success',
@@ -51,9 +44,7 @@ exports.getTutorAssignment = catchAsync(async (req, res, next) => {
 exports.acceptedAssignment = catchAsync(async (req, res, next) => {
   const allAcceptedAssignments = await Detail.find({ accepted: true });
 
-  const features = new APIFeatures(Detail.find({ accepted: true }), req.query)
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Detail.find({ accepted: true }), req.query).sort().paginate();
 
   const assignments = await features.query;
 
@@ -72,9 +63,7 @@ exports.acceptedAssignment = catchAsync(async (req, res, next) => {
 exports.rejectedAssignment = catchAsync(async (req, res, next) => {
   const allRejectedAssignments = await Detail.find({ rejected: true });
 
-  const features = new APIFeatures(Detail.find({ rejected: true }), req.query)
-    .sort()
-    .paginate();
+  const features = new APIFeatures(Detail.find({ rejected: true }), req.query).sort().paginate();
 
   const assignments = await features.query;
 
@@ -91,10 +80,7 @@ exports.rejectedAssignment = catchAsync(async (req, res, next) => {
 });
 
 exports.findAcceptedAssignments = catchAsync(async (req, res, next) => {
-  const assignment = await Detail.find({ assignmentID: req.params.id })
-    .where('accepted')
-    .equals(true)
-    .exec();
+  const assignment = await Detail.find({ assignmentID: req.params.id }).where('accepted').equals(true).exec();
   if (assignment.length < 1) {
     return next(new AppError('No tutor has accepted this assignment', 404));
   }
@@ -108,9 +94,7 @@ exports.findAcceptedAssignments = catchAsync(async (req, res, next) => {
 exports.findTutors = catchAsync(async (req, res, next) => {
   const assignment = await Detail.find({ assignmentID: req.params.id });
   if (assignment.length < 1) {
-    return next(
-      new AppError('This assignment has not been sent to a tutor', 404)
-    );
+    return next(new AppError('This assignment has not been sent to a tutor', 404));
   }
   res.status(200).json({
     status: 'success',
