@@ -132,6 +132,25 @@ const assignmentCompletedStatus = async function (id) {
   }
 };
 
+const assignmentVerificationStatus = async function (id) {
+  const response = await Assignment.findById(id);
+  if (response) {
+    response.status = 'answer verification by admin';
+    await response.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid assignment or tutor id', 400);
+  }
+};
+
+const increaseAssignments = async (tutorId) => {
+  const result = await Tutor.findByIdAndUpdate(tutorId, { $inc: { numOfAssignments: 1 } }, { new: true });
+  if (result) {
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid tutor id', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
@@ -142,6 +161,8 @@ module.exports = {
   saveAssignmentDetails,
   updateNotification,
   assignToTutorStatus,
+  increaseAssignments,
+  assignmentVerificationStatus,
   assignmentCompletedStatus,
   updateAssignmentStatus,
 };
