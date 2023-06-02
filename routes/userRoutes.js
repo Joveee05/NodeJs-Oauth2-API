@@ -24,54 +24,21 @@ router.use(authController.protect);
 
 router.get('/', authController.restrictTo('admin'), userController.getAllUsers);
 
-router.get(
-  '/all_admins',
-  authController.restrictTo('admin'),
-  userController.getAllAdmins
-);
+router.get('/all_admins', authController.restrictTo('admin'), userController.getAllAdmins);
 
-router.patch(
-  '/add_admin',
-  authController.restrictTo('admin'),
-  userController.addAdmin
-);
+router.patch('/add_admin', authController.restrictTo('admin'), userController.addAdmin);
 
-router.patch(
-  '/remove_admin',
-  authController.restrictTo('admin'),
-  userController.removeAdmin
-);
+router.patch('/remove_admin', authController.restrictTo('admin'), userController.removeAdmin);
 
-router.post(
-  '/contactUs/admin_reply/:id',
-  authController.restrictTo('admin'),
-  userController.adminReply
-);
+router.post('/contactUs/admin_reply/:id', authController.restrictTo('admin'), userController.adminReply);
 
-router.get(
-  '/contactUs/:id',
-  authController.restrictTo('admin'),
-  userController.getContact
-);
+router.get('/contactUs/:id', authController.restrictTo('admin'), userController.getContact);
 
-router.delete(
-  '/delete_contact/:id',
-  authController.restrictTo('admin'),
-  userController.deleteContact
-);
+router.delete('/delete_contact/:id', authController.restrictTo('admin'), userController.deleteContact);
 
-router.get(
-  '/all_emails',
-  authController.restrictTo('admin'),
-  userController.getAllContacts
-);
+router.get('/all_emails', authController.restrictTo('admin'), userController.getAllContacts);
 
-router.patch(
-  '/updateMe',
-  userController.uploadUserPhoto,
-  userController.resizeUserPhoto,
-  userController.updateMe
-);
+router.patch('/updateMe', userController.uploadUserPhoto, userController.resizeUserPhoto, userController.updateMe);
 
 router.get('/me', userController.getMe, userController.getUser);
 
