@@ -5,7 +5,12 @@ const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const { createNotification, assignmentCompletedStatus } = require('./utility');
+const {
+  createNotification,
+  assignmentCompletedStatus,
+  assignmentVerificationStatus,
+  increaseAssignments,
+} = require('./utility');
 const { addAnswer, getAnswerByOptions } = require('./answerController');
 const { deleteAssignmentFile } = require('./assignmentUpload');
 const Email = require('../utils/email');
@@ -181,18 +186,38 @@ exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   if (!assignment) {
     return next(new AppError('Invalid or no assignment Id', 404));
   }
-  const user = assignment.postedBy;
+  const user = body.answeredBy;
 
-  const message2 = `Hi ${user.fullName}, the solution to your assignment is now available`;
+  const msg = `Hi ${user.fullName}, thank you for providing the solution to the assignment. The answer is now under admin verification`;
   const response = await addAnswer(body);
   const answerId = response.data.id;
   if (response.success == true) {
-    await assignmentCompletedStatus(assignmentId);
-    await createNotification('assignment complete', message2, user, assignmentId, answerId);
+    await assignmentVerificationStatus(assignmentId);
+    await increaseAssignments(user);
+    await createNotification('assignment verification', msg, user, assignmentId, answerId);
     return res.status(201).json(response);
   } else {
     return res.status(404).json(response);
   }
+});
+
+exports.verifyAssignmentAnswers = catchAsync(async (req, res, next) => {
+  const assignmentId = req.params.assignmentId;
+  const assignment = await Assignment.findById(assignmentId);
+  if (!assignment) {
+    return next(new AppError('Invalid or no assignment Id', 404));
+  }
+  const user = assignment.postedBy;
+  const message2 = `Hi ${user.fullName}, the solution to your assignment is now available`;
+
+  await assignmentCompletedStatus(assignmentId);
+  await createNotification('assignment complete', message2, user, assignmentId);
+  await new Email(user).notifyUser();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Answer successfully verified',
+  });
 });
 
 exports.getAssignmentAnswer = catchAsync(async (req, res, next) => {
