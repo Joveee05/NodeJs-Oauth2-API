@@ -2,6 +2,7 @@ const express = require('express');
 const assignmentController = require('../controllers/assignmentController');
 const authController = require('../controllers/authController');
 const assignment = require('../controllers/sentAssignments');
+const auth = require('../controllers/tutor/auth');
 const router = express.Router({ mergeParams: true });
 
 router.get('/unanswered_assignments', assignmentController.getUnansweredAssignments);
@@ -21,13 +22,19 @@ router.get(
   assignmentController.getAssignmentAnswer
 );
 
+router.post('/:assignmentId/send_answer', auth.protect, assignmentController.assignmentAnswer);
+
 router.get('/:id', assignmentController.getAssignment);
 
 router.use(authController.protect);
 
-// router.post('/create-checkout-session/:assignmentId', assignmentController.getCheckoutSession);
+router.get(
+  '/:assignmentId/verify_answer',
+  authController.restrictTo('admin'),
+  assignmentController.verifyAssignmentAnswers
+);
 
-router.post('/:assignmentId/send_answer', authController.restrictTo('admin'), assignmentController.assignmentAnswer);
+// router.post('/create-checkout-session/:assignmentId', assignmentController.getCheckoutSession);
 
 router.get('/tutors_accepted/:id', assignment.findAcceptedAssignments);
 
@@ -521,6 +528,7 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *      - in: body
  *        name: answer
  *        description: New answer
+ *        required: true
  *        schema:
  *          type: object
  *          properties:
@@ -582,6 +590,27 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *            description: No unanswered assignments found.
  *          500:
  *            description: Internal server error.
+ *
+ */
+
+/**
+ * @swagger
+ * /assignments/{assignmentId}/verify_answer:
+ *   get:
+ *     summary: Verify answer to assignment
+ *     tags: [Assignments]
+ *     parameters:
+ *      - in: path
+ *        name: assignmentId
+ *        required: true
+ *        description: The assignment id
+ *     responses:
+ *       201:
+ *         description: Answer successfully verified
+ *       401:
+ *            description: You are not logged in. Please log in to get access
+ *       403:
+ *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *
  */
 
