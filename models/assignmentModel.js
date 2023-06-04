@@ -30,8 +30,9 @@ const assignmentSchema = new mongoose.Schema(
     pisqreId: {
       type: String,
     },
-    assignmentID: {
+    tutorID: {
       type: mongoose.Schema.ObjectId,
+      ref: 'Tutor',
     },
   },
   {
