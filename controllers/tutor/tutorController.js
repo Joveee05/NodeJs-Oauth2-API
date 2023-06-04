@@ -8,7 +8,13 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
-let { createNotification, saveAssignmentDetails, updateAssignmentStatus, assignToTutorStatus } = require('../utility');
+let {
+  createNotification,
+  saveAssignmentDetails,
+  updateAssignmentStatus,
+  updateTutorId,
+  assignToTutorStatus,
+} = require('../utility');
 let { updateQuestion, updateNumOfAns, removeNumOfAns } = require('../tutor/helpers');
 const Detail = require('../../models/saveAssignmentModel');
 
@@ -260,6 +266,7 @@ exports.assignToTutor = catchAsync(async (req, res, next) => {
     return next(new AppError('No tutor found with this id', 404));
   }
   const message = `Hi ${tutor.fullName}, thanks for accepting to take on this assignment. Please provide the solution within 24hours - Admin`;
+  await updateTutorId(assignmentId, tutorId);
   await assignToTutorStatus(assignmentId, tutorId);
   await createNotification('assign to tutor', message, tutorId, assignmentId);
   await new Email(tutor).sendAssignment();
