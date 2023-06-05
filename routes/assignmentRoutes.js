@@ -7,13 +7,11 @@ const router = express.Router({ mergeParams: true });
 
 router.get('/unanswered_assignments', assignmentController.getUnansweredAssignments);
 
+router.get('/unverified_answers', assignmentController.getUnverifiedAnswers);
+
 router.get('/tutors/:id', assignment.getTutorAssignment);
 
 router.get('/search_assignments', assignmentController.searchAssignment);
-
-router.get('/all_accepted_assignments', assignment.acceptedAssignment);
-
-router.get('/all_rejected_assignments', assignment.rejectedAssignment);
 
 router.get(
   '/:id/answers',
@@ -277,64 +275,6 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: Oops... You have no assignments!!
- *
- */
-
-/**
- * @swagger
- * /assignments/all_accepted_assignments:
- *      get:
- *        summary: Get all accepted assignments
- *        tags: [Assignments]
- *        parameters:
- *            - in: query
- *              name: page
- *              description: page number
- *            - in: query
- *              name: limit
- *              description: limit
- *        responses:
- *          200:
- *            description: 5 assignments found
- *            content:
- *                application/json:
- *                  schema:
- *                      $ref: '#/components/schemas/Assignment'
- *          401:
- *            description: You are not logged in. Please log in to get access
- *          403:
- *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
- *          404:
- *            description: No accepted assignments found in the database
- *
- */
-
-/**
- * @swagger
- * /assignments/all_rejected_assignments:
- *      get:
- *        summary: Get all rejected assignments
- *        tags: [Assignments]
- *        parameters:
- *            - in: query
- *              name: page
- *              description: page number
- *            - in: query
- *              name: limit
- *              description: limit
- *        responses:
- *          200:
- *            description: 5 rejected assignments found
- *            content:
- *                application/json:
- *                  schema:
- *                      $ref: '#/components/schemas/Assignment'
- *          401:
- *            description: You are not logged in. Please log in to get access
- *          403:
- *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
- *          404:
- *            description: No accepted assignments found in the database
  *
  */
 
@@ -611,6 +551,33 @@ router.route('/:id').patch(assignmentController.updateAssignment).delete(assignm
  *            description: You are not logged in. Please log in to get access
  *       403:
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
+ *
+ */
+
+/**
+ * @swagger
+ * /assignments/unverified_answers:
+ *      get:
+ *        summary: Get all unverified aassignment answers
+ *        tags: [Assignments]
+ *        parameters:
+ *          - in: query
+ *            name: page
+ *            description: page number
+ *          - in: query
+ *            name: limit
+ *            description: limit
+ *        responses:
+ *          200:
+ *            description: 200 unverified assignments
+ *            content:
+ *                application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Assignment'
+ *          404:
+ *            description: No unanswered assignments found.
+ *          500:
+ *            description: Internal server error.
  *
  */
 
