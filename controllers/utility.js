@@ -160,6 +160,16 @@ const updateTutorId = async function (id, tutorId) {
   }
 };
 
+const answerVerified = async function (id) {
+  const result = await Assignment.findById(id);
+  if (result) {
+    result.answerVerified = true;
+    await result.save({ validateBeforeSave: false });
+  } else {
+    return new AppError('Inavlid assignment id', 400);
+  }
+};
+
 module.exports = {
   removeVotesForObjectId,
   createNotification,
@@ -172,6 +182,7 @@ module.exports = {
   assignToTutorStatus,
   increaseAssignments,
   updateTutorId,
+  answerVerified,
   assignmentVerificationStatus,
   assignmentCompletedStatus,
   updateAssignmentStatus,
