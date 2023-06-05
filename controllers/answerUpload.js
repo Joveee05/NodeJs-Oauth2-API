@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const { GridFsStorage } = require('multer-gridfs-storage');
+const AppError = require('../utils/appError');
 const fs = require('fs');
 const dotenv = require('dotenv');
 
