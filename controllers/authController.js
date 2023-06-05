@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/userModel');
+const Tutor = require('../models/tutorModel');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const Email = require('../utils/email');
@@ -16,9 +17,7 @@ const signToken = (id) =>
 const sendAccessToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true,
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
@@ -62,8 +61,7 @@ exports.logOut = (req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { email, fullName, firstName, lastName, password, passwordConfirm } =
-    req.body;
+  const { email, fullName, firstName, lastName, password, passwordConfirm } = req.body;
 
   const user = new User({
     googleId: null,
@@ -101,18 +99,13 @@ exports.adminSignUp = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
   if (!token) {
-    return next(
-      new AppError('You are not logged in. Please log in to proceed.', 401)
-    );
+    return next(new AppError('You are not logged in. Please log in to proceed.', 401));
   }
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const currentUser = await User.findById(decoded.id);
@@ -120,12 +113,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next(new AppError('This user no longer exists.', 401));
   }
   if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError(
-        'This user recently changed password. Please log in with new password.',
-        401
-      )
-    );
+    return next(new AppError('This user recently changed password. Please log in with new password.', 401));
   }
   req.user = currentUser;
   res.locals.user = currentUser;
@@ -135,10 +123,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
     try {
-      const decoded = await promisify(jwt.verify)(
-        req.cookies.jwt,
-        process.env.JWT_SECRET
-      );
+      const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
 
       const currentUser = await User.findById(decoded.id);
       if (!currentUser) {
@@ -162,14 +147,23 @@ exports.restrictTo =
   (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
-        new AppError(
-          'You do not have permission to perform this action. Please, Login as Admin to proceed',
-          403
-        )
+        new AppError('You do not have permission to perform this action. Please, Login as Admin to proceed', 403)
       );
     }
     next();
   };
+
+exports.checkUser = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const user = await User.findById(id);
+  if (!user) {
+    const tutor = await Tutor.findById(id);
+    req.user = tutor;
+  } else {
+    req.user = user;
+  }
+  next();
+});
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
@@ -223,10 +217,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  const hashedToken = crypto
-    .createHash('sha256')
-    .update(req.params.token)
-    .digest('hex');
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
