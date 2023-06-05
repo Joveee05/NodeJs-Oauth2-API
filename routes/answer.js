@@ -38,8 +38,6 @@ router.get('/question/:id', async (req, res, next) => {
   res.json(response);
 });
 
-router.use(authController.protect);
-
 router.get('/myAnswers', async (req, res, next) => {
   const allMyAnswers = await Answer.find({ answeredBy: req.user.id });
   const features = new APIFeatures(Answer.find({ answeredBy: req.user.id }), req.query).sortByTimeStamp().paginate();
