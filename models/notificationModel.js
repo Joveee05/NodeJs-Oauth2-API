@@ -11,11 +11,9 @@ const notificationSchema = new mongoose.Schema(
     },
     questionID: {
       type: mongoose.Schema.ObjectId,
-      ref: 'QuestionPageSchema',
     },
     answerID: {
       type: mongoose.Schema.ObjectId,
-      ref: 'AnswerSchema',
     },
     read: {
       type: Boolean,
