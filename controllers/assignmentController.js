@@ -10,13 +10,13 @@ const {
   assignmentCompletedStatus,
   assignmentVerificationStatus,
   increaseAssignments,
+  answerVerified,
 } = require('./utility');
 const { addAnswer, getAnswerByOptions } = require('./answerController');
 const { deleteAssignmentFile } = require('./assignmentUpload');
 const Email = require('../utils/email');
+const answerEmail = require('../utils/answerEmail');
 const Tutor = require('../models/tutorModel');
-
-const message = 'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
   const body = {
@@ -31,6 +31,7 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
   if (!body) {
     return next(new AppError('No request body object', 400));
   }
+  const message = 'We have recieved your assignment. A solution will be provided before your stated deadline - Admin';
   const assignment = await Assignment.create(body);
   await createNotification('new_assignment', message, userId, assignment._id);
 
@@ -175,6 +176,7 @@ exports.searchAssignment = catchAsync(async (req, res, next) => {
 
 exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   const assignmentId = req.params.assignmentId;
+  const adminId = process.env.ADMIN_ID;
   let body = {
     answeredBy: req.user.id,
     question: assignmentId,
@@ -186,15 +188,19 @@ exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   if (!assignment) {
     return next(new AppError('Invalid or no assignment Id', 404));
   }
-  const user = body.answeredBy;
+  const user = await Tutor.findById(body.answeredBy);
 
   const msg = `Hi ${user.fullName}, thank you for providing the solution to the assignment. The answer is now under admin verification`;
+  const msg2 = 'The answer to an assignment has been provided and this requires your urgent verification';
   const response = await addAnswer(body);
   const answerId = response.data.id;
+
   if (response.success == true) {
     await assignmentVerificationStatus(assignmentId);
     await increaseAssignments(user);
     await createNotification('assignment verification', msg, user, assignmentId, answerId);
+    await createNotification('assignment verification', msg2, adminId, assignmentId, answerId);
+    await new answerEmail(user, assignment).verifyAssignment();
     return res.status(201).json(response);
   } else {
     return res.status(404).json(response);
@@ -209,7 +215,7 @@ exports.verifyAssignmentAnswers = catchAsync(async (req, res, next) => {
   }
   const user = assignment.postedBy;
   const message2 = `Hi ${user.fullName}, the solution to your assignment is now available`;
-
+  await answerVerified(assignmentId);
   await assignmentCompletedStatus(assignmentId);
   await createNotification('assignment complete', message2, user, assignmentId);
   await new Email(user).notifyUser();
@@ -235,6 +241,22 @@ exports.getUnansweredAssignments = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: `${assignment.length} unanswered assignments`,
+    allAssignment: allAssignment.length,
+    result: assignment.length,
+    data: assignment,
+  });
+});
+
+exports.getUnverifiedAnswers = catchAsync(async (req, res, next) => {
+  const allAssignment = await Assignment.find({ answerVerified: false });
+  const features = new APIFeatures(Assignment.find({ answerVerified: false }), req.query).sort().paginate();
+  const assignment = await features.query;
+  if (assignment.length < 1 || allAssignment.length < 1) {
+    return next(new AppError('No unverified assignments found', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `${assignment.length} unverified assignments`,
     allAssignment: allAssignment.length,
     result: assignment.length,
     data: assignment,
