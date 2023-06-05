@@ -34,6 +34,10 @@ const assignmentSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'Tutor',
     },
+    answerVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     versionKey: false,
