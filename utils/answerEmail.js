@@ -10,7 +10,7 @@ module.exports = class Email {
     this.amount = assignment.amount;
     this.id = assignment.pisqreId;
     this.courseName = assignment.courseName;
-    this.from = 'Pisqre API <no-reply@pisqre.com>';
+    this.from = `Pisqre API ${process.env.EMAIL_FROM}`;
   }
 
   newTransport() {
