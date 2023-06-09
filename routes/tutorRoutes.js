@@ -89,6 +89,8 @@ router.patch('/update_tutor/:id', tutorController.tutorDocuments);
 
 router.post('/answers/:id', tutorController.tutorAnswer);
 
+router.patch('/answers/:id', tutorController.updateAnswer);
+
 router.delete('/answers/:id', tutorController.deleteAnswer);
 
 router.get('/me/my_questions', tutorController.myQuestions);
@@ -992,6 +994,47 @@ router.get('/me/all_my_answers', tutorController.myAnswers);
  *            description: You do not have permission to perform this action. Please, Login as Admin to proceed
  *          404:
  *            description: No tutor found with this id
+ */
+
+/**
+ * @swagger
+ * /tutors/answers/{id}:
+ *   patch:
+ *     summary: Edit answers for tutors
+ *     tags: [Tutors]
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *        type: string
+ *        required: true
+ *        description: The answer Id
+ *      - in: body
+ *        name: Answer
+ *        description: New answer for tutor
+ *        schema:
+ *          type: object
+ *          properties:
+ *            answer:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Answer updated successfully
+ *         content:
+ *             application/json:
+ *                  schema:
+ *                     example:
+ *                        status: success
+ *                        message: Answer updated successfully
+ *                        data:
+ *                          answeredByTutor: 65747yehd03746hh
+ *                          answer: string
+ *                          question: 65747yehd03746hh
+ *                          answerTimeStamp: 2023-03-19T12:56:27.956Z
+ *                          answerModifiedTimeStamp: 2023-03-19T12:56:27.956Z
+ *                          views: 0
+ *                          votes: 0
+ *                          id: 65408ftegh5464ydgd99
  */
 
 module.exports = router;
