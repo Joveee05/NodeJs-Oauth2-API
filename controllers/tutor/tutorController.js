@@ -8,14 +8,15 @@ const AppError = require('../../utils/appError');
 const Email = require('../../utils/email');
 const catchAsync = require('../../utils/catchAsync');
 const APIFeatures = require('../../utils/apiFeatures');
-let {
+const {
   createNotification,
   saveAssignmentDetails,
   updateAssignmentStatus,
   updateTutorId,
   assignToTutorStatus,
 } = require('../utility');
-let { updateQuestion, updateNumOfAns, removeNumOfAns } = require('../tutor/helpers');
+const { updateQuestion, updateNumOfAns, removeNumOfAns } = require('../tutor/helpers');
+const { updateAnswer } = require('../answerController');
 const Detail = require('../../models/saveAssignmentModel');
 
 const multerStorage = multer.memoryStorage();
@@ -362,6 +363,25 @@ exports.tutorAnswer = catchAsync(async (req, res, next) => {
     message: 'Answer created successfully',
     data: answer,
   });
+});
+
+exports.updateAnswer = catchAsync(async (req, res, next) => {
+  const answerId = req.params.id;
+  const answer = await Answer.findById(answerId);
+  const questionId = answer.question._id;
+
+  const question = await Question.findById(questionId);
+  const userID = question.user._id;
+  const user = await Tutor.findById(req.user.id);
+  const message = `${user.fullName} updated an answer`;
+  let response = await updateAnswer(answerId, req.body);
+
+  if (response.success == true) {
+    await createNotification('updated answer to question', message, userID, questionId, answerId);
+    res.status(200).json(response);
+  } else {
+    res.status(404).json(response);
+  }
 });
 
 exports.myQuestions = catchAsync(async (req, res, next) => {
