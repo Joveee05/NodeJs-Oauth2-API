@@ -74,8 +74,8 @@ const tutorSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
     },
-    timeAvailable: {
-      type: Date,
+    meetLink: {
+      type: String,
     },
     description: {
       type: String,
