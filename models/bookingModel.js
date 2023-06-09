@@ -9,6 +9,7 @@ const bookingSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      required: [true, 'A booking must have a description'],
     },
     duration: {
       type: String,
@@ -33,6 +34,9 @@ const bookingSchema = new mongoose.Schema(
     bookedBy: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
+    },
+    meetLink: {
+      type: String,
     },
     price: {
       type: Number,
