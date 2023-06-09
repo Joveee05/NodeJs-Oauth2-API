@@ -178,7 +178,7 @@ exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   const assignmentId = req.params.assignmentId;
   const adminId = process.env.ADMIN_ID;
   let body = {
-    answeredBy: req.user.id,
+    answeredByTutor: req.user.id,
     question: assignmentId,
     answer: req.body.answer,
     answerTimeStamp: new Date(),
@@ -188,7 +188,7 @@ exports.assignmentAnswer = catchAsync(async (req, res, next) => {
   if (!assignment) {
     return next(new AppError('Invalid or no assignment Id', 404));
   }
-  const user = await Tutor.findById(body.answeredBy);
+  const user = await Tutor.findById(body.answeredByTutor);
 
   const msg = `Hi ${user.fullName}, thank you for providing the solution to the assignment. The answer is now under admin verification`;
   const msg2 = 'The answer to an assignment has been provided and this requires your urgent verification';
