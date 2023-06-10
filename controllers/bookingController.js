@@ -9,8 +9,18 @@ const bookingEmail = require('../utils/bookingEmail');
 const catchAsync = require('../utils/catchAsync');
 const { createNotification, removeSchedule, updateNumOfBookings, updateSchedule } = require('./utility');
 
-const message1 = 'You have successfully booked a Live Session - Admin';
-const message2 = 'This is to notify you that you have an upcoming Live Session - Admin';
+const message1 = 'You have successfully booked a Live Session. The tutor will provide you a Live Session link';
+const message2 =
+  'You have an upcoming Live Session. Please provide meeting link at least 24hours before the start of the session - Admin';
+
+const options = {
+  hour: 'numeric',
+  minute: 'numeric',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  weekday: 'long',
+};
 
 exports.bookSession = catchAsync(async (req, res, next) => {
   const body = {
@@ -21,19 +31,19 @@ exports.bookSession = catchAsync(async (req, res, next) => {
     tutor: req.params.tutorId,
     sessionType: req.body.sessionType,
     bookedBy: req.user.id,
-    time: req.body.time,
+    time: new Intl.DateTimeFormat('en-US', options).format(new Date(req.body.time)),
     pisqreId: Math.floor(Math.random() * 100000000 + 1),
   };
   const user = await User.findById(body.bookedBy);
   const tutor = await Tutor.findById(body.tutor);
   const booking = await Booking.create(body);
   if (booking) {
-    await new bookingEmail(user, tutor, booking).confirmBooking();
-    await new bookingEmail(tutor, user, booking).notifyTutor();
-    await createNotification('live session', message1, body.bookedBy, booking.id);
-    await createNotification('live session', message2, body.tutor, booking.id);
     await updateSchedule(req.query.schedule);
     await updateNumOfBookings(body.tutor);
+    await createNotification('live session', message1, body.bookedBy, booking.id);
+    await createNotification('live session', message2, body.tutor, booking.id);
+    await new bookingEmail(user, tutor, booking).confirmBooking();
+    await new bookingEmail(tutor, user, booking).notifyTutor();
   } else {
     return next(new AppError('There was an issue creating a booking', 500));
   }
