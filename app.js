@@ -82,10 +82,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.set('trust-proxy', true);
 
-app.get('/api', (req, res) => {
-  const ip = req.ip;
-  res.send(ip);
-});
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
