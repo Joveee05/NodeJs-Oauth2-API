@@ -13,15 +13,6 @@ const message1 = 'You have successfully booked a Live Session. The tutor will pr
 const message2 =
   'You have an upcoming Live Session. Please provide meeting link at least 24hours before the start of the session - Admin';
 
-const options = {
-  hour: 'numeric',
-  minute: 'numeric',
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  weekday: 'long',
-};
-
 exports.bookSession = catchAsync(async (req, res, next) => {
   const body = {
     courseName: req.body.courseName,
@@ -31,7 +22,7 @@ exports.bookSession = catchAsync(async (req, res, next) => {
     tutor: req.params.tutorId,
     sessionType: req.body.sessionType,
     bookedBy: req.user.id,
-    time: new Intl.DateTimeFormat('en-US', options).format(new Date(req.body.time)),
+    time: new Date(req.body.time).toUTCString(),
     pisqreId: Math.floor(Math.random() * 100000000 + 1),
   };
   const user = await User.findById(body.bookedBy);
