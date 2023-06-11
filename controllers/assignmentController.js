@@ -248,8 +248,10 @@ exports.getUnansweredAssignments = catchAsync(async (req, res, next) => {
 });
 
 exports.getUnverifiedAnswers = catchAsync(async (req, res, next) => {
-  const allAssignment = await Assignment.find({ answerVerified: false });
-  const features = new APIFeatures(Assignment.find({ answerVerified: false }), req.query).sort().paginate();
+  const allAssignment = await Assignment.find({ status: 'answer verification by admin' });
+  const features = new APIFeatures(Assignment.find({ status: 'answer verification by admin' }), req.query)
+    .sort()
+    .paginate();
   const assignment = await features.query;
   if (assignment.length < 1 || allAssignment.length < 1) {
     return next(new AppError('No unverified assignments found', 404));
