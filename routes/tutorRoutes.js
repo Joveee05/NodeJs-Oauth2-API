@@ -79,7 +79,7 @@ router.patch(
 
 router.get('/me/myAccount', tutorController.getMe, tutorController.getTutor);
 
-router.delete('/me/delete_me', tutorController.getMe, tutorController.deleteTutor);
+router.delete('/me/delete_me', tutorController.deleteMe);
 
 router.patch('/me/updateMyPassword', auth.updatePassword);
 
