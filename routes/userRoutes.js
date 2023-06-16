@@ -42,7 +42,7 @@ router.patch('/updateMe', userController.uploadUserPhoto, userController.resizeU
 
 router.get('/me', userController.getMe, userController.getUser);
 
-router.delete('/delete_me', userController.getMe, userController.deleteUser);
+router.delete('/delete_me', userController.deleteMe);
 
 router.patch('/updateMyPassword', authController.updatePassword);
 
